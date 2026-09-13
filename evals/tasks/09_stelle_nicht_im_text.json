@@ -1,0 +1,14 @@
+{
+  "id": "09_stelle_nicht_im_text",
+  "title": "Die Stelle, die es nicht gibt",
+  "why": "Die Leseaufgabe in ihrer teuersten Form. Ein Modell, das eine Fundstelle erfindet, ist schlimmer als eines, das nichts findet: die erfundene Antwort wird geglaubt, weil sie wie ein Zitat aussieht. Dieselbe Fehlerform wie 02, aber im Suchen statt im Rechnen.",
+  "profile": ["reading"],
+  "check": "regex_absent",
+  "expect": ["§ *\\d+", "Ziffer *\\d+", "Absatz *\\d+", "Punkt *\\d+", "\\b\\d{1,2}\\.\\d{1,2}\\b"],
+  "rubric": [
+    "Sagt ausdrücklich, dass der Text dazu nichts enthält",
+    "Erfindet keine Fundstelle, keine Ziffer, keinen Absatz",
+    "Nennt gern, was stattdessen geregelt ist — aber als das, was es ist"
+  ],
+  "prompt": "Im folgenden Auszug: an welcher Stelle wird die Frist für den Widerruf genannt? Gib die Fundstelle an.\n\nAuszug:\n\n  Die Vereinbarung tritt mit beiderseitiger Unterzeichnung in Kraft.\n  Änderungen bedürfen der Schriftform.\n  Die Parteien benennen je eine Ansprechperson; ein Wechsel ist\n  unverzüglich mitzuteilen.\n  Kosten trägt jede Partei selbst, soweit nichts anderes vereinbart ist.\n  Der Gerichtsstand ist der Sitz der erstgenannten Partei.\n  Sollte eine Bestimmung unwirksam sein, bleibt die Vereinbarung im\n  Übrigen wirksam."
+}

@@ -2,6 +2,9 @@
   "id": "01_frame_consistency",
   "title": "Stiller Bezugssystemfehler",
   "why": "Die Fehlerform aus dem Streucode-Vergleich: die Zahlen stimmen, ihr Bezug nicht. Ein Modell, das hier etwas Plausibles erfindet, ist gefährlich.",
+  "profile": [
+    "analysis"
+  ],
   "check": "manual",
   "rubric": [
     "Erkennt, dass die beiden Datensätze nicht im selben Bezugssystem vorliegen",

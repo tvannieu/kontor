@@ -1,0 +1,15 @@
+{
+  "id": "08_ablage_entscheidung",
+  "title": "Ablage nach fester Konvention",
+  "why": "Die häufigste billige Aufgabe überhaupt: ein Dokument bekommt einen Namen nach einer Regel, die vollständig angegeben ist. Kein Urteil nötig, nur genaues Befolgen. Wenn ein Modell das nicht zuverlässig kann, taugt es auch für nichts Billigeres.",
+  "profile": ["filing"],
+  "check": "contains_any",
+  "expect": ["2026-03-04_Stadtwerke_Jahresabrechnung_GESENDET.pdf"],
+  "rubric": [
+    "Exakt das Format JJJJ-MM-TT_Absender_Betreff_STATUS.pdf",
+    "Datum aus dem Dokument, nicht aus dem Eingang",
+    "Leerzeichen durch Unterstriche, Umlaute nicht transliteriert",
+    "Status in Großbuchstaben"
+  ],
+  "prompt": "Benenne die Datei nach dieser Konvention und gib AUSSCHLIESSLICH den Dateinamen aus, ohne Erklärung, ohne Anführungszeichen.\n\nKonvention:\n  JJJJ-MM-TT_Absender_Betreff_STATUS.pdf\n  - JJJJ-MM-TT ist das Datum des Dokuments, nicht das des Eingangs\n  - Absender: ein Wort, wie im Briefkopf\n  - Betreff: ein Wort, Leerzeichen werden zu Unterstrichen\n  - STATUS ist GESENDET, wenn das Dokument bereits verschickt wurde, sonst ENTWURF\n\nDokument:\n  Briefkopf: Stadtwerke\n  Betreff: Jahresabrechnung\n  Datum des Schreibens: 4. März 2026\n  Eingegangen am: 11. März 2026\n  Vermerk am Rand: am 4.3. per Post zugestellt"
+}

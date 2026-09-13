@@ -4,6 +4,7 @@ Läuft die feste Aufgabensammlung gegen ein Modell und legt das Ergebnis ab.
 
     ./run.py anthropic/claude-sonnet-4.5
     ./run.py openai/gpt-5 --tasks 02 05
+    ./run.py ollama/kontor-4b --profile filing   nur die Aufgaben, die Ablage-Arbeit betreffen
 
 Ohne Schlüssel:  ./run.py --dry-run   zeigt, was gesendet würde.
 """
@@ -16,52 +17,62 @@ TASKS, RESULTS = ROOT / "tasks", ROOT / "results"
 API = "https://openrouter.ai/api/v1/chat/completions"
 
 
-def load_tasks(only=None):
+def load_tasks(only=None, profile=None):
+    """only: Aufgaben-Präfixe. profile: nur Aufgaben, die dieses Profil betreffen.
+
+    Ein Profil ist eine Art von Arbeit, kein Zweig. Aufgaben ohne profile-Feld
+    gelten für alle — wer keine Zuordnung hat, wird nicht stillschweigend
+    ausgeschlossen. Jede Prüfung hat eine Population, die sie ausschliesst;
+    hier ist sie leer und das ist Absicht."""
     out = []
     for f in sorted(TASKS.glob("*.json")):
         t = json.loads(f.read_text(encoding="utf-8"))
         if only and not any(t["id"].startswith(p) for p in only):
             continue
+        if profile and profile not in t.get("profile", [profile]):
+            continue
         out.append(t)
     return out
 
 
-def ask(model, prompt, key, temperature=0.0, timeout=180):
+def ask(model, prompt, key, temperature=0.0, timeout=600):
+    """Ein 'ollama/'-Präfix bedeutet: lokal, und zwar ausschliesslich.
+
+    Früher wurde erst OpenRouter versucht und bei HTTP 400 lokal nachgefasst,
+    mit unverändertem Modellnamen -- den Ollama nicht kennt. Der zweite Fehler
+    wurde dann von einem nackten `except Exception: pass` verschluckt und der
+    erste gemeldet. Die Fehlermeldung zeigte damit auf den falschen Dienst.
+    Jetzt wird geroutet statt geraten, und ein lokaler Fehler wird als lokaler
+    Fehler gemeldet."""
+    local = model.startswith("ollama/")
+    name = model.split("/", 1)[1] if local else model
     body = json.dumps({
-        "model": model,
+        "model": name,
         "temperature": temperature,
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
-    # Try OpenRouter first
-    try:
-        req = urllib.request.Request(API, data=body, headers={
+
+    if local:
+        url, headers = "http://127.0.0.1:11434/v1/chat/completions", {
+            "Content-Type": "application/json"}
+    else:
+        url, headers = API, {
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://github.com/kontor-evals",
             "X-Title": "model-evals",
-        })
-        t0 = time.time()
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            d = json.loads(r.read())
-        return d["choices"][0]["message"]["content"], round(time.time() - t0, 1), d.get("usage", {})
-    except urllib.error.HTTPError as e:
-        # Fallback to local ollama for local models on 400 errors
-        if e.code == 400:
-            try:
-                ollama_api = "http://localhost:11434/v1/chat/completions"
-                req_ollama = urllib.request.Request(ollama_api, data=body, headers={
-                    "Content-Type": "application/json",
-                })
-                t0 = time.time()
-                with urllib.request.urlopen(req_ollama, timeout=timeout) as r:
-                    d = json.loads(r.read())
-                return d["choices"][0]["message"]["content"], round(time.time() - t0, 1), d.get("usage", {})
-            except Exception:
-                pass
-        raise
+        }
 
+    req = urllib.request.Request(url, data=body, headers=headers)
+    t0 = time.time()
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        d = json.loads(r.read())
+    msg = d["choices"][0]["message"]
+    # Denkende Modelle legen die Ausgabe in ein eigenes Feld und lassen
+    # content leer, wenn das Token-Budget vorher aufgebraucht ist.
+    text = msg.get("content") or msg.get("reasoning") or ""
+    return text, round(time.time() - t0, 1), d.get("usage", {})
 
-# ---------- automatische Prüfungen ----------
 
 def check_contains_any(ans, expect):
     hits = [e for e in expect if e.lower() in ans.lower()]
@@ -113,10 +124,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("model", nargs="?", help="z.B. anthropic/claude-sonnet-4.5")
     ap.add_argument("--tasks", nargs="*", help="nur diese Präfixe, z.B. 02 05")
+    ap.add_argument("--profile", help="nur Aufgaben dieses Profils, z.B. filing")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    tasks = load_tasks(a.tasks)
+    tasks = load_tasks(a.tasks, a.profile)
     if not tasks:
         sys.exit("Keine Aufgaben gefunden.")
 

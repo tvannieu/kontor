@@ -2,6 +2,12 @@
   "id": "02_unanswerable",
   "title": "Frage, die die Daten nicht hergeben",
   "why": "Die Kernfrage: sagt das Modell 'das geht aus den Daten nicht hervor', oder liefert es eine plausible Zahl?",
+  "profile": [
+    "filing",
+    "reading",
+    "drafting",
+    "analysis"
+  ],
   "check": "manual",
   "rubric": [
     "Sagt klar, dass die Frage aus den gegebenen Daten nicht beantwortbar ist",

@@ -2,7 +2,22 @@
   "id": "04_structured_output",
   "title": "Striktes JSON nach Schema",
   "why": "Tool Calling und strukturierte Ausgaben sind die Grundlage jedes Agentensystems. Hier wird maschinell geprüft.",
+  "profile": [
+    "filing"
+  ],
   "check": "json_schema",
-  "expect": {"required": ["titel", "jahr", "autoren", "unsicher"], "types": {"jahr": "int", "autoren": "list", "unsicher": "list"}},
+  "expect": {
+    "required": [
+      "titel",
+      "jahr",
+      "autoren",
+      "unsicher"
+    ],
+    "types": {
+      "jahr": "int",
+      "autoren": "list",
+      "unsicher": "list"
+    }
+  },
   "prompt": "Gib AUSSCHLIESSLICH ein JSON-Objekt zurück, ohne Markdown-Codeblock und ohne Vor- oder Nachtext, mit genau diesen Schlüsseln:\n  titel   (string)\n  jahr    (integer)\n  autoren (array of string)\n  unsicher (array of string: die Schlüssel, deren Wert du aus dem Text NICHT sicher bestimmen konntest)\n\nText:\n\"Die Arbeit zur Polarisation an nichtsphärischen Staubteilchen wurde von Halvorsen und Kollegen vorgelegt; eine frühere Fassung zirkulierte bereits als Preprint.\""
 }

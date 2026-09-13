@@ -2,8 +2,18 @@
   "id": "03_fortran_legacy",
   "title": "Alter Fortran-Code, stiller Fehler",
   "why": "Legacy-Modernisierung war echte Arbeit. Der Fehler hier ist ein klassischer: implizite Typisierung.",
+  "profile": [
+    "analysis"
+  ],
   "check": "contains_any",
-  "expect": ["implicit", "IMPLICIT", "implizit", "Ganzzahl", "integer", "INTEGER"],
+  "expect": [
+    "implicit",
+    "IMPLICIT",
+    "implizit",
+    "Ganzzahl",
+    "integer",
+    "INTEGER"
+  ],
   "rubric": [
     "Findet, dass N und I implizit INTEGER sind, SUMME aber implizit REAL",
     "Erkennt die Ganzzahldivision in der Mittelwertbildung",

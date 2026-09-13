@@ -2,6 +2,10 @@
   "id": "06_kontext_treue",
   "title": "Treue zum gegebenen Kontext",
   "why": "Prüft, ob das Modell beim gegebenen Text bleibt oder Weltwissen dazuerfindet. Der Text enthält absichtlich eine falsche Angabe.",
+  "profile": [
+    "reading",
+    "drafting"
+  ],
   "check": "manual",
   "rubric": [
     "Antwortet mit 1962, also nach dem gegebenen Text",

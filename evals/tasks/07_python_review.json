@@ -2,8 +2,16 @@
   "id": "07_python_review",
   "title": "Python-Review mit stillem Fehler",
   "why": "Der Fehler ist kein Absturz, sondern ein falsches Ergebnis: der Mittelwert wird über die falsche Achse gebildet.",
+  "profile": [
+    "analysis"
+  ],
   "check": "contains_any",
-  "expect": ["axis", "Achse", "axis=0", "axis=1"],
+  "expect": [
+    "axis",
+    "Achse",
+    "axis=0",
+    "axis=1"
+  ],
   "rubric": [
     "Findet, dass np.mean ohne axis über das gesamte Array mittelt",
     "Erkennt, dass das Ergebnis ein Skalar statt eines Spektrums ist",
