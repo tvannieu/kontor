@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# kontor — run the agent under a named task profile.
+#
+#   kontor profiles              list them
+#   kontor which                 what this branch is currently set to
+#   kontor run <profile> "..."   one-shot, nothing persists
+#   kontor use <profile>         set this branch's default, then just run `crush`
+#
+# The profile says what KIND of work this is; the config says which model that
+# implies. Deliberately not automatic: deciding "is this a cheap task?" requires
+# understanding the task, which costs more than the cheap task saves.
+set -euo pipefail
+
+CONF="${KONTOR_PROFILES:-$HOME/.config/kontor/profiles.conf}"
+CRUSH="${KONTOR_CRUSH:-crush}"
+[ -r "$CONF" ] || { echo "no profiles at $CONF" >&2; exit 2; }
+
+field() {  # field <profile> <n>
+  awk -v p="$1" -v n="$2" '$1=="profile" && $2==p {
+    if (n==3) print $3; else if (n==4) print $4;
+    else { $1=$2=$3=$4=""; sub(/^ +/,""); gsub(/"/,""); print }
+  }' "$CONF"
+}
+names() { awk '$1=="profile"{print $2}' "$CONF"; }
+
+repo=$(git rev-parse --show-toplevel 2>/dev/null || printf '%s' "$PWD")
+cfg="$repo/crush.json"
+
+case "${1:-}" in
+  profiles|"")
+    printf '%-10s %-26s %s\n' PROFILE MODELL ZWECK
+    while read -r p; do
+      printf '%-10s %-26s %s\n' "$p" "$(field "$p" 3)" "$(field "$p" 0)"
+    done < <(names)
+    ;;
+
+  which)
+    [ -f "$cfg" ] || { echo "no crush.json in $repo" >&2; exit 1; }
+    cur=$(python3 -c 'import json,sys;c=json.load(open(sys.argv[1]));m=c["models"]["large"];print(m["provider"]+"/"+m["model"])' "$cfg")
+    match=$( { while read -r p; do [ "$(field "$p" 3)" = "$cur" ] && echo "$p"; done < <(names); } | head -1 ) || true
+    printf '%s\n  large: %s%s\n' "$(basename "$repo")" "$cur" "${match:+  (profile: $match)}"
+    ;;
+
+  run)
+    p="${2:?usage: kontor run <profile> \"prompt\"}"; shift 2
+    l=$(field "$p" 3); s=$(field "$p" 4)
+    [ -n "$l" ] || { echo "unknown profile: $p" >&2; exit 1; }
+    printf 'kontor: %s — %s\n' "$p" "$l" >&2
+    exec "$CRUSH" run -m "$l" --small-model "$s" "$@"
+    ;;
+
+  use)
+    p="${2:?usage: kontor use <profile>}"
+    l=$(field "$p" 3); s=$(field "$p" 4)
+    [ -n "$l" ] || { echo "unknown profile: $p" >&2; exit 1; }
+    [ -f "$cfg" ] || { echo "no crush.json in $repo" >&2; exit 1; }
+
+    # A local-first branch may reach a hosted model deliberately, per session.
+    # It may not have one as its DEFAULT -- that is the whole of local-first.
+    BCONF="${KONTOR_CONF:-$HOME/.config/kontor/branches.conf}"
+    if [ -r "$BCONF" ]; then
+      # shellcheck disable=SC1090
+      . "$BCONF"
+      for b in "${LOCAL_FIRST[@]:-}"; do
+        if [ "$b" = "$(basename "$repo")" ] && [ "${l%%/*}" != "ollama" ]; then
+          echo "refused: $(basename "$repo") is local-first; '$p' would make a hosted model its default." >&2
+          echo "  A hosted model here is a per-session decision, not a setting." >&2
+          echo "  Use:  kontor run $p \"...\"   (one-shot)  or  ctrl+m inside crush." >&2
+          exit 1
+        fi
+      done
+    fi
+
+    python3 - "$cfg" "$l" "$s" <<'PY'
+import json,sys
+cfg,large,small = sys.argv[1],sys.argv[2],sys.argv[3]
+c = json.load(open(cfg))
+avail = {f"{pid}/{m['id']}" for pid,p in c["providers"].items() for m in p.get("models",[])}
+for want in (large, small):
+    if want not in avail:
+        sys.exit(f"{want} is not available in this branch.\n"
+                 f"  available: {', '.join(sorted(avail))}\n"
+                 f"  a local-first branch cannot use a hosted profile.")
+for slot,spec in (("large",large),("small",small)):
+    prov,mid = spec.split("/",1)
+    c["models"][slot] = {**c["models"].get(slot,{}), "provider":prov, "model":mid}
+json.dump(c, open(cfg,"w"), indent=2); open(cfg,"a").write("\n")
+PY
+    printf 'kontor: %s ist jetzt %s — %s\n' "$(basename "$repo")" "$p" "$l"
+    printf '⚠️  Die naechste Verteilung setzt das zurueck. Fuer dauerhaft: profiles.conf.\n'
+    ;;
+
+  *) echo "usage: kontor [profiles|which|run <p> \"...\"|use <p>]" >&2; exit 2 ;;
+esac

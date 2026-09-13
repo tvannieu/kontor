@@ -18,6 +18,25 @@ Seven tasks. Four are machine-checkable. **Three deliberately have no determinab
 
 Each branch class then adds tasks of its own: administrative prose for one, tabular integrity for another, legacy numerics for a third. The task set is JSON files with a fixed schema, so a new class is new files and not new code.
 
+## Profiles: the part that is built
+
+The selection is by **task profile**, not by branch and not automatically. `tools/kontor` takes a profile name and launches the runner with the models that profile implies:
+
+```
+kontor profiles              list them
+kontor which                 what this branch is set to
+kontor run filing "..."      one-shot; nothing persists
+kontor use reading           set this branch's default
+```
+
+🔑 **Why it is not automatic.** To decide whether a task is cheap, a system has to understand the task — which means a model call, which costs more than the cheap task saves. Every automatic router of this kind spends more deciding than it spends doing. The judgement stays with the person, at the moment they start, which is the only place it is free.
+
+⚠️ **A local-first branch refuses `use` with a hosted profile.** It may reach a hosted model deliberately, per session, with `run` or by switching inside the runner — but it may not have one as its *default*. That distinction is the whole of local-first: a hosted default sends the first question before the thought *which model am I on* arrives.
+
+The first version of this tool did not enforce that and cheerfully made a hosted model the permanent default of a local-first branch. It is enforced now, and verified in both directions: refused where it must be, allowed where it must be.
+
+**Profiles are also the missing input to the question above.** With a task set per profile, "which tier suffices for filing-shaped work" becomes a measurement rather than the estimate currently written into the generated configuration.
+
 ## What is missing
 
 - Enough runs to say anything about a tier. A handful of models is an impression, not a measurement.
