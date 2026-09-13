@@ -21,12 +21,19 @@ Das ist die Fehlerform, auf die es ankommt: diese Systeme scheitern nicht mit ei
 ## Benutzung
 
 ```bash
-export OPENROUTER_API_KEY=sk-or-...      # Schlüssel: openrouter.ai/keys
 ./run.py anthropic/claude-sonnet-4.5     # alle Aufgaben
 ./run.py openai/gpt-5 --tasks 02 05      # nur einzelne
-./run.py --dry-run                       # zeigt nur, was gesendet würde
+./run.py --dry-run                       # zeigt nur, was gesendet würde, ohne Schlüssel
 ./report.py                              # alle Läufe nebeneinander
 ```
+
+**Der Schlüssel steht in keiner Datei.** `run.py` holt ihn aus dem Schlüsselbund des Betriebssystems und fällt erst danach auf eine Umgebungsvariable zurück:
+
+```bash
+security add-generic-password -a "$USER" -s kontor-openrouter -w   # fragt nach, nicht in der History
+```
+
+Damit liegt der Schlüssel weder im Repository noch in einer Shell-Konfiguration, und ein versehentliches `git add` kann ihn nicht erfassen. Die Umgebungsvariable `OPENROUTER_API_KEY` funktioniert weiterhin, ist aber der Notnagel und nicht der Weg.
 
 Über **OpenRouter** liegen neue Modelle meist binnen Stunden nach der Veröffentlichung an, gegen Abrechnung pro Token statt pro Abonnement. Ein Durchlauf kostet je nach Modell wenige Cent.
 
