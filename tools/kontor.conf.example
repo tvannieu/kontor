@@ -1,0 +1,22 @@
+# Kontor instance configuration — example.
+#
+# Copy to ~/.config/kontor/branches.conf and edit. Keep it out of every
+# repository: it is the only place role names and real directories are
+# connected, and it is instance data, not system data.
+
+KONTOR_ROOT="$HOME"
+MANIFEST_SOURCE="$HOME/journal/REPO_MANIFEST.md"
+
+# Branches that default to the local model. Anything whose contents should not
+# leave the machine on a prompt typed without thinking.
+LOCAL_FIRST=(journal counsel ledger applications devotional)
+
+# Branches that default to a hosted model.
+HOSTED=(framework benchmarks thesis paper-1 paper-2 notes slides
+        kitchen studio listings kontor)
+
+# Branches where the agent may read but not write. A retrieval tool by
+# construction rather than by instruction.
+READONLY=(journal)
+
+BRANCHES=("${LOCAL_FIRST[@]}" "${HOSTED[@]}")

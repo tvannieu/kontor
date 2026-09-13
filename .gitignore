@@ -1,0 +1,5 @@
+.crush/
+crush.json
+.DS_Store
+*.local.*
+evals/results/*.json
