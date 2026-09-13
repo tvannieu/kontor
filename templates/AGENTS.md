@@ -1,12 +1,8 @@
 # AGENTS.md — <Branch>
 
-The full working guidelines for this repository live in **`CLAUDE.md`** in this same directory.
-Despite the filename it is model-agnostic — read it first and follow it. `REPO_MANIFEST.md` beside
-it is the map of the whole system.
+The full working guidelines for this repository live in **`CLAUDE.md`** in this same directory. Despite the filename it is model-agnostic — read it first and follow it. `REPO_MANIFEST.md` beside it is the map of the whole system.
 
-`CLAUDE.md` is the single source of truth. This file is only a pointer, kept short so the two
-cannot drift apart — and because some agent tools load both by name, so a full copy here would send
-the same instructions twice before a question is asked.
+`CLAUDE.md` is the single source of truth. This file is only a pointer, kept short so the two cannot drift apart — and because some agent tools load both by name, so a full copy here would send the same instructions twice before a question is asked.
 
 ## If you read nothing else
 

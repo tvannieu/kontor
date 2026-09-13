@@ -2,16 +2,12 @@
 
 Two layers: rules every branch follows, and rules each branch invented for itself.
 
-The second layer is the interesting one. Eleven branches were asked independently what conventions
-they had and which mistake produced each. They work on unrelated things — a thesis, a recipe
-collection, a benchmark suite, correspondence with authorities — and they had **independently
-arrived at the same class of rule.**
+The second layer is the interesting one. Eleven branches were asked independently what conventions they had and which mistake produced each. They work on unrelated things — a thesis, a recipe collection, a benchmark suite, correspondence with authorities — and they had **independently arrived at the same class of rule.**
 
 > **Every one of them had built a mechanism to stop a record from quietly drifting away from
 > reality.**
 
-Nobody coordinated that. It emerged because the same failure kept happening in eleven different
-shapes.
+Nobody coordinated that. It emerged because the same failure kept happening in eleven different shapes.
 
 ---
 
@@ -30,9 +26,7 @@ Inherited across all branches:
 
 ## The rules that stop a record from drifting
 
-Collected from eleven branches. Each is quoted close to how its branch stated it, and each
-survives being moved to a repository about something else entirely — that was the test applied
-before it was written down.
+Collected from eleven branches. Each is quoted close to how its branch stated it, and each survives being moved to a repository about something else entirely — that was the test applied before it was written down.
 
 ### Against silence
 
@@ -83,33 +77,25 @@ before it was written down.
 
 > **Every check has a population it silently excludes. Write down which one.**
 
-A duplicate check keyed on document references and invoice numbers found several duplicates. The
-rows with neither — typed in from a statement rather than from a document — were invisible to it,
-and there were more of them.
+A duplicate check keyed on document references and invoice numbers found several duplicates. The rows with neither — typed in from a statement rather than from a document — were invisible to it, and there were more of them.
 
-This is the single most transportable sentence the system has produced, and it names the failure
-that recurs in [`lessons.md`](lessons.md) four separate times.
+This is the single most transportable sentence the system has produced, and it names the failure that recurs in [`lessons.md`](lessons.md) four separate times.
 
 ### Against automating the part that is the work
 
-One branch admits nothing except through an intake folder, where a session reads each item and
-turns it into something new before filing it.
+One branch admits nothing except through an intake folder, where a session reads each item and turns it into something new before filing it.
 
 > **Placing is the work.** An automated placer would file correctly and produce nothing: the rule
 > protects the interval between arrival and filing, the only place judgement happens. **It would
 > measure as an improvement and leave the tree intact and empty.**
 
-Its own limit, which is also the test for the distribution exception in
-[`architecture.md`](architecture.md): *a generated file with exactly one correct location is not
-content. Content is whatever requires a judgement about where it goes.*
+Its own limit, which is also the test for the distribution exception in [`architecture.md`](architecture.md): *a generated file with exactly one correct location is not content. Content is whatever requires a judgement about where it goes.*
 
 ---
 
 ## Instruction files
 
-Three files at the root of every branch. Agent harnesses resolve them **by name, relative to the
-repository root**, before the first prompt. Moving them into a subfolder breaks nothing visibly —
-a session simply runs without the repository's rules, and nobody is told.
+Three files at the root of every branch. Agent harnesses resolve them **by name, relative to the repository root**, before the first prompt. Moving them into a subfolder breaks nothing visibly — a session simply runs without the repository's rules, and nobody is told.
 
 | File | Role |
 |---|---|
@@ -117,12 +103,7 @@ a session simply runs without the repository's rules, and nobody is told.
 | `AGENTS.md` | A short pointer to `CLAUDE.md` plus a few rules that prevent irreversible damage. |
 | `REPO_MANIFEST.md` | The map. Distributed, not linked — an identical copy in each branch. |
 
-🔑 **Why `AGENTS.md` is a pointer and not a copy.** It began as a full duplicate of `CLAUDE.md`.
-Neither file mentioned the other existed, so the first edit to either would have diverged them
-silently. What settled it was a measurement rather than taste: some agent tools load **both** by
-name, so a branch was spending roughly 7,000 tokens saying the same thing twice before a question
-was asked — a fifth of a local model's context window. The pointer keeps a damage-prevention block
-rather than being bare, because some harnesses inject one file without reliably opening a second.
+🔑 **Why `AGENTS.md` is a pointer and not a copy.** It began as a full duplicate of `CLAUDE.md`. Neither file mentioned the other existed, so the first edit to either would have diverged them silently. What settled it was a measurement rather than taste: some agent tools load **both** by name, so a branch was spending roughly 7,000 tokens saying the same thing twice before a question was asked — a fifth of a local model's context window. The pointer keeps a damage-prevention block rather than being bare, because some harnesses inject one file without reliably opening a second.
 
 ---
 ← [README](../README.md) · [Architecture](architecture.md) · [Lessons](lessons.md)

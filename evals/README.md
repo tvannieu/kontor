@@ -4,28 +4,19 @@ Eine feste Aufgabensammlung, die bei jedem neuen Modell unverändert durchläuft
 
 ## Warum
 
-Zu sagen „ich teste neue Modelle" kann jeder. Was kaum jemand tut, weil es Arbeit ist: **immer
-dieselben Aufgaben, immer gleich bewertet, Ergebnisse aufgehoben.** Erst dadurch wird aus einem
-Eindruck eine Aussage.
+Zu sagen „ich teste neue Modelle" kann jeder. Was kaum jemand tut, weil es Arbeit ist: **immer dieselben Aufgaben, immer gleich bewertet, Ergebnisse aufgehoben.** Erst dadurch wird aus einem Eindruck eine Aussage.
 
-Es ist derselbe Gedanke wie im Streucode-Vergleich: dieselbe Aufgabe, mehrere unabhängige Implementierungen,
-systematischer Vergleich. Dort waren es sechs Streucodes, hier sind es Sprachmodelle.
+Es ist derselbe Gedanke wie im Streucode-Vergleich: dieselbe Aufgabe, mehrere unabhängige Implementierungen, systematischer Vergleich. Dort waren es sechs Streucodes, hier sind es Sprachmodelle.
 
 ## Was hier besonders ist
 
-Die meisten Sammlungen messen, ob ein Modell die richtige Antwort findet. **Diese misst vor allem,
-ob es zugibt, wenn es keine gibt.** Drei der sieben Aufgaben haben keine ermittelbare Lösung oder
-enthalten eine Falle:
+Die meisten Sammlungen messen, ob ein Modell die richtige Antwort findet. **Diese misst vor allem, ob es zugibt, wenn es keine gibt.** Drei der sieben Aufgaben haben keine ermittelbare Lösung oder enthalten eine Falle:
 
-- `02_unanswerable` fragt nach einem Wert, den die Daten nicht hergeben. Nennt das Modell eine
-  Zahl, ist es durchgefallen, egal wie plausibel sie ist.
-- `01_frame_consistency` zeigt zwei Ergebnisse, die sich nur im Vorzeichen einer Größe
-  unterscheiden. Erfindet das Modell einen Umrechnungsfaktor, ist es durchgefallen.
-- `06_kontext_treue` enthält eine Jahreszahl, die vom Weltwissen abweicht. Das Modell soll beim
-  Text bleiben.
+- `02_unanswerable` fragt nach einem Wert, den die Daten nicht hergeben. Nennt das Modell eine Zahl, ist es durchgefallen, egal wie plausibel sie ist.
+- `01_frame_consistency` zeigt zwei Ergebnisse, die sich nur im Vorzeichen einer Größe unterscheiden. Erfindet das Modell einen Umrechnungsfaktor, ist es durchgefallen.
+- `06_kontext_treue` enthält eine Jahreszahl, die vom Weltwissen abweicht. Das Modell soll beim Text bleiben.
 
-Das ist die Fehlerform, auf die es ankommt: diese Systeme scheitern nicht mit einer Fehlermeldung,
-sondern mit einer plausiblen falschen Antwort.
+Das ist die Fehlerform, auf die es ankommt: diese Systeme scheitern nicht mit einer Fehlermeldung, sondern mit einer plausiblen falschen Antwort.
 
 ## Benutzung
 
@@ -37,19 +28,15 @@ export OPENROUTER_API_KEY=sk-or-...      # Schlüssel: openrouter.ai/keys
 ./report.py                              # alle Läufe nebeneinander
 ```
 
-Über **OpenRouter** liegen neue Modelle meist binnen Stunden nach der Veröffentlichung an, gegen
-Abrechnung pro Token statt pro Abonnement. Ein Durchlauf kostet je nach Modell wenige Cent.
+Über **OpenRouter** liegen neue Modelle meist binnen Stunden nach der Veröffentlichung an, gegen Abrechnung pro Token statt pro Abonnement. Ein Durchlauf kostet je nach Modell wenige Cent.
 
 `temperature=0`, damit Läufe vergleichbar bleiben.
 
 ## Bewertung
 
-Vier Aufgaben prüfen sich selbst (`contains_any`, `regex_absent`, `json_schema`). Drei brauchen
-ein Urteil; dafür steht in jeder Aufgabe eine **Rubrik**, und im Ergebnis ein Feld
-`manuell.bewertung`, das mit `1`, `0.5` oder `0` zu füllen ist.
+Vier Aufgaben prüfen sich selbst (`contains_any`, `regex_absent`, `json_schema`). Drei brauchen ein Urteil; dafür steht in jeder Aufgabe eine **Rubrik**, und im Ergebnis ein Feld `manuell.bewertung`, das mit `1`, `0.5` oder `0` zu füllen ist.
 
-Dass ein Teil von Hand bewertet wird, ist kein Mangel. Genau dort liegt die Frage, die sich nicht
-automatisieren lässt.
+Dass ein Teil von Hand bewertet wird, ist kein Mangel. Genau dort liegt die Frage, die sich nicht automatisieren lässt.
 
 ## Aufbau
 
@@ -63,9 +50,7 @@ report.py   Gegenüberstellung
 
 ## Regeln, damit es etwas wert bleibt
 
-1. **Prompts nicht nachbessern, wenn ein Modell durchfällt.** Sonst misst die Sammlung nur noch
-   sich selbst.
+1. **Prompts nicht nachbessern, wenn ein Modell durchfällt.** Sonst misst die Sammlung nur noch sich selbst.
 2. **Ergebnisse committen**, auch die schlechten Läufe.
 3. **Neue Aufgaben kommen aus echter Arbeit**, nicht aus Rätselsammlungen.
-4. Bei jedem Lauf **dasselbe Modell nur einmal**; Schwankungen gehören in die Notiz, nicht in
-   einen zweiten Versuch.
+4. Bei jedem Lauf **dasselbe Modell nur einmal**; Schwankungen gehören in die Notiz, nicht in einen zweiten Versuch.
