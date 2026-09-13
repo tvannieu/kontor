@@ -1,0 +1,34 @@
+{
+  "modell": "thinkingmachines/inkling:free",
+  "zeit_utc": "2026-09-12T2158",
+  "aufgaben": [
+    {
+      "id": "01_frame_consistency",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    },
+    {
+      "id": "02_unanswerable",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    },
+    {
+      "id": "03_fortran_legacy",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    },
+    {
+      "id": "04_structured_output",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    },
+    {
+      "id": "05_instruktionstreue",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    },
+    {
+      "id": "06_kontext_treue",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    },
+    {
+      "id": "07_python_review",
+      "fehler": "HTTP 403: {\"error\":{\"message\":\"thinkingmachines/inkling:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps\",\"code\":403,\"met"
+    }
+  ]
+}

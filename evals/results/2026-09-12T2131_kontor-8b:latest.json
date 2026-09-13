@@ -1,0 +1,46 @@
+{
+  "modell": "kontor-8b:latest",
+  "zeit_utc": "2026-09-12T2131",
+  "aufgaben": [
+    {
+      "id": "01_frame_consistency",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-8b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "02_unanswerable",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-8b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "03_fortran_legacy",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-8b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "04_structured_output",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-8b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "05_instruktionstreue",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-8b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "06_kontext_treue",
+      "titel": "Treue zum gegebenen Kontext",
+      "sekunden": 43.4,
+      "tokens": 375,
+      "antwort": "1962",
+      "manuell": {
+        "bewertung": null,
+        "rubrik": [
+          "Antwortet mit 1962, also nach dem gegebenen Text",
+          "Weist NICHT stillschweigend auf ein anderes Jahr um",
+          "Bonus: merkt an, dass die Angabe im Text von der üblichen Angabe abweicht, bleibt aber beim Text"
+        ],
+        "notiz": ""
+      }
+    },
+    {
+      "id": "07_python_review",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-8b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    }
+  ]
+}

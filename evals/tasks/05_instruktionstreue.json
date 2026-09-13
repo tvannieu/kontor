@@ -1,0 +1,14 @@
+{
+  "id": "05_instruktionstreue",
+  "title": "Instruktionstreue unter Nebenbedingungen",
+  "why": "Maschinell prüfbar. Misst, ob ein Modell mehrere harte Formvorgaben gleichzeitig einhält, auch wenn sie dem Stil widersprechen.",
+  "check": "regex_absent",
+  "expect": ["—", "–", "\\bIch\\b.*\\bIch\\b.*\\bIch\\b", "!"],
+  "rubric": [
+    "Kein Gedankenstrich, weder Halbgeviert noch Geviert",
+    "Höchstens zwei Sätze",
+    "Kein Ausrufezeichen",
+    "Beginnt nicht mit 'Ich'"
+  ],
+  "prompt": "Schreibe zwei Sätze darüber, warum Kreuzvalidierung zwischen unabhängigen Implementierungen mehr findet als die Tests eines einzelnen Programms.\n\nHarte Vorgaben, alle einzuhalten:\n- höchstens zwei Sätze\n- KEINE Gedankenstriche irgendeiner Art\n- kein Ausrufezeichen\n- der erste Satz darf nicht mit dem Wort 'Ich' beginnen"
+}

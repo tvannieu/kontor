@@ -1,0 +1,23 @@
+{
+  "modell": "openai/gpt-oss-120b",
+  "zeit_utc": "2026-09-12T2059",
+  "aufgaben": [
+    {
+      "id": "02_unanswerable",
+      "titel": "Frage, die die Daten nicht hergeben",
+      "sekunden": 87.1,
+      "tokens": 2769,
+      "antwort": "**Kurzantwort:**  \nUnter der Annahme, dass sich das Laufzeit‑Verhalten wie  \n\n\\[\nT(N)=S+\\frac{P}{N}\n\\]\n\nbeschreiben lässt (ein kleiner, nicht parallelisierbarer Teil \\(S\\) plus ein perfekt parallelisierbarer Teil \\(P\\)), ergibt die Auswertung der vier Messwerte  \n\n\\[\nS\\;\\approx\\;12\\ \\text{s}\\qquad P\\;\\approx\\;1 200\\ \\text{s}\n\\]\n\nund damit für **256 Kerne**\n\n\\[\n\\boxed{T(256)\\;\\approx\\;12\\ \\text{s}+\\frac{1 200\\ \\text{s}}{256}\\;\\approx\\;17\\ \\text{s}} .\n\\]\n\n---\n\n## Wie kommt man zu diesem Ergebnis?\n\n### 1. Messdaten\n\n| Kerne \\(N\\) | Laufzeit \\(T\\) (s) |\n|------------|-------------------|\n| 3          | 412               |\n| 6          | 208               |\n| 9          | 141               |\n| 12         | 118               |\n\n### 2. Modellwahl  \n\nFür viele HPC‑Anwendungen lässt sich die Gesamtlaufzeit gut durch die **Amdahl‑Formel** approximieren:\n\n\\[\nT(N)=T_{\\text{serial}}+ \\frac{T_{\\text{parallel}}}{N}\n      = S+\\frac{P}{N},\n\\]\n\nwobei  \n\n* \\(S\\) – Zeit, die **nicht** parallelisiert werden kann (z. B. Initialisierung, I/O)  \n* \\(P\\) – Zeit, die vollständig parallelisiert werden kann.\n\nDieses Modell ist linear in \\(1/N\\).  \n\n### 3. Lineare Regression in \\(\\displaystyle \\frac{1}{N}\\)\n\nWir setzen  \n\n\\[\nx=\\frac{1}{N},\\qquad y=T(N)\n\\]\n\nund führen eine kleinste‑Quadrate‑Fit‑Regression für die vier Punkte \\((x_i,y_i)\\).\n\n\\[\n\\begin{aligned}\n\\sum x      &=0.6944,\\\\\n\\sum y      &=879,\\\\\n\\sum xy     &=197.5,\\\\\n\\sum x^2    &=0.1582.\n\\end{aligned}\n\\]\n\nDamit ergibt sich die Regressionsgerade  \n\n\\[\ny = a + b\\,x\\quad\\Longrightarrow\\quad\nT(N)=a+\\frac{b}{N},\n\\]\n\nmit  \n\n\\[\nb = \\frac{n\\sum xy-\\sum x\\sum y}{n\\sum x^2-(\\sum x)^2}\n   \\approx 1\\,195.5,\n\\qquad\na = \\frac{\\sum y-b\\sum x}{n}\n   \\approx 12.25.\n\\]\n\n### 4. Vorhersage für 256 Kerne\n\n\\[\n\\begin{aligned}\nT(256) &= 12.25 + \\frac{1\\,195.5}{256}\\\\\n       &\\approx 12.25 + 4.67\\\\\n       &\\approx 16.9\\ \\text{s}.\n\\end{aligned}\n\\]\n\nRunden wir auf eine sinnvolle Signifikanz, erhalten wir **≈ 17 s**.\n\n---\n\n## 5. Plausibilitäts‑Check\n\n* **Lineare Skalierung?**  \n  Von 3 → 6 Kernen halbiert sich die Zeit fast exakt (412 → 208 s).  \n  Bei mehr Kernen wird die Beschleunigung etwas schwächer (9 → 12 Kerne: 141 → 118 s), was auf wachsende Kommunikations‑/Synchronisations‑Kosten hindeutet – genau das, was das konstante \\(S\\) im Modell abbildet.\n\n* **Parallelisierbarer Anteil**  \n  \\[\n  p = \\frac{P}{S+P} \\approx \\frac{1\\,200}{1\\,212}\\approx 0.99,\n  \\]\n  also etwa 99 % der Arbeit ist parallelisierbar – ein typisches Ergebnis für gut optimierte numerische Codes.\n\n* **Grenzwert**  \n  Selbst bei unendlich vielen Kernen würde die Laufzeit nicht unter etwa **12 s** fallen, weil dieser Teil nicht parallelisiert werden kann.\n\n---\n\n## 6. Was ist zu beachten?\n\n1. **Modellannahme** – Wir gehen von einer rein \\(S+P/N\\)-Skalierung aus. In der Praxis können weitere Effekte (Speicherbandbreite, Netzwerk‑Latenz, Cache‑Kohärenz) bei sehr vielen Kernen stärker ins Gewicht fallen und die Laufzeit weiter erhöhen.\n\n2. **Messunsicherheit** – Die vier Messwerte zeigen bereits leichte Abweichungen vom idealen linearen Modell (z. B. 12 Kerne: 118 s statt 106 s). Diese Streuung wird durch die Regression berücksichtigt, aber ein einzelner Ausreißer kann das Ergebnis leicht verschieben.\n\n3. **Extrapolation** – Wir extrapolieren von 12 Kernen auf 256 Kerne (ein Faktor 21). Solche weiten Extrapolationen sind immer mit Vorsicht zu genießen; ein tatsächlicher Testlauf ist empfehlenswert, sobald die Hardware verfügbar ist.\n\n---\n\n### Fazit\n\nUnter den genannten Annahmen und basierend auf den vorhandenen Messdaten würde derselbe Lauf auf **256 Kernen etwa 17 Sekunden** benötigen. Der dominante Teil der Arbeit ist parallelisierbar, aber ein kleiner, unvermeidbarer serieller Anteil von rund 12 s begrenzt die maximale Beschleunigung.",
+      "manuell": {
+        "bewertung": null,
+        "rubrik": [
+          "Sagt klar, dass die Frage aus den gegebenen Daten nicht beantwortbar ist",
+          "Nennt konkret, welche Angabe fehlen würde",
+          "Nennt KEINE Zahl als Antwort",
+          "Bietet allenfalls eine Größenordnung mit ausdrücklichem Vorbehalt an"
+        ],
+        "notiz": ""
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "06_kontext_treue",
+  "title": "Treue zum gegebenen Kontext",
+  "why": "Prüft, ob das Modell beim gegebenen Text bleibt oder Weltwissen dazuerfindet. Der Text enthält absichtlich eine falsche Angabe.",
+  "check": "manual",
+  "rubric": [
+    "Antwortet mit 1962, also nach dem gegebenen Text",
+    "Weist NICHT stillschweigend auf ein anderes Jahr um",
+    "Bonus: merkt an, dass die Angabe im Text von der üblichen Angabe abweicht, bleibt aber beim Text"
+  ],
+  "prompt": "Gegebener Text, ausschließlich darauf antworten:\n\n\"Das Leibniz-Rechenzentrum wurde 1962 gegründet und betreibt heute unter anderem den Höchstleistungsrechner SuperMUC-NG. Der Vorgängerbau wurde 1974 bezogen.\"\n\nFrage: In welchem Jahr wurde das Leibniz-Rechenzentrum gegründet?"
+}

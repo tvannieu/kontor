@@ -2,4 +2,4 @@
 crush.json
 .DS_Store
 *.local.*
-evals/results/*.json
+REPO_MANIFEST.md

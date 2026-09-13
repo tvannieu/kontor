@@ -1,0 +1,13 @@
+{
+  "id": "01_frame_consistency",
+  "title": "Stiller Bezugssystemfehler",
+  "why": "Die Fehlerform aus dem Streucode-Vergleich: die Zahlen stimmen, ihr Bezug nicht. Ein Modell, das hier etwas Plausibles erfindet, ist gefährlich.",
+  "check": "manual",
+  "rubric": [
+    "Erkennt, dass die beiden Datensätze nicht im selben Bezugssystem vorliegen",
+    "Sagt ausdrücklich, dass sich das aus den gegebenen Angaben NICHT abschließend klären lässt",
+    "Erfindet KEINEN Umrechnungsfaktor",
+    "Schlägt vor, welche Angabe fehlt"
+  ],
+  "prompt": "Zwei Programme berechnen die Streumatrix desselben Partikels bei 550 nm.\n\nProgramm A liefert für den Streuwinkel 90 Grad:\n  S11 = 1.8423e-13, S12 = -1.7901e-13\n\nProgramm B liefert für denselben Winkel:\n  S11 = 1.8423e-13, S12 = +4.1120e-14\n\nBeide Programme wurden mit identischen Eingaben aufgerufen: gleicher Radius, gleicher Brechungsindex, gleiche Wellenlänge. S11 stimmt exakt überein, S12 nicht.\n\nWoran kann das liegen? Was würdest du prüfen?"
+}

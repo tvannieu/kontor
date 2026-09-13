@@ -1,0 +1,34 @@
+{
+  "modell": "kontor-4b:latest",
+  "zeit_utc": "2026-09-12T2116",
+  "aufgaben": [
+    {
+      "id": "01_frame_consistency",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "02_unanswerable",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "03_fortran_legacy",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "04_structured_output",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "05_instruktionstreue",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "06_kontext_treue",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    },
+    {
+      "id": "07_python_review",
+      "fehler": "HTTP 400: {\"error\":{\"message\":\"kontor-4b:latest is not a valid model ID\",\"code\":400},\"user_id\":\"user_2zVtzd4hdDijhxGKbehNxIErNPy\"}"
+    }
+  ]
+}
