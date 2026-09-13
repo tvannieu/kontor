@@ -42,9 +42,11 @@ Details: [`docs/architecture.md`](docs/architecture.md) · [`docs/pouch.md`](doc
 
 ## Branch names
 
-Branch names in this repository are **role names** — `counsel`, `ledger`, `journal`, `applications`, `devotional`, `framework`, `benchmarks`, `thesis`, `kitchen`. The real ones are domain-specific and stay private.
+Branch names in this repository are placeholders. The real ones are domain-specific and stay private, and so is the list of which branches fall into which class.
 
-This is not decoration. The classification below is a list of which branches may not reach a hosted model, and a list like that, published under a real name, says a great deal about a life without a single sentence of content. The architecture does not depend on the names.
+This is not decoration, and role names are not enough on their own. A roster of plausible roles says almost exactly what the real names would: a reader infers the domains from the shape of the list, whether the label is the real directory name or a tactful synonym for it.
+
+So there is no roster. What matters architecturally is the **criterion**, not the membership: a branch whose contents must not leave the machine defaults to a local model. Which branches those are is instance data, and instance data lives in the config.
 
 ---
 

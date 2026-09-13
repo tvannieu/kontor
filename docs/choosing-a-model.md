@@ -14,7 +14,7 @@ Seven tasks. Four are machine-checkable. **Three deliberately have no determinab
 
 ## The bridge
 
-🔑 **The three unanswerable tasks are branch-independent.** Every branch needs a model that says *I don't know*. A branch holding correspondence with authorities needs it most, because there the plausible wrong answer is the expensive one — fluent prose that is wrong in the details costs more than an obvious failure.
+🔑 **The three unanswerable tasks are branch-independent.** Every branch needs a model that says *I don't know*. The branches that need it most are the ones where a plausible wrong answer costs more than an obvious failure — fluent prose that is wrong in the details is worse than a refusal, because nothing about it invites checking.
 
 Each branch class then adds tasks of its own: administrative prose for one, tabular integrity for another, legacy numerics for a third. The task set is JSON files with a fixed schema, so a new class is new files and not new code.
 

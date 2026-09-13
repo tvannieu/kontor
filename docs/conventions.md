@@ -2,7 +2,7 @@
 
 Two layers: rules every branch follows, and rules each branch invented for itself.
 
-The second layer is the interesting one. Eleven branches were asked independently what conventions they had and which mistake produced each. They work on unrelated things — a thesis, a recipe collection, a benchmark suite, correspondence with authorities — and they had **independently arrived at the same class of rule.**
+The second layer is the interesting one. Eleven branches were asked independently what conventions they had and which mistake produced each. They work on entirely unrelated things — a manuscript, a recipe collection, a benchmark suite, a set of running administrative matters — and they had **independently arrived at the same class of rule.**
 
 > **Every one of them had built a mechanism to stop a record from quietly drifting away from
 > reality.**
