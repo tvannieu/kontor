@@ -36,6 +36,10 @@ while IFS= read -r t; do
 done < <(grep -vE '^\s*(#|$)' "$DENY")
 
 # 2. domain vocabulary — German first, because the private corpus is German
+# Triaged 14.09.2026: the stem 'diagnos' fired three times on ordinary
+# engineering prose -- diagnosed, diagnostic, Diagnose-of-a-bug. Narrowed to the
+# German medical compound, which does not occur technically. A warning list
+# everyone has learned to ignore is worse than no warning list.
 scan "domain vocabulary" -InEi 'VOCABULARY_KEPT_OUTSIDE_THE_REPOSITORY'
 
 # 3. identifiers: statutes, case numbers, IBANs, mail addresses, API keys, phone numbers

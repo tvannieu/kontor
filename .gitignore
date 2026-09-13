@@ -3,3 +3,4 @@ crush.json
 .DS_Store
 *.local.*
 REPO_MANIFEST.md
+demo/*.gif
