@@ -19,7 +19,7 @@
       "titel": "Striktes JSON nach Schema",
       "sekunden": 122.0,
       "tokens": 4066,
-      "antwort": "{\n  \"titel\": \"Die Arbeit zur Polarisation an nichtsphärischen Staubteilchen\",\n  \"jahr\": null,\n  \"autoren\": [\"Halvorsen\"],\n  \"unsicher\": [\"jahr\"]\n}",
+      "antwort": "{\n  \"titel\": \"Die Arbeit zur Polarisation an nichtsph\u00e4rischen Staubteilchen\",\n  \"jahr\": null,\n  \"autoren\": [\"Halvorsen\"],\n  \"unsicher\": [\"jahr\"]\n}",
       "automatisch": {
         "bestanden": false,
         "notiz": "jahr ist NoneType, erwartet int"
@@ -30,7 +30,7 @@
       "titel": "Instruktionstreue unter Nebenbedingungen",
       "sekunden": 49.6,
       "tokens": 1833,
-      "antwort": "Kreuzvalidierung zwischen unabhängigen Implementierungen ermöglicht eine umfassende Überprüfung der Algorithmusverlässigkeit durch Vergleich verschiedener Ausführungen. Tests eines einzelnen Programms sind hingegen auf eine begrenzte Testumgebung beschränkt und können somit nicht alle potenziellen Fehlerquellen erfassen.",
+      "antwort": "Kreuzvalidierung zwischen unabh\u00e4ngigen Implementierungen erm\u00f6glicht eine umfassende \u00dcberpr\u00fcfung der Algorithmusverl\u00e4ssigkeit durch Vergleich verschiedener Ausf\u00fchrungen. Tests eines einzelnen Programms sind hingegen auf eine begrenzte Testumgebung beschr\u00e4nkt und k\u00f6nnen somit nicht alle potenziellen Fehlerquellen erfassen.",
       "automatisch": {
         "bestanden": true,
         "notiz": "sauber"
@@ -43,13 +43,13 @@
       "tokens": 356,
       "antwort": "1962",
       "manuell": {
-        "bewertung": null,
+        "bewertung": 1,
         "rubrik": [
           "Antwortet mit 1962, also nach dem gegebenen Text",
           "Weist NICHT stillschweigend auf ein anderes Jahr um",
-          "Bonus: merkt an, dass die Angabe im Text von der üblichen Angabe abweicht, bleibt aber beim Text"
+          "Bonus: merkt an, dass die Angabe im Text von der \u00fcblichen Angabe abweicht, bleibt aber beim Text"
         ],
-        "notiz": ""
+        "notiz": "Antwortet mit 1962, also nach dem gegebenen Text. Weist NICHT stillschweigend auf ein anderes Jahr um. Entspricht Rubrik-Linie 1 exakt. Kein Bonus-Hinweis auf den Abweichungscharakter, aber das ist optional."
       }
     },
     {
@@ -57,7 +57,7 @@
       "titel": "Python-Review mit stillem Fehler",
       "sekunden": 87.7,
       "tokens": 3249,
-      "antwort": "Der Fehler liegt darin, dass die Funktion nicht pro Wellenlänge separat mittelt, sondern die gesamte gewichtete Matrix über alle Korngrößen und Wellenlängen hinweg durchschnittlich berechnet. Dies führt zu einem einzigen Wert statt eines Spektrums (Arrays mit einer Wellenlängenkomponente pro Element).\n\n### Ursache:\n- `np.mean(gewichtet)` berechnet den Durchschnitt **über alle Korngrößen und alle Wellenlängen**, nicht pro Wellenlänge.\n- Die korrekte Berechnung des mittleren Spektrums erfordert, für **jede Wellenlänge** den gewichteten Mittelwert über alle Korngrößen zu bilden.\n\n### Lösung:\nVerwende `np.sum(..., axis=0)` zur Berechnung des **gewichteten Summens** pro Wellenlänge und teile durch die **Gesamtsumme der Gewichte**:\n\n```python\nimport numpy as np\n\ndef mittleres_spektrum(qext, gewichte):\n    # qext: (n_groessen, n_wellenlaengen)\n    # gewichte: (n_groessen,)\n    # Gewichtete Summe pro Wellenlänge\n    weighted_sum = np.sum(gewichte[:, None] * qext, axis=0)\n    total_weight = np.sum(gewichte)\n    return weighted_sum / total_weight\n```\n\n### Warum das funktioniert:\n1. `gewichte[:, None]` erweitert die Gewichtsvektoren zu einer Matrix mit Form `(n_groessen, 1)`.\n2. `gewichte[:, None] * qext` multipliziert die Gewichte elementweise mit `qext` (Form `(n_groessen, n_wellenlaengen)`).\n3. `np.sum(..., axis=0)` summiert über alle Korngrößen für **jede Wellenlänge** separat.\n4. `total_weight` ist die Summe aller Gewichte (Skalar).\n5. Das Ergebnis ist ein Array der Länge `n_wellenlaengen`, das das gewichtete Mittel pro Wellenlänge liefert.\n\n### Beispiel:\nFür `qext = [[1, 2, 3], [4, 5, 6]]` und `gewichte = [1, 2]`:\n- **Ergebnis**: `[3, 4, 5]` (korrekt, da `1*1 + 4*2 = 9` → `9/3 = 3`, etc.)\n\nDies entspricht der gewünschten Spektrumberechnung.",
+      "antwort": "Der Fehler liegt darin, dass die Funktion nicht pro Wellenl\u00e4nge separat mittelt, sondern die gesamte gewichtete Matrix \u00fcber alle Korngr\u00f6\u00dfen und Wellenl\u00e4ngen hinweg durchschnittlich berechnet. Dies f\u00fchrt zu einem einzigen Wert statt eines Spektrums (Arrays mit einer Wellenl\u00e4ngenkomponente pro Element).\n\n### Ursache:\n- `np.mean(gewichtet)` berechnet den Durchschnitt **\u00fcber alle Korngr\u00f6\u00dfen und alle Wellenl\u00e4ngen**, nicht pro Wellenl\u00e4nge.\n- Die korrekte Berechnung des mittleren Spektrums erfordert, f\u00fcr **jede Wellenl\u00e4nge** den gewichteten Mittelwert \u00fcber alle Korngr\u00f6\u00dfen zu bilden.\n\n### L\u00f6sung:\nVerwende `np.sum(..., axis=0)` zur Berechnung des **gewichteten Summens** pro Wellenl\u00e4nge und teile durch die **Gesamtsumme der Gewichte**:\n\n```python\nimport numpy as np\n\ndef mittleres_spektrum(qext, gewichte):\n    # qext: (n_groessen, n_wellenlaengen)\n    # gewichte: (n_groessen,)\n    # Gewichtete Summe pro Wellenl\u00e4nge\n    weighted_sum = np.sum(gewichte[:, None] * qext, axis=0)\n    total_weight = np.sum(gewichte)\n    return weighted_sum / total_weight\n```\n\n### Warum das funktioniert:\n1. `gewichte[:, None]` erweitert die Gewichtsvektoren zu einer Matrix mit Form `(n_groessen, 1)`.\n2. `gewichte[:, None] * qext` multipliziert die Gewichte elementweise mit `qext` (Form `(n_groessen, n_wellenlaengen)`).\n3. `np.sum(..., axis=0)` summiert \u00fcber alle Korngr\u00f6\u00dfen f\u00fcr **jede Wellenl\u00e4nge** separat.\n4. `total_weight` ist die Summe aller Gewichte (Skalar).\n5. Das Ergebnis ist ein Array der L\u00e4nge `n_wellenlaengen`, das das gewichtete Mittel pro Wellenl\u00e4nge liefert.\n\n### Beispiel:\nF\u00fcr `qext = [[1, 2, 3], [4, 5, 6]]` und `gewichte = [1, 2]`:\n- **Ergebnis**: `[3, 4, 5]` (korrekt, da `1*1 + 4*2 = 9` \u2192 `9/3 = 3`, etc.)\n\nDies entspricht der gew\u00fcnschten Spektrumberechnung.",
       "automatisch": {
         "bestanden": true,
         "notiz": "gefunden: ['axis', 'axis=0']"
