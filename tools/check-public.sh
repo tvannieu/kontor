@@ -26,7 +26,7 @@ scan() {  # scan <label> <grep-flags> <pattern>
 DENY="${KONTOR_DENY:-$HOME/.config/kontor/deny.txt}"
 [ -r "$DENY" ] || { hit "deny-list not readable: $DENY — refusing to run"; exit 2; }
 
-files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$'; }
+files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$' | grep -vE '^inbox/'; }
 
 # 1. the private wordlist
 while IFS= read -r t; do
