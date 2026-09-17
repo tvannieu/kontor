@@ -98,16 +98,18 @@ Consistent with the original note's own caveat, this is documentation-only, not 
 
 | Model | Auto (6) | Manual (3, C/P/I) |
 |---|---|---|
-| `openai/gpt-oss-120b` | 6/6 C (at `max_tokens=4096`) | 02: I · 01: **I** (re-run, fixed scorer — see below) · 06: C |
+| `openai/gpt-oss-120b` | 6/6 C (at `max_tokens=4096`) | 02: I · 01: **I** (3 generations + the original completion re-scored — see below) · 06: C |
 | `nvidia/nemotron-3.5-lightning:free` | 5/6 C, 04 I (schema, see above) | 01: **I** (fixed scorer, matches the human rating) |
 | `ollama/kontor-4b:latest` | 3/6 C (05, 08, 07-at-8192), 3/6 I (03, 04, 09) | not run — see "Local models" |
 
-`gpt-oss-120b`'s task-01 answer differed between the two runs (the "-1 factor" version, re-run after the scorer fix, invents a conversion factor and is correctly I; the earlier version graded P by the old flat scorer did not, and wasn't re-run against the fixed scorer to see if it would now grade P or I — that specific comparison is still open, see below).
+`gpt-oss-120b` generated three different answers to task 01 across three separate runs at `temperature=0` — real non-determinism, worth knowing on its own. All three name a plausible cause and none explicitly admits the question can't be resolved from the given data; all three grade **I** under the fixed scorer.
+
+**Closed the loop properly rather than trusting that pattern alone**: re-scored the *exact original completion text* that the old flat scorer had graded **P** — no new generation, same grader model, only the criterion changed. Re-graded **I**, with the grader's own reasoning citing the same missing decisive line. That rules out the alternative explanation (that the P grade was reasonable for its specific answer, and the disputed nemotron case was the outlier) — it wasn't; the flat scorer over-credited this exact text too, it simply hadn't been caught yet.
 
 ## What is not done
 
 - Only three models run (two hosted, one local, partially). The other models already in `evals/results/` (`google/gemma-4-31b-it:free`, `thinkingmachines/inkling:free` — the latter needs an agentic-harness wrapper per a 403 seen before this port existed) are straightforward to add now that the harness works, but each additional run is a real cost or a real risk and was kept deliberately minimal today.
 - `ollama/kontor-8b:latest` untested through the port — `kontor-4b` alone already surfaced a real, unresolved failure mode; adding the larger model's memory footprint on top wasn't worth it today.
-- The fixed scorer was verified against the two cases that motivated it (nemotron/01, gpt-oss-120b/06) plus a fresh gpt-oss-120b/01 run. Not re-run against every existing manual-task result from before the fix — in particular, `gpt-oss-120b`'s original P-graded task-01 answer (the "conventions, no invented factor" version, different generation from the "-1 factor" one above) was never re-scored under the fixed criteria to see whether it's a genuine P or was also a flat-scorer artifact.
+- The fixed scorer has been verified against every manual-task grade produced so far (nemotron/01, gpt-oss-120b/06, three separate gpt-oss-120b/01 generations, and the original pre-fix completion re-scored directly) but not against task 02 specifically for a case with a known disagreement — none has turned up yet, not because it was checked and cleared.
 - `task 09` (`stelle_nicht_im_text`) and `task 05` (`instruktionstreue`) both produced **empty** answers from `gpt-oss-120b` in the very first (pre-fix) run, and were marked passed (`clean`) by `regex_absent` anyway — because a check for the *absence* of a forbidden pattern is vacuously satisfied by no output at all. That is a real gap in the check itself, present in `run.py` too (identical logic), not introduced by the port. Worth a rubric note if these two tasks get a token-budget-starved run again — a pass on `regex_absent` is not evidence the model actually answered.
 - The venv (`evals/.venv/`) is local and untracked; `inspect-ai` and `openai` are its only two added dependencies, both pinned to whatever `pip install inspect-ai` resolved on 2026-09-17. No `requirements.txt` written yet.
