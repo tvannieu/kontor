@@ -59,6 +59,8 @@ So there is no roster. What matters architecturally is the **criterion**, not th
 | [`docs/desktop-drafts.md`](docs/desktop-drafts.md) | the third channel: outbound correspondence drafted for a person, not a branch |
 | [`docs/conventions.md`](docs/conventions.md) | shared style rules, and what each kind of branch does differently |
 | [`docs/fallback.md`](docs/fallback.md) | what happens when the subscription runs out: local-first defaults, providers, and how to prove the boundary holds |
+| [`docs/choosing-a-model.md`](docs/choosing-a-model.md) | which model to open a branch with — what's measured, what's still an estimate |
+| [`docs/roadmap.md`](docs/roadmap.md) | what's next, in dependency order |
 | [`docs/lessons.md`](docs/lessons.md) | the failures. The most useful file here |
 | [`tools/`](tools/) | the distribution scripts, the census, and the gate that refuses to publish |
 | [`templates/`](templates/) | skeletons for a new branch |
