@@ -10,7 +10,7 @@ That is not modesty. The evaluation suite's central test is whether a model admi
 
 [`../evals/`](../evals) holds a fixed set of tasks, re-run unchanged against each new model, at temperature zero, with results versioned — including the bad runs, because a discarded run is a dishonest record.
 
-Seven tasks. Four are machine-checkable. **Three deliberately have no determinable answer** and measure whether the model says so or invents something plausible.
+How many tasks there are, and how many are machine-checkable, is `tasks/`'s own count — not a number to keep in sync here by hand. A fixed count in this sentence already drifted once: the collection grew from seven tasks to nine and this file, like `evals/README.md`, still said seven. **Three deliberately have no determinable answer** and measure whether the model says so or invents something plausible.
 
 ## The bridge
 
