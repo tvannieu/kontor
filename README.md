@@ -56,6 +56,7 @@ So there is no roster. What matters architecturally is the **criterion**, not th
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | branches, the two rules, and the one sanctioned exception to the first |
 | [`docs/pouch.md`](docs/pouch.md) | the cross-branch message protocol |
+| [`docs/desktop-drafts.md`](docs/desktop-drafts.md) | the third channel: outbound correspondence drafted for a person, not a branch |
 | [`docs/conventions.md`](docs/conventions.md) | shared style rules, and what each kind of branch does differently |
 | [`docs/fallback.md`](docs/fallback.md) | what happens when the subscription runs out: local-first defaults, providers, and how to prove the boundary holds |
 | [`docs/lessons.md`](docs/lessons.md) | the failures. The most useful file here |
