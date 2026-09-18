@@ -1,0 +1,18 @@
+{
+  "modell": "openai/gpt-oss-120b",
+  "zeit_utc": "2026-09-18T0037",
+  "aufgaben": [
+    {
+      "id": "08_ablage_entscheidung",
+      "titel": "Ablage nach fester Konvention",
+      "sekunden": 5.2,
+      "tokens": 444,
+      "kosten_usd": 4.182e-05,
+      "antwort": "2026-03-04_Stadtwerke_Jahresabrechnung_GESENDET.pdf",
+      "automatisch": {
+        "bestanden": true,
+        "notiz": "gefunden: ['2026-03-04_Stadtwerke_Jahresabrechnung_GESENDET.pdf']"
+      }
+    }
+  ]
+}

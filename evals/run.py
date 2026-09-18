@@ -46,11 +46,17 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
     Fehler gemeldet."""
     local = model.startswith("ollama/")
     name = model.split("/", 1)[1] if local else model
-    body = json.dumps({
+    payload = {
         "model": name,
         "temperature": temperature,
         "messages": [{"role": "user", "content": prompt}],
-    }).encode()
+    }
+    if not local:
+        # OpenRouter only returns usage.cost when explicitly asked; Ollama
+        # has no such concept and ignores an unknown field harmlessly, but
+        # local calls are free anyway so there is nothing to request.
+        payload["usage"] = {"include": True}
+    body = json.dumps(payload).encode()
 
     if local:
         url, headers = "http://127.0.0.1:11434/v1/chat/completions", {
@@ -165,22 +171,27 @@ def main():
             continue
 
         rec = {"id": t["id"], "titel": t["title"], "sekunden": dur,
-               "tokens": usage.get("total_tokens"), "antwort": ans}
+               "tokens": usage.get("total_tokens"), "kosten_usd": usage.get("cost"),
+               "antwort": ans}
+        kost = f"  ${rec['kosten_usd']:.5f}" if rec["kosten_usd"] is not None else ""
         fn = CHECKS.get(t["check"])
         if fn:
             ok, note = fn(ans, t["expect"])
             rec["automatisch"] = {"bestanden": ok, "notiz": note}
-            print(("BESTANDEN" if ok else "DURCHGEFALLEN") + f"  ({note})  {dur}s")
+            print(("BESTANDEN" if ok else "DURCHGEFALLEN") + f"  ({note})  {dur}s{kost}")
         else:
             rec["manuell"] = {"bewertung": None, "rubrik": t.get("rubric", []), "notiz": ""}
             offen += 1
-            print(f"zu bewerten  {dur}s")
+            print(f"zu bewerten  {dur}s{kost}")
         run["aufgaben"].append(rec)
 
     RESULTS.mkdir(exist_ok=True)
     out = RESULTS / f"{stamp}_{a.model.replace('/', '_')}.json"
     out.write_text(json.dumps(run, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nGeschrieben: {out.relative_to(ROOT)}")
+    kosten = [r["kosten_usd"] for r in run["aufgaben"] if r.get("kosten_usd") is not None]
+    if kosten:
+        print(f"Kosten (OpenRouter, gemeldet): ${sum(kosten):.5f}")
     if offen:
         print(f"{offen} Aufgaben warten auf deine Bewertung. Feld 'manuell.bewertung' "
               f"auf 1, 0.5 oder 0 setzen und 'notiz' ausfüllen.")
