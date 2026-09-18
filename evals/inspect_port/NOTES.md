@@ -151,6 +151,7 @@ So the answer the proposal asked for, now from the code: *Harbor's model — a c
 | `openai/gpt-oss-120b` | 6/6 C (at `max_tokens=4096`) | 02: I · 01: **I** (3 generations + the original completion re-scored — see below) · 06: C |
 | `nvidia/nemotron-3.5-lightning:free` | 5/6 C, 04 I (schema, see above) | 01: **I** (fixed scorer, matches the human rating) |
 | `ollama/kontor-4b:latest` | 3/6 C (05, 08, 07-at-8192), 3/6 I (03, 04, 09) | not run — see "Local models" |
+| `google/gemma-4-31b-it` (paid tier) | 5/6 C, 04 I (`null` — the same honest-null pattern) | 01: I · 02: I · 06: C |
 | `google/gemma-4-31b-it:free` | unreachable — 429, shared free pool rate-limited | — |
 | `thinkingmachines/inkling:free` | unreachable — 403, agentic-harness-only | — |
 
@@ -169,9 +170,11 @@ So the answer the proposal asked for, now from the code: *Harbor's model — a c
 
 Not a design flaw exactly — retrying a 429 and not retrying a 403 is the right behavior. But the retry path loses the one piece of information (the status code) that tells you *why* it gave up, right when you need it most. A framework that retries transient failures should still surface what it was retrying, in the message it hands back when it stops.
 
+**Postscript, same day:** the free listing was the only thing wrong with gemma. OpenRouter's paid `google/gemma-4-31b-it` ($0.09/M in) ran both tasks cleanly — cents — and landed on the same profile as every other hosted model here: competent on the checkable tasks, `null` on 04, wrong in the way the suite exists to catch on 01 and 02, correct on 06. Six of seven historical models now have real data through the port; `inkling` remains the one that needs an agentic harness to call at all.
+
 ## What is not done
 
-- Five of the seven models in `evals/results/` now tried through the port (three with sample data, two confirmed-unreachable). `google/gemma-4-31b-it:free` could still produce real data on a later attempt if OpenRouter's shared free pool isn't saturated at the time — worth one retry, not worth waiting on. `thinkingmachines/inkling:free` needs an actual agentic-harness wrapper to call at all, which is a real integration, not a retry.
+- Six of the seven models in `evals/results/` now have data through the port (gemma via its paid listing, the free one being rate-limited on a shared pool). `thinkingmachines/inkling:free` remains the one that needs an actual agentic-harness wrapper to call at all — a real integration, not a retry.
 - `ollama/kontor-8b:latest` deliberately not run through the port — `kontor-4b` alone already surfaced a real, unresolved failure mode, and the machine had already been under real memory pressure from this suite once today. Adding the larger model's footprint on top wasn't worth repeating that.
 - The fixed scorer has now been calibrated (see "Judge calibration"): two graders agree with all six human labels and with each other on 13 of 14 items. The remaining known weakness is the one the split exposed — a grader concluding P after finding a decisive line unmet. A two-pass scorer (decide each decisive line, then derive the letter mechanically) would remove that failure mode; not built.
 - `task 09` (`stelle_nicht_im_text`) and `task 05` (`instruktionstreue`) both produced **empty** answers from `gpt-oss-120b` in the very first (pre-fix) run, and were marked passed (`clean`) by `regex_absent` anyway — because a check for the *absence* of a forbidden pattern is vacuously satisfied by no output at all. That is a real gap in the check itself, present in `run.py` too (identical logic), not introduced by the port. Worth a rubric note if these two tasks get a token-budget-starved run again — a pass on `regex_absent` is not evidence the model actually answered.
