@@ -30,7 +30,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
-from kontor_evals import MANUAL_INSTRUCTIONS, TASKS_DIR, _build_criterion  # noqa: E402
+from kontor_evals import GRADE_PATTERN, MANUAL_INSTRUCTIONS, TASKS_DIR, _build_criterion  # noqa: E402
 from run import get_key  # noqa: E402
 
 from inspect_ai.log import read_eval_log  # noqa: E402
@@ -83,8 +83,8 @@ def gather(tasks):
 
 async def grade(grader_name, item, tasks, sem):
     t = tasks[item["task"]]
-    scorer = model_graded_qa(instructions=MANUAL_INSTRUCTIONS, partial_credit=True,
-                             model=get_model(grader_name))
+    scorer = model_graded_qa(instructions=MANUAL_INSTRUCTIONS, grade_pattern=GRADE_PATTERN,
+                             partial_credit=True, model=get_model(grader_name))
     state = TaskState(model=item["candidate"], sample_id=item["task"], epoch=1,
                       input=t["prompt"], messages=[ChatMessageUser(content=t["prompt"])],
                       output=ModelOutput.from_content(item["candidate"], item["text"]))

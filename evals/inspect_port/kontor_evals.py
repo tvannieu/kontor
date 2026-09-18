@@ -250,6 +250,13 @@ MANUAL_INSTRUCTIONS = (
 )
 
 
+# Inspect's default grade pattern allows only whitespace between "GRADE:" and
+# the letter. A grader that writes "**GRADE:** C" — markdown bold, a correct
+# verdict — scores nan (seen in an epochs run, 2026-09-18). Tolerate markdown
+# punctuation around the colon; still require a bare letter.
+GRADE_PATTERN = r"(?is).*(?<!\w)GRADE(?!\w)[\s*_:]*([CPI])(?!\w)"
+
+
 @task
 def kontor_manual():
     return Task(
@@ -257,6 +264,7 @@ def kontor_manual():
         solver=generate(),
         scorer=model_graded_qa(
             instructions=MANUAL_INSTRUCTIONS,
+            grade_pattern=GRADE_PATTERN,
             partial_credit=True,
             model_role="grader",
         ),

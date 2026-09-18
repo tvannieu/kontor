@@ -76,6 +76,25 @@ Every manual grade above came from one grader, sometimes grading its own answers
 
 What that says for practice: the scorer's rule structure is right (both graders *find* the same fact), but a grader that can't hold "decisive beats secondary" reliably will leak P grades onto fluent-wrong answers — the original bug, reappearing one layer down. A stronger grader, or a two-pass design (first decide each decisive line yes/no, then let the letter follow mechanically instead of asking the model to conclude), would close it. Not built; the second is small and the more robust of the two.
 
+### Epochs: a single run is a coin flip on one task, and once the grader dropped the coin
+
+`gpt-oss-120b` gave three different answers to task 01 across three runs at `temperature=0` (above). So: `--epochs 3 --epochs-reducer mode`, both tasks, same model, same grader. Cents.
+
+| Task | Epoch grades | Mode |
+|---|---|---|
+| 03, 05, 07, 08, 09 | C C C | C — stable |
+| **04_structured_output** | **I I C** | I |
+| 01, 02 | I I I | I — stable |
+| **06_kontext_treue** | **C nan C** | C |
+
+Two instabilities, different in kind.
+
+**Task 04 is a coin flip, and the coin is the honest-null tension.** Epochs 1–2 returned `"jahr": null` (schema fails: not an int); epoch 3 returned an integer (schema passes). Same model, same prompt, temperature 0. The single run earlier today happened to land on `"jahr": 0` and passed; two of three epochs would not have. So the earlier finding — that 04's check can't tell an honest null from a confident guess — is worse than a design gap: *which one you get is non-deterministic*, and a one-epoch result on this task is reporting the flip, not the model. Anything that cites 04 from a single run is citing noise.
+
+**Task 06's `nan` was the grader, not the candidate.** The candidate answered the identical bare `1962` all three times. On epoch 2 the grader reasoned correctly, concluded correctly, and wrote `**GRADE:** C` — markdown bold. Inspect's default grade regex allows only whitespace between the colon and the letter, so `**` broke the match and the score became `nan`: a correct verdict, lost to formatting. The mode reducer papered over it (C nan C → C), which is exactly why a one-epoch run would have shown a hole with no explanation. Fixed with a tolerant `grade_pattern` (`GRADE_PATTERN` in `kontor_evals.py`, shared with `calibrate.py`), tested against the bold, plain, and edge shapes, then re-run on that sample.
+
+The opinion: `--epochs` is a good, cheap feature and the reducer choice matters — `mode` is right for letter grades. But the default grade parser is brittle to the single most common thing a chat model does to a label (bold it), and the failure is silent at the run level. That belongs next to the retry-error finding above: the framework handles the hard cases and drops the easy one.
+
 ### Task 04 rewards a sentinel over an honest null — and it's not the port's doing
 
 Both hosted models hit the same shape of trouble on task 04, differently. The schema requires `jahr: int`. Neither model could determine the year with confidence, and both correctly flagged `"jahr"` in `unsicher`:
