@@ -31,7 +31,7 @@ Das ist die Fehlerform, um die es geht: diese Systeme scheitern nicht mit einer 
 
 ## Schlüssel
 
-Der OpenRouter-Schlüssel liegt im macOS-Schlüsselbund unter **`kontor-openrouter`**, derselbe, den `kontor/distribute_crush_config.sh` in die crush.json schreibt. `run.py` holt ihn von dort; ersatzweise `OPENROUTER_API_KEY`. **Der Schlüssel gehört nicht in eine Datei.**
+Der OpenRouter-Schlüssel liegt im macOS-Schlüsselbund unter **`kontor-openrouter`**, derselbe, den `tools/distribute_crush_config.sh` in die crush.json schreibt. `run.py` holt ihn von dort; ersatzweise `OPENROUTER_API_KEY`. **Der Schlüssel gehört nicht in eine Datei.**
 
 ## Struktur
 
@@ -51,4 +51,4 @@ Zwei Zwecke, und der zweite ist der wichtigere.
 
 ---
 ## Document Information
-*Last Updated: September 12, 2026* *Document Type: Guide* *Scope: Arbeitsanweisung für Agenten in model-evals* *Status: Active Documentation*
+*Last Updated: September 18, 2026* *Document Type: Guide* *Scope: Arbeitsanweisung für Agenten in model-evals* *Status: Active Documentation*

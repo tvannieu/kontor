@@ -222,7 +222,7 @@ emit() {  # emit <repo> <kind>
 #
 # crush.json is machinery, not documentation: it is an output of this script, which
 # is itself versioned in the manifest's canonical branch. Its history would never be read, and in a repo that
-# is later shared with co-authors — drei Forschungszweigen — a personal
+# is later shared with co-authors — three research branches — a personal
 # tooling config naming an OpenRouter account is awkward to have committed.
 # So every branch ignores it, decided once here rather than thirteen times separately.
 # (Suggested by a sibling branch, 12.09.2026.)

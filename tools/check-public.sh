@@ -41,7 +41,13 @@ files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$' | g
 terms() {
   grep -vE '^[[:space:]]*(#|$)' "$DENY"
   if [ -r "$BCONF" ]; then
-    ( . "$BCONF"; for b in "${BRANCHES[@]:-}"; do [ "$b" = "$self" ] || printf '%s\n' "$b"; done )
+    # A name written with a hyphen where the directory has an underscore (or
+    # the reverse) is the same name to a reader. Found 18.09.2026 in a
+    # comment the whole-word scan had walked past.
+    ( . "$BCONF"; for b in "${BRANCHES[@]:-}"; do
+        [ "$b" = "$self" ] && continue
+        printf '%s\n%s\n%s\n' "$b" "${b//_/-}" "${b//-/_}"
+      done | sort -u )
   fi
 }
 if [ "$(terms | wc -l | tr -d ' ')" = 0 ]; then
