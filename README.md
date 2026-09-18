@@ -4,9 +4,9 @@
 
 ---
 
-Twenty repositories on one laptop, 3,580 commits, one agent session each — and not one of them can write into another. It was built while running legal, medical, financial and research threads in parallel, where the cost of one contaminating another was high, and the whole architecture follows from that single constraint: **a branch that can be written to from outside has no reliable state.** Everything crossing a boundary goes through a file in the receiving repository's `inbox/`; 669 such messages have been delivered so far. What is here is the infrastructure — the conventions, the scripts that distribute generated configuration to every branch, the runbook for when the subscription runs out and a local model takes over, and a fixed evaluation suite for deciding which model is safe to open a given repository with. None of the contents of those repositories are here, and none of them ever will be.
+Eighteen repositories on one laptop, 3,868 commits, one agent session each — and not one of them can write into another. It was built while running legal, medical, financial and research threads in parallel, where the cost of one contaminating another was high, and the whole architecture follows from that single constraint: **a branch that can be written to from outside has no reliable state.** Everything crossing a boundary goes through a file in the receiving repository's `inbox/`; 713 such messages have been delivered so far, 518 of them acted on and filed. What is here is the infrastructure — the conventions, the scripts that distribute generated configuration to every branch, the runbook for when the subscription runs out and a local model takes over, the gate that refuses to publish anything private, and a fixed evaluation suite for deciding which model to trust with which kind of work. None of the contents of those repositories are here, and none of them ever will be — not in a file, not in a filename, and not in the history.
 
-*Numbers as of 13 September 2026. Reproduce them with [`tools/census.sh`](tools/census.sh) — it prints the definition it used for each.*
+*Numbers as of 18 September 2026. Reproduce them with [`tools/census.sh`](tools/census.sh) — it prints the definition it used for each.*
 
 ---
 
@@ -36,6 +36,8 @@ Direct session-to-session messaging exists and is useful for conversation. **It 
 
 If losing it would cost something, write the file.
 
+There is no enforcement behind either rule — no sandbox, no permission boundary. They are instructions in a file, trusted to a well-behaved agent and a person who is paying attention. Adopting Kontor means adopting that discipline; [`docs/adopting.md`](docs/adopting.md) says so plainly and walks the five steps.
+
 Details: [`docs/architecture.md`](docs/architecture.md) · [`docs/pouch.md`](docs/pouch.md)
 
 ---
@@ -54,31 +56,43 @@ So there is no roster. What matters architecturally is the **criterion**, not th
 
 | | |
 |---|---|
-| [`docs/adopting.md`](docs/adopting.md) | the path from nothing to a working set of branches |
+| [`docs/adopting.md`](docs/adopting.md) | the path from nothing to a working set of branches, in five steps |
 | [`docs/architecture.md`](docs/architecture.md) | branches, the two rules, and the one sanctioned exception to the first |
 | [`docs/pouch.md`](docs/pouch.md) | the cross-branch message protocol |
-| [`docs/desktop-drafts.md`](docs/desktop-drafts.md) | the third channel: outbound correspondence drafted for a person, not a branch |
-| [`docs/conventions.md`](docs/conventions.md) | shared style rules, and what each kind of branch does differently |
-| [`docs/fallback.md`](docs/fallback.md) | what happens when the subscription runs out: local-first defaults, providers, and how to prove the boundary holds |
-| [`docs/choosing-a-model.md`](docs/choosing-a-model.md) | which model to open a branch with — what's measured, what's still an estimate |
-| [`docs/roadmap.md`](docs/roadmap.md) | what's next, in dependency order |
+| [`docs/desktop-drafts.md`](docs/desktop-drafts.md) | the third channel: correspondence drafted for a person, not a branch |
+| [`docs/conventions.md`](docs/conventions.md) | shared style rules, and the rules eleven branches arrived at independently |
+| [`docs/fallback.md`](docs/fallback.md) | when the subscription runs out: local-first defaults, providers, and how to prove the boundary holds |
+| [`docs/choosing-a-model.md`](docs/choosing-a-model.md) | which model to open a branch with — what is measured, what is still an estimate |
+| [`docs/roadmap.md`](docs/roadmap.md) | what is next, in dependency order, and what got done on the way |
 | [`docs/lessons.md`](docs/lessons.md) | the failures. The most useful file here |
-| [`tools/`](tools/) | the distribution scripts, the census, and the gate that refuses to publish |
-| [`templates/`](templates/) | skeletons for a new branch |
-| [`evals/`](evals/) | a fixed task set for deciding which model to trust with which branch |
+| [`tools/`](tools/) | the distribution scripts, the census, the profile switcher, and the gate that refuses to publish |
+| [`templates/`](templates/) | skeletons for a new branch: its two instruction files, a pouch message, a retirement note |
+| [`evals/`](evals/) | a fixed task set, in German, for deciding which model to trust with which kind of work — see below |
+
+### The evaluation suite
+
+[`evals/`](evals/) holds ten live tasks (and one retired with its reasons), re-run unchanged against each new model at temperature zero, with every result committed — including the bad runs, because a discarded run is a dishonest record. Most of the tasks are ordinary; three deliberately have no determinable answer and measure whether a model says so or invents something plausible. That is the failure shape that matters: these systems do not fail with an error, they fail with a fluent wrong answer.
+
+Around the tasks: [`run.py`](evals/run.py) runs them (hosted, local, or through an agent runner for the providers only it reaches) and records cost per call; [`report.py`](evals/report.py) puts the runs side by side; [`coverage.py`](evals/coverage.py) says, per task profile, whether the model your config assigns is *evidenced* on that profile's tasks or merely *assumed* — the mapping between what a branch may use and what has been shown to work. [`evals/inspect_port/`](evals/inspect_port/) is the same suite ported to Inspect AI, with [`NOTES.md`](evals/inspect_port/NOTES.md), an opinion formed by running it rather than reading about it: what the framework does well, where it hung a laptop, where its grader lost a correct verdict to markdown bold, and a judge calibration with the reasoning kept — because a calibration that stores only the percentage has thrown away the part you would act on.
 
 ---
 
 ## Configuration lives outside the repository
 
-The scripts here are generic. The lists they act on — which branches exist, which are local-first, which are read-only — live in `~/.config/kontor/branches.conf`, outside every repository. [`tools/kontor.conf.example`](tools/kontor.conf.example) shows the shape.
+The scripts here are generic. The lists they act on — which branches exist, which are local-first, which are read-only, which model each task profile implies — live in `~/.config/kontor/`, outside every repository. [`tools/kontor.conf.example`](tools/kontor.conf.example) and [`tools/profiles.conf.example`](tools/profiles.conf.example) show the shape.
 
-🔑 The same applies, more strictly, to the wordlist used by [`tools/check-public.sh`](tools/check-public.sh), which refuses to publish if anything private is present. **That list is not in this repository and must never be.** A public file enumerating the names you are protecting publishes the names, permanently, in git history, in the one place you are inviting people to read. The script ships the mechanism and fails closed when the list is absent.
+🔑 The same applies, more strictly, to what [`tools/check-public.sh`](tools/check-public.sh) scans for. **Neither the wordlist of private names nor the vocabulary of private matters is in this repository, and neither must ever be.** A public file enumerating the names you are protecting publishes the names, permanently, in git history, in the one place you are inviting people to read — and a list of the *kinds* of matter does the same. The script ships the mechanism and fails closed when either list is absent. It also takes every branch name straight from the config, so a name can never be missing from the list because nobody typed it twice; that was learned the hard way, and [`docs/lessons.md`](docs/lessons.md) is where such things go.
+
+---
+
+## Languages
+
+The documentation is in English, written for a stranger. The evaluation suite — its tasks, its README, its result notes — is in German, and deliberately so: the private corpus these branches work on is German, and the failure the suite measures (a plausible wrong answer) is not language-neutral. Translating the tasks would measure a different thing.
 
 ---
 
 ## Status
 
-Early. The conventions and the fallback are in daily use and have been for months; the evaluation suite is days old and has more tasks than results. [`docs/choosing-a-model.md`](docs/choosing-a-model.md) says which parts of it are measured and which are still guesswork, rather than pretending the question is settled.
+The conventions, the distribution scripts and the fallback have been in daily use for months. The evaluation suite is younger and now has more to say: runs against local and hosted models, a port to a second framework with the differences written up, a calibration of the grader against human ratings, and a per-profile account of what is evidenced. The honest part is unchanged in kind — the model choice per branch is still an estimate for some profiles, and [`docs/choosing-a-model.md`](docs/choosing-a-model.md) says which, rather than pretending the question is settled. [`docs/roadmap.md`](docs/roadmap.md) says what comes next and why in that order.
 
 This repository was assembled using the protocol it documents, including the request that produced its own contents.
