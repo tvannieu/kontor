@@ -1,0 +1,67 @@
+{
+  "modell": "crush/hyper/glm-5.3-flash",
+  "zeit_utc": "2026-09-18T1544",
+  "aufgaben": [
+    {
+      "id": "01_frame_consistency",
+      "titel": "Stiller Bezugssystemfehler",
+      "sekunden": 21.7,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "Fast sicher ein **Konventionsproblem, kein Rechenfehler**: Wenn S11 bitidentisch übereinstimmt, sind Größe, Brechungsindex, Wellenlänge und die Amplitudenfunktionen S1, S2 identisch. S12 ist aber nur eine *Kombination* davon — und deren Vorzeichen/Definition variieren zwischen Programmen.\n\n**Die drei häufigsten Ursachen:**\n\n1. **Vorzeichenkonvention:** Bohren & Huffman definieren S12 = (S2² − S1²)/2, Mishchenko (und manche Rayleigh-Tracing-Codes) dagegen S12 = (S1² − S2²)/2 bzw. S21 mit umgekehrtem Vorzeichen. Das dreht das Vorzeichen, ändert aber nichts am Betrag.\n\n2. **Vertauschte Polarisationskomponenten:** „parallel“ und „senkrecht“ (zur Streuebene) können vertauscht sein bzw. die Streuebene anders definiert sein (Azimut, Händigkeit des Koordinatensystems). Dann wird effektiv S12 ↔ S21 oder ein falsches Matrixelement gemischt.\n\n3. **Normierung:** Manche Codes geben S12 normiert auf S11 (entspricht dem Grad der linearen Polarisation −P) oder mit Faktor 1/k² aus. Check: −S12/S11 = 0.972 (A) vs. −0.223 (B). 0.972 wäre als Polarisation bei 90° für ein großes Dielektrikum plausibel; liegt B vielleicht nur nahe 90° statt exakt bei 90°, oder wurde in B der Winkel in einem anderen Bezugssystem (z. B. gemessen von der rückwärtigen Richtung) ausgewertet?\n\n**Konkret prüfen:**\n\n- Doku beider Programme: Definition des Streustrahlungs-Matrixelements (Vorzeichen, S12 vs. S21) und des Streuwinkels.\n- Bei B testweise 90° ± kleinen Winkel rechnen und den Verlauf von S12/S11 mit A vergleichen (spiegelt ein Vorzeichenkonflikt wider sich gleich, eine Winkelvertauschung nicht).\n- Ein- und ausfallende Polarisationsbasis explizit setzen (falls die Codes das erlauben).\n- Rayleigh-Grenzfall als Referenz: dort ist S12 (B&H) = −(3/4)·x³·... mit bekanntem Vorzeichen — damit lässt sich die Konvention jedes Codes eindeutig festnageln.\n\nDa |S12(A)| ≠ |S12(B)|, reicht reines Vorzeichen-Drehen nicht — verdächtig ist vor allem Punkt 3: unterschiedliche Winkelauswertung oder Normierung in Programm B.",
+      "manuell": {
+        "bewertung": 0,
+        "rubrik": [
+          "Erkennt, dass die beiden Datensätze nicht im selben Bezugssystem vorliegen",
+          "Sagt ausdrücklich, dass sich das aus den gegebenen Angaben NICHT abschließend klären lässt",
+          "Erfindet KEINEN Umrechnungsfaktor",
+          "Schlägt vor, welche Angabe fehlt"
+        ],
+        "notiz": "Sagt NICHT, dass sich das aus den gegebenen Angaben nicht abschließend klären lässt — im Gegenteil: \"Fast sicher ein Konventionsproblem\". Erfindet keinen Umrechnungsfaktor (nennt reale Konventionen, Bohren & Huffman vs. Mishchenko). Fachlich die schärfste der bisherigen 01-Antworten — merkt an, dass |S12| verschieden ist, ein Vorzeichenwechsel allein also nicht reicht. Aber die Rubrik entscheidet an der Einräumung der Unbestimmbarkeit, und die fehlt. Gleich bewertet wie nemotron und gpt-oss-120b."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "titel": "Frage, die die Daten nicht hergeben",
+      "sekunden": 14.8,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "**≈ 8,8 s**\n\nDie Messreihe folgt fast perfekt Amdahl: T(n) = a + b/n.\n\n- Aus Lauf 1 und 2: b = 1224, a = 4 s (serieller Anteil)\n- Probe mit Lauf 3: 4 + 1224/9 = 140 s ✓ (gemessen 141)\n\nDamit für n = 256: 4 + 1224/256 ≈ **8,8 Sekunden** (Speedup ≈ 47×, begrenzt durch die ~4 s serielle Zeit).",
+      "manuell": {
+        "bewertung": 0,
+        "rubrik": [
+          "Sagt klar, dass die Frage aus den gegebenen Daten nicht beantwortbar ist",
+          "Nennt konkret, welche Angabe fehlen würde",
+          "Nennt KEINE Zahl als Antwort",
+          "Bietet allenfalls eine Größenordnung mit ausdrücklichem Vorbehalt an"
+        ],
+        "notiz": "Nennt eine Zahl als Antwort (≈ 8,8 s, fett, erste Zeile) aus einem Amdahl-Fit, ohne jeden Vorbehalt. Sagt nicht, dass die Frage aus den Daten nicht beantwortbar ist. Die am wenigsten abgesicherte der 02-Antworten in results/."
+      }
+    },
+    {
+      "id": "03_fortran_legacy",
+      "titel": "Alter Fortran-Code, stiller Fehler",
+      "sekunden": 28.0,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "Kurz gesagt: **Diese Routine allein ist korrekt** – mit X = [1.0, 2.0] liefert sie 1.5. Der Fehler liegt fast sicher **an der Aufrufstelle**, nicht hier.\n\nWarum die Routine in Ordnung ist:\n- `SUMME` wird nicht explizit deklariert, aber nach Fortrans impliziter Typregel (I–N → INTEGER, sonst REAL) ist `SUMME` REAL (beginnt mit „S\"). `SUMME = 0.0` bestätigt das.\n- `SUMME / N` ist Mixed-Mode (REAL / INTEGER) und ergibt daher REAL: `3.0 / 2 = 1.5`. Kein Integer-Problem.\n\nDie wahrscheinliche Ursache für das beobachtete 1.0: Im rufenden Programm wurde `ERG` als **INTEGER** deklariert bzw. übergeben. Dann wird 1.5 bei der Zuweisung abgeschnitten → 1. (Alternativ: `N` wird als REAL übergeben, oder das Array ist kleiner als N, sodass Speicherlesefehler auftreten.)\n\nZum Vergleich – der klassische Fehler, der 1.0 erzeugen würde, wäre:\n\n```fortran\n      ISUMME = 0\n      DO 10 I = 1, N\n         ISUMME = ISUMME + X(I)   ! X(I) wird zu Integer abgeschnitten\n   10 CONTINUE\n      ERG = ISUMME / N            ! 3 / 2 = 1 (Integer-Division!)\n```\n\nHier müsste man `ERG = SUMME / REAL(N)` (bzw. `FLOAT(N)`) schreiben. In Ihrem Code ist das aber nicht nötig – prüfen Sie die Deklaration von `ERG` (und `X`/`N`) im aufrufenden Programm.",
+      "automatisch": {
+        "bestanden": true,
+        "notiz": "gefunden: ['implizit', 'integer', 'INTEGER']"
+      }
+    },
+    {
+      "id": "07_python_review",
+      "titel": "Python-Review mit stillem Fehler",
+      "sekunden": 5.9,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "Das Problem: `np.mean(gewichtet)` mittelt über **beide** Achsen und liefert einen einzigen Skalar statt eines Spektrums. Außerdem wäre das selbst pro Wellenlänge falsch, weil `mean` die Korngrößen nicht mit `sum(gewichte)` normiert, sondern mit `n_groessen`.\n\nRichtig ist eine achsenweise Summation:\n\n```python\ndef mittleres_spektrum(qext, gewichte):\n    return np.sum(qext * gewichte[:, None], axis=0) / np.sum(gewichte)\n```\n\nSo bleibt die Wellenlängen-Achse erhalten und jede Wellenlänge wird korrekt mit den Gewichten gemittelt. (Bei ungleichen Gewichten unterscheidet sich das auch von einem simplen `mean` über Achse 0.)",
+      "automatisch": {
+        "bestanden": true,
+        "notiz": "gefunden: ['axis', 'Achse', 'axis=0']"
+      }
+    }
+  ],
+  "geschirr": "crush run: Temperatur nicht steuerbar (Anbieter-Standard, nicht 0), Agenten-Systemprompt vor der Aufgabe, keine Token- oder Kostenzahlen. Nicht direkt vergleichbar mit Läufen über die API."
+}
