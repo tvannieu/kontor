@@ -2,7 +2,7 @@
 
 This repository is the **system**: the conventions, scripts and documentation that the branches around it follow. It is **destined to be public** and currently private while it is written.
 
-`REPO_MANIFEST.md` beside this file is the map of the whole arrangement.
+`REPO_MANIFEST.md`, when it is beside this file, is the map of the whole arrangement — generated and distributed, never committed, so a fresh clone does not have it. [`docs/adopting.md`](docs/adopting.md) says where it comes from.
 
 ## What makes this branch different from every other
 

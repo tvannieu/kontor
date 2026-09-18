@@ -25,22 +25,40 @@ scan() {  # scan <label> <grep-flags> <pattern>
 
 DENY="${KONTOR_DENY:-$HOME/.config/kontor/deny.txt}"
 [ -r "$DENY" ] || { hit "deny-list not readable: $DENY — refusing to run"; exit 2; }
+VOCAB="${KONTOR_VOCAB:-$HOME/.config/kontor/vocab.txt}"
+[ -r "$VOCAB" ] || { hit "vocabulary list not readable: $VOCAB — refusing to run"; exit 2; }
+BCONF="${KONTOR_CONF:-$HOME/.config/kontor/branches.conf}"
+self=$(basename "$(git rev-parse --show-toplevel)")
 
 files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$' | grep -vE '^inbox/'; }
 
-# 1. the private wordlist
+# 1. the private wordlist — plus every branch name in the instance config.
+# Found 18.09.2026: the deny-list had been empty since it was created, and
+# every "clean" this script printed was vacuous for this scan. Names the
+# config already knows can never again be missing because nobody typed them;
+# the file itself is for people, employers and matters. Whole-word matching,
+# because branch names can be ordinary words.
+terms() {
+  grep -vE '^[[:space:]]*(#|$)' "$DENY"
+  if [ -r "$BCONF" ]; then
+    ( . "$BCONF"; for b in "${BRANCHES[@]:-}"; do [ "$b" = "$self" ] || printf '%s\n' "$b"; done )
+  fi
+}
+if [ "$(terms | wc -l | tr -d ' ')" = 0 ]; then
+  hit "private wordlist is empty — $DENY has no terms and $BCONF lists no branches; a scan against nothing is not a scan"
+fi
 while IFS= read -r t; do
   [ -z "$t" ] && continue
-  m=$(files | xargs -r grep -IniF -- "$t" /dev/null 2>/dev/null | head -3)
+  m=$(files | xargs -r grep -IniwF -- "$t" /dev/null 2>/dev/null | head -3)
   [ -n "$m" ] && { hit "private term matched:"; printf '%s\n' "$m" >&2; }
-done < <(grep -vE '^\s*(#|$)' "$DENY")
+done < <(terms)
 
-# 2. domain vocabulary — German first, because the private corpus is German
-# Triaged 14.09.2026: the stem 'diagnos' fired three times on ordinary
-# engineering prose -- diagnosed, diagnostic, Diagnose-of-a-bug. Narrowed to the
-# German medical compound, which does not occur technically. A warning list
-# everyone has learned to ignore is worse than no warning list.
-scan "domain vocabulary" -InEi 'VOCABULARY_KEPT_OUTSIDE_THE_REPOSITORY'
+# 2. domain vocabulary — kept outside the repository, like the wordlist: a
+# published list of the kinds of matter you are protecting describes them as
+# surely as the names would. One extended-regex alternative per line.
+pat=$(grep -vE '^[[:space:]]*(#|$)' "$VOCAB" | paste -sd'|' -)
+[ -n "$pat" ] || hit "vocabulary list is empty: $VOCAB"
+scan "domain vocabulary" -InEi "$pat"
 
 # 3. identifiers: statutes, case numbers, IBANs, mail addresses, API keys, phone numbers
 scan "identifier pattern" -InE '§ *[0-9]+|[0-9]{1,3} [A-Z] [0-9]{2,5}/[0-9]{2}|DE[0-9]{2}[0-9A-Z ]{12,}|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|(sk-or|tvly|ghp_|github_pat|xoxb)[-_A-Za-z0-9]{12,}|\+?49[ /-][0-9][0-9 /-]{6,}'
