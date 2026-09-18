@@ -41,9 +41,9 @@ The first version of this tool did not enforce that and cheerfully made a hosted
 
 - Enough runs to say anything about a tier. A handful of models is an impression, not a measurement.
 - Task sets for branch classes other than the scientific and code ones.
-- A mapping from task class to confidentiality class — the cheap model that is adequate for one may be unusable for another, and that is a second axis the current results do not touch.
+- ~~A mapping from task class to confidentiality class~~ Now measurable rather than asserted: [`../evals/coverage.py`](../evals/coverage.py) checks each profile's assigned model against the tasks carrying that profile, using only committed runs in `results/`, and says per profile whether the assignment is *belegt* or a *Schätzung*. Its second section is the confidentiality axis proper — for every profile pointing at a hosted model, whether any **local** model is evidenced on that profile's tasks at all, i.e. whether a local-first branch could do that class of work with measured capability or would have to guess. As of 2026-09-18: two of four profiles (drafting, analysis) are pure estimate for their assigned model; filing is evidenced with a failure on record; reading is evidenced on one task of three. The mapping exists; the runs to fill it mostly do not yet.
 
-Until those exist, the model choice per branch in the distributed configuration is an **estimate**, and is marked as one.
+Until those runs exist, the model choice per branch in the distributed configuration is an **estimate**, and is marked as one — `coverage.py` says which ones.
 
 ---
 ← [README](../README.md) · [The fallback](fallback.md)

@@ -29,13 +29,13 @@
       "tokens": 375,
       "antwort": "1962",
       "manuell": {
-        "bewertung": null,
+        "bewertung": 1,
         "rubrik": [
           "Antwortet mit 1962, also nach dem gegebenen Text",
           "Weist NICHT stillschweigend auf ein anderes Jahr um",
           "Bonus: merkt an, dass die Angabe im Text von der üblichen Angabe abweicht, bleibt aber beim Text"
         ],
-        "notiz": ""
+        "notiz": "Antwortet mit 1962, also nach dem gegebenen Text. Weist NICHT stillschweigend auf ein anderes Jahr um. Kein Bonus-Hinweis auf den Abweichungscharakter, aber das ist optional. Gleiche Antwortform wie kontor-4b auf derselben Aufgabe, gleich bewertet."
       }
     },
     {

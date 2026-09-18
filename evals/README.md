@@ -25,6 +25,7 @@ Das ist die Fehlerform, auf die es ankommt: diese Systeme scheitern nicht mit ei
 ./run.py openai/gpt-5 --tasks 02 05      # nur einzelne
 ./run.py --dry-run                       # zeigt nur, was gesendet würde, ohne Schlüssel
 ./report.py                              # alle Läufe nebeneinander
+./coverage.py                            # welche Profil-Modell-Zuordnung belegt ist, welche geschätzt
 ```
 
 **Der Schlüssel steht in keiner Datei.** `run.py` holt ihn aus dem Schlüsselbund des Betriebssystems und fällt erst danach auf eine Umgebungsvariable zurück:
@@ -53,6 +54,7 @@ tasks/      eine Datei je Aufgabe, versioniert. Prompts werden nicht still geän
 results/    ein Ergebnis je Lauf, Dateiname aus Zeitstempel und Modell
 run.py      Läufer
 report.py   Gegenüberstellung
+coverage.py Profil-Modell-Zuordnung gegen results/: belegt oder Schätzung
 ```
 
 ## Regeln, damit es etwas wert bleibt
