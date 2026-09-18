@@ -26,7 +26,6 @@ itself, which is not a real evaluation — always pass a separate grader.
 """
 
 import json
-import re
 from pathlib import Path
 
 from inspect_ai import Task, task
@@ -167,42 +166,15 @@ def _load(only_checks):
     return samples
 
 
-# --- the three deterministic checks, transliterated from run.py's CHECKS
-# dict (evals/run.py:77-101) so the auto tasks score identically to the
-# existing runner. ---
+# The deterministic checks are run.py's own, imported, not a copy: the first
+# version of this file transliterated them, and the moment run.py's
+# json_schema check grew two optional keys (2026-09-18, for task 10) the copy
+# would have silently scored that task differently from the runner. Same
+# reason re_run_ollama.py imports them. One source, or two that drift.
+import sys as _sys
 
-
-def _contains_any(ans, expect):
-    hits = [e for e in expect if e.lower() in ans.lower()]
-    return bool(hits), (f"found: {hits}" if hits else f"none of {expect}")
-
-
-def _regex_absent(ans, expect):
-    hits = [p for p in expect if re.search(p, ans)]
-    return not hits, ("clean" if not hits else f"forbidden but present: {hits}")
-
-
-def _json_schema(ans, expect):
-    raw = re.sub(r"^```(?:json)?|```$", "", ans.strip(), flags=re.M).strip()
-    try:
-        o = json.loads(raw)
-    except Exception as e:
-        return False, f"not valid JSON: {e}"
-    missing = [k for k in expect.get("required", []) if k not in o]
-    if missing:
-        return False, f"missing keys: {missing}"
-    kinds = {"int": int, "list": list, "str": str}
-    for k, want in expect.get("types", {}).items():
-        if k in o and not isinstance(o[k], kinds[want]):
-            return False, f"{k} is {type(o[k]).__name__}, expected {want}"
-    return True, "schema satisfied"
-
-
-_AUTO_FNS = {
-    "contains_any": _contains_any,
-    "regex_absent": _regex_absent,
-    "json_schema": _json_schema,
-}
+_sys.path.insert(0, str(TASKS_DIR.parent))
+from run import CHECKS as _AUTO_FNS  # noqa: E402
 
 
 @scorer(metrics=[accuracy(), stderr()])

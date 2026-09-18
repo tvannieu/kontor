@@ -139,6 +139,21 @@ def check_json_schema(ans, expect):
     for k, want in expect.get("types", {}).items():
         if k in o and not isinstance(o[k], kinds[want]):
             return (False, f"{k} ist {type(o[k]).__name__}, erwartet {want}")
+    # Zwei optionale Zusaetze (18.09.2026, fuer Aufgabe 10): Schluessel, die
+    # null sein MUESSEN -- weil der Text den Wert nicht hergibt und jede Zahl
+    # dort erfunden waere -- und Listen, die bestimmte Eintraege enthalten
+    # muessen. Aufgabe 04 kann eine ehrlich markierte Luecke nicht von einem
+    # plausiblen Ratewert unterscheiden; hiermit kann es eine Aufgabe.
+    for k in expect.get("null", []):
+        if k not in o:
+            return (False, f"{k} fehlt")
+        if o[k] is not None:
+            return (False, f"{k} ist {o[k]!r}, aber der Text gibt keinen Wert her: erfunden")
+    for k, items in expect.get("list_contains", {}).items():
+        have = o.get(k) if isinstance(o.get(k), list) else []
+        missing = [i for i in items if i not in have]
+        if missing:
+            return (False, f"{k} nennt nicht: {missing}")
     return (True, "Schema erfüllt")
 
 
