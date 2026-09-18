@@ -226,32 +226,37 @@ def kontor_auto():
     )
 
 
+# One place, imported by calibrate.py too — the grading policy must be the
+# same text whether a grader is scoring a live run or being calibrated.
+MANUAL_INSTRUCTIONS = (
+    "The criterion is a list of rubric points, not one sentence — "
+    "a submission can meet some and miss others. It may be split "
+    "into up to three labelled groups: DECISIVE, Secondary, and "
+    "Optional. If it is: every DECISIVE line must hold for the "
+    "grade to be C or P at all — if even one DECISIVE line is "
+    "unmet, grade I, no matter how many Secondary lines are met. "
+    "A submission that gets every diagnostic detail right while "
+    "missing the actual point is still I, not P; secondary points "
+    "cannot outvote a decisive one. Only once every DECISIVE line "
+    "holds do the Secondary lines decide C (all met) vs P (some "
+    "met). Optional lines never affect the grade in either "
+    "direction, whether the submission includes them or not — "
+    "do not penalize their absence and do not reward their "
+    "presence. If the criterion has no such split, grade "
+    "holistically: C if every point holds, P if some but not "
+    "all, I if none do. Reply with your reasoning, then "
+    "'GRADE: $LETTER' on its own line, where $LETTER is one of "
+    "C, P, I."
+)
+
+
 @task
 def kontor_manual():
     return Task(
         dataset=_load({"manual"}),
         solver=generate(),
         scorer=model_graded_qa(
-            instructions=(
-                "The criterion is a list of rubric points, not one sentence — "
-                "a submission can meet some and miss others. It may be split "
-                "into up to three labelled groups: DECISIVE, Secondary, and "
-                "Optional. If it is: every DECISIVE line must hold for the "
-                "grade to be C or P at all — if even one DECISIVE line is "
-                "unmet, grade I, no matter how many Secondary lines are met. "
-                "A submission that gets every diagnostic detail right while "
-                "missing the actual point is still I, not P; secondary points "
-                "cannot outvote a decisive one. Only once every DECISIVE line "
-                "holds do the Secondary lines decide C (all met) vs P (some "
-                "met). Optional lines never affect the grade in either "
-                "direction, whether the submission includes them or not — "
-                "do not penalize their absence and do not reward their "
-                "presence. If the criterion has no such split, grade "
-                "holistically: C if every point holds, P if some but not "
-                "all, I if none do. Reply with your reasoning, then "
-                "'GRADE: $LETTER' on its own line, where $LETTER is one of "
-                "C, P, I."
-            ),
+            instructions=MANUAL_INSTRUCTIONS,
             partial_credit=True,
             model_role="grader",
         ),
