@@ -6,12 +6,14 @@ What's next, in the order it should happen and why — not a wishlist, a depende
 
 Everything below depends on this being solid, not the other way around. `choosing-a-model.md` is already honest that model choice per branch is currently **an estimate, marked as one**: not enough runs to say anything about a tier, no task sets for branch classes beyond the scientific and code ones, and no mapping from task class to confidentiality class.
 
-What's open, concretely:
+What's open, concretely — updated 2026-09-18, a day into it:
 
-- **The Inspect AI port** (`evals/inspect_port/`) is validated against one hosted model (`openai/gpt-oss-120b`) and unvalidated against the local Ollama models — the local run that should have validated it hung for an hour and had to be killed twice before the harness got a `max_tokens`/`timeout`/`max_connections` cap. Needs a careful, single-sample-first re-validation.
-- **No multi-model comparison run yet.** The original point of the port — same tasks, several models, write up the differences — has one model's worth of data.
-- **No cost tracking.** `report.py` shows pass/fail only. `run.py` already captures token counts per task and the Inspect port captures full usage; neither is surfaced anywhere a model choice could be based on it. "Capable enough" and "cheap enough" are currently two separate judgement calls a person makes from memory, not one comparison a report shows.
-- **No task-class-to-confidentiality mapping.** The cheap model adequate for one branch's tasks may be unusable for another's, and nothing here measures that second axis yet.
+- ~~The Inspect AI port is unvalidated against local Ollama models~~ **Done.** Validated carefully (single-sample first, machine health checked between runs) and it surfaced a real failure: `kontor-4b` burns its full token budget with an empty answer on two prompts regardless of budget size, a genuinely stuck generation rather than a "needs more room" problem — see `evals/inspect_port/NOTES.md`.
+- **The scorer had its own bug, found and fixed.** The manual-task grader treated every rubric line as equal weight and gave a known-fail answer partial credit. Fixed (decisive vs. secondary vs. optional rubric lines, sourced from each task's own stated hard-fail conditions) and the fix was verified against the *exact* completion text the old scorer got wrong, not just a fresh run that happened to grade correctly.
+- **Multi-model comparison started, not finished.** Two hosted models (`gpt-oss-120b`, `nemotron`) plus one local, through the fixed scorer. The models already in `evals/results/` not yet run through the port: `google/gemma-4-31b-it:free`, `thinkingmachines/inkling:free` (expects a 403, worth confirming Inspect surfaces it cleanly). `kontor-8b` untested locally.
+- **No cost tracking**, still open. `report.py` shows pass/fail only. `run.py` already captures token counts per task and the Inspect port captures full usage; neither is surfaced anywhere a model choice could be based on it.
+- **No task-class-to-confidentiality mapping**, still open. The cheap model adequate for one branch's tasks may be unusable for another's, and nothing here measures that second axis yet.
+- **New, not anticipated when this was written:** task 04's automatic check can't distinguish an honestly-flagged "I don't know" from a confidently wrong guess — both pass the schema check identically. Worth a new task variant if that distinction matters enough to measure directly (not a change to task 04 itself, per the suite's own rule against silently editing a task).
 
 ## 2. An eval'd classifier, not an assumed one — later, not now
 
@@ -25,7 +27,7 @@ So: worth building, but as a natural extension of the measurement discipline alr
 
 ## 3. Documentation — real gap, but narrow and lower-stakes
 
-The one concrete hole found so far: there is no single walkthrough of how someone else would actually adopt kontor — clone the system repo (not yet public; no remote configured as of this writing), create sibling branch repos with no shared git history, seed them from `templates/`, populate `~/.config/kontor/` themselves, run the distribution scripts. Reconstructable today from `README.md` + `architecture.md` + `pouch.md` + `fallback.md` together, but nowhere as one path. A contained addition, not a rewrite — the existing docs are already disciplined. Ranked below the evals gap because nothing here blocks anything else; it's a reader's convenience, not a dependency.
+~~There is no single walkthrough of how someone else would actually adopt kontor~~ **Done, 2026-09-18** — [`docs/adopting.md`](adopting.md) walks the five steps, cross-referencing rather than repeating `architecture.md` / `pouch.md` / `conventions.md` / `fallback.md`. Writing it surfaced a second, smaller gap along the way: `templates/` had a skeleton for `AGENTS.md` but none for the `CLAUDE.md` it points to — someone following the walkthrough literally would have hit a dead link on their first branch. Added `templates/CLAUDE.md`.
 
 ---
 ← [README](../README.md) · [Choosing a model](choosing-a-model.md)
