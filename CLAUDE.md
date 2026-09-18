@@ -18,4 +18,4 @@ Everything here is written for a stranger. No instance data, no real branch name
 - **Nothing here is published until Thomas has read the finished text.** Two sessions made that a condition of contributing, independently. It applies to all of it.
 
 ---
-← [README](README.md) · [Manifest](REPO_MANIFEST.md)
+← [README](README.md) · [Adopting](docs/adopting.md)
