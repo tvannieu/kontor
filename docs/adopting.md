@@ -4,7 +4,7 @@ The path from nothing to a working set of branches, assembled once instead of le
 
 ## 1. Clone the system repo
 
-As of this writing, that means "when it's published" — this repository has no `git remote` configured yet; see the README's own status. Once it is, this step is the only one that involves kontor's own git history at all.
+`git clone https://github.com/tvannieu/kontor` — this step is the only one that involves kontor's own git history at all. Everything that follows is your own repositories and your own config.
 
 ## 2. Create the branch repos — as siblings, never as clones of kontor
 
