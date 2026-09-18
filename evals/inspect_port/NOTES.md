@@ -101,15 +101,28 @@ Consistent with the original note's own caveat, this is documentation-only, not 
 | `openai/gpt-oss-120b` | 6/6 C (at `max_tokens=4096`) | 02: I · 01: **I** (3 generations + the original completion re-scored — see below) · 06: C |
 | `nvidia/nemotron-3.5-lightning:free` | 5/6 C, 04 I (schema, see above) | 01: **I** (fixed scorer, matches the human rating) |
 | `ollama/kontor-4b:latest` | 3/6 C (05, 08, 07-at-8192), 3/6 I (03, 04, 09) | not run — see "Local models" |
+| `google/gemma-4-31b-it:free` | unreachable — 429, shared free pool rate-limited | — |
+| `thinkingmachines/inkling:free` | unreachable — 403, agentic-harness-only | — |
 
 `gpt-oss-120b` generated three different answers to task 01 across three separate runs at `temperature=0` — real non-determinism, worth knowing on its own. All three name a plausible cause and none explicitly admits the question can't be resolved from the given data; all three grade **I** under the fixed scorer.
 
 **Closed the loop properly rather than trusting that pattern alone**: re-scored the *exact original completion text* that the old flat scorer had graded **P** — no new generation, same grader model, only the criterion changed. Re-graded **I**, with the grader's own reasoning citing the same missing decisive line. That rules out the alternative explanation (that the P grade was reasonable for its specific answer, and the disputed nemotron case was the outlier) — it wasn't; the flat scorer over-credited this exact text too, it simply hadn't been caught yet.
 
+### Two more models tried, neither produced data — and that's itself the finding
+
+`google/gemma-4-31b-it:free` and `thinkingmachines/inkling:free` were both already known-unreliable on this suite (`evals/results/`, 2026-09-12: gemma all-429, inkling all-403). Tried both through the port six days later. Both failed the same way, confirming these aren't one-off flakes but persistent, structural facts about these specific free-tier listings — informative on its own, even with zero sample-level data to show for it.
+
+**How each failure surfaced differs, and matters:**
+
+- `inkling` → a clean `PermissionDeniedError`, the actual OpenRouter message printed immediately: *"only available on agentic harnesses... Gate Free Endpoints by Agentic Harness."* Not retried — a 403 correctly isn't a transient failure. One line, no ambiguity, no wasted quota.
+- `gemma` → a bare `RetryError[<Future ... raised APIConnectionError>]`, after Inspect had already retried and exhausted its budget. **The actual reason — a 429, rate-limited on the shared free pool — never appears anywhere in that error.** Had to reproduce it with a raw request outside Inspect entirely to confirm what was actually happening; `read_eval_log(...).error` shows the same opaque retry wrapper, not the underlying HTTP status. `run.py`'s much simpler `except HTTPError as e: print(f"HTTP {e.code}")` would have shown `429` on the first line, no reproduction needed.
+
+Not a design flaw exactly — retrying a 429 and not retrying a 403 is the right behavior. But the retry path loses the one piece of information (the status code) that tells you *why* it gave up, right when you need it most. A framework that retries transient failures should still surface what it was retrying, in the message it hands back when it stops.
+
 ## What is not done
 
-- Only three models run (two hosted, one local, partially). The other models already in `evals/results/` (`google/gemma-4-31b-it:free`, `thinkingmachines/inkling:free` — the latter needs an agentic-harness wrapper per a 403 seen before this port existed) are straightforward to add now that the harness works, but each additional run is a real cost or a real risk and was kept deliberately minimal today.
-- `ollama/kontor-8b:latest` untested through the port — `kontor-4b` alone already surfaced a real, unresolved failure mode; adding the larger model's memory footprint on top wasn't worth it today.
+- Five of the seven models in `evals/results/` now tried through the port (three with sample data, two confirmed-unreachable). `google/gemma-4-31b-it:free` could still produce real data on a later attempt if OpenRouter's shared free pool isn't saturated at the time — worth one retry, not worth waiting on. `thinkingmachines/inkling:free` needs an actual agentic-harness wrapper to call at all, which is a real integration, not a retry.
+- `ollama/kontor-8b:latest` deliberately not run through the port — `kontor-4b` alone already surfaced a real, unresolved failure mode, and the machine had already been under real memory pressure from this suite once today. Adding the larger model's footprint on top wasn't worth repeating that.
 - The fixed scorer has been verified against every manual-task grade produced so far (nemotron/01, gpt-oss-120b/06, three separate gpt-oss-120b/01 generations, and the original pre-fix completion re-scored directly) but not against task 02 specifically for a case with a known disagreement — none has turned up yet, not because it was checked and cleared.
 - `task 09` (`stelle_nicht_im_text`) and `task 05` (`instruktionstreue`) both produced **empty** answers from `gpt-oss-120b` in the very first (pre-fix) run, and were marked passed (`clean`) by `regex_absent` anyway — because a check for the *absence* of a forbidden pattern is vacuously satisfied by no output at all. That is a real gap in the check itself, present in `run.py` too (identical logic), not introduced by the port. Worth a rubric note if these two tasks get a token-budget-starved run again — a pass on `regex_absent` is not evidence the model actually answered.
 - The venv (`evals/.venv/`) is local and untracked; `inspect-ai` and `openai` are its only two added dependencies, both pinned to whatever `pip install inspect-ai` resolved on 2026-09-17. No `requirements.txt` written yet.
