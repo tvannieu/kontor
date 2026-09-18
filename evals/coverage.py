@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-"""Welche Profil-Modell-Zuordnung in profiles.conf ist durch Laeufe belegt, und
-welche ist eine Schaetzung?
+"""Which profile-to-model assignment in profiles.conf is evidenced, and which is a guess?
 
-choosing-a-model.md sagt offen, dass die Modellwahl je Profil derzeit eine
-Schaetzung ist. Dieses Skript macht daraus eine pruefbare Aussage: fuer jedes
-Profil das zugewiesene (grosse) Modell, die Aufgaben, die dieses Profil tragen,
-und ob es fuer genau dieses Modell auf genau diesen Aufgaben einen Lauf in
-results/ gibt -- und wie der ausging.
+choosing-a-model.md states openly that the model choice per profile is
+currently an estimate. This script turns that into a checkable claim: for
+each profile, the assigned (large) model, the tasks that carry that profile,
+and whether there is a run in results/ for exactly that model on exactly
+those tasks — and how it went.
 
-Zweiter Teil, die Vertraulichkeitsachse: ein local-first-Zweig darf ein
-gehostetes Modell nicht als Standard haben (tools/kontor verweigert das). Fuer
-Profile, die auf ein gehostetes Modell zeigen, steht hier, ob ueberhaupt ein
-lokales Modell auf deren Aufgaben belegt ist -- also ob ein local-first-Zweig
-diese Art Arbeit mit nachgewiesener Faehigkeit lokal erledigen koennte, oder ob
-er dort schlicht geraten muss.
+Second part, the confidentiality axis: a local-first branch may not have a
+hosted model as its default (tools/kontor refuses it). For profiles that
+point at a hosted model, this reports whether any local model is evidenced
+on their tasks at all — that is, whether a local-first branch could do that
+kind of work with measured capability, or would simply have to guess.
 
-Liest nur results/*.json (die dauerhafte, versionierte Evidenz) und die
-Instanzkonfiguration. Kein Modellaufruf, keine Kosten.
+Reads only results/*.json (the durable, versioned evidence) and the instance
+configuration. No model call, no cost.
 """
 import json, os, re, sys
 from pathlib import Path
@@ -27,21 +25,21 @@ PROFILES = Path(os.environ.get("KONTOR_PROFILES", os.path.expanduser("~/.config/
 
 
 def norm(model):
-    """'ollama/kontor-4b:latest' und 'kontor-4b:latest' meinen dasselbe Modell;
-    aeltere Laeufe schrieben den Namen ohne Anbieter-Praefix. 'crush/' ist
-    kein Anbieter, sondern das Geschirr (run.py, ask_crush) -- darunter steht
-    das Modell so, wie profiles.conf es nennt."""
+    """'ollama/kontor-4b:latest' and 'kontor-4b:latest' mean the same model;
+    older runs wrote the name without a provider prefix. 'crush/' is not a
+    provider but the harness (run.py, ask_crush) — underneath it the model is
+    named as profiles.conf names it."""
     return re.sub(r"^(ollama|crush)/", "", model)
 
 
 def load_profiles():
     if not PROFILES.is_file():
-        sys.exit(f"keine profiles.conf unter {PROFILES} (siehe tools/profiles.conf.example)")
+        sys.exit(f"no profiles.conf at {PROFILES} (see tools/profiles.conf.example)")
     out = {}
     for line in PROFILES.read_text(encoding="utf-8").splitlines():
         parts = line.split()
         if len(parts) >= 4 and parts[0] == "profile":
-            out[parts[1]] = {"gross": parts[2], "klein": parts[3]}
+            out[parts[1]] = {"large": parts[2], "small": parts[3]}
     return out
 
 
@@ -53,32 +51,32 @@ def load_tasks():
     return out
 
 
-def verdict(a):
-    if "fehler" in a:
-        return "fehler"
-    if "automatisch" in a:
-        return "+" if a["automatisch"]["bestanden"] else "-"
-    b = a.get("manuell", {}).get("bewertung")
-    return {1: "+", 0.5: "o", 0: "-"}.get(b, "?")
+def verdict(t):
+    if "error" in t:
+        return "error"
+    if "auto" in t:
+        return "+" if t["auto"]["passed"] else "-"
+    r = t.get("manual", {}).get("rating")
+    return {1: "+", 0.5: "o", 0: "-"}.get(r, "?")
 
 
 def load_results():
-    """(normiertes Modell, Aufgabe) -> Liste von (Datum, Urteil)."""
+    """(normalised model, task) -> list of (date, verdict)."""
     out = {}
     for f in sorted(RESULTS.glob("*.json")):
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
-            continue  # abgebrochener Lauf; steht in results/, ist aber kein Beleg
-        m = norm(d["modell"])
-        for a in d["aufgaben"]:
-            out.setdefault((m, a["id"]), []).append((d["zeit_utc"][:10], verdict(a)))
+            continue  # an interrupted run; it sits in results/ but is not evidence
+        m = norm(d["model"])
+        for t in d["tasks"]:
+            out.setdefault((m, t["id"]), []).append((d["time_utc"][:10], verdict(t)))
     return out
 
 
 def evidence(results, model, task):
-    """Nur echte Urteile zaehlen. Ein HTTP-Fehler ist kein Beleg, ein
-    unbewerteter manueller Lauf auch nicht."""
+    """Only real verdicts count. An HTTP error is not evidence, and neither
+    is an unrated manual run."""
     return [(dt, v) for dt, v in results.get((norm(model), task), []) if v in "+o-"]
 
 
@@ -89,67 +87,70 @@ def main():
         for p in profs:
             by_profile.setdefault(p, []).append(tid)
 
-    print("Belegt oder geschaetzt?  Je Profil: das zugewiesene grosse Modell gegen\n"
-          "die Aufgaben, die dieses Profil tragen, nach results/.\n")
+    print("Evidenced or estimated?  Per profile: the assigned large model against\n"
+          "the tasks that carry that profile, according to results/.\n")
     for p, spec in profiles.items():
-        model = spec["gross"]
+        model = spec["large"]
         tids = sorted(by_profile.get(p, []))
         print(f"== {p}  ->  {model} ==")
-        gepr, best, durch, fehl = 0, 0, 0, 0
+        tested, passed, failed, errored = 0, 0, 0, 0
         for tid in tids:
             ev = evidence(results, model, tid)
             if not ev:
-                # "nie versucht" und "versucht, aber nur Fehler" sind zwei
-                # verschiedene Ergebnisse; das zweite heisst meist: das Modell ist
-                # ueber das Geschirr, das es erreicht, gerade nicht ansprechbar.
+                # "never attempted" and "attempted, only errors" are two
+                # different results; the second usually means the model is
+                # not reachable through the harness that reaches it.
                 runs = results.get((norm(model), tid), [])
                 if runs:
-                    fehl += 1
-                    print(f"  {tid:<24} Fehler, kein Beleg  ({len(runs)} Lauf/Laeufe, zuletzt {runs[-1][0]})")
+                    errored += 1
+                    print(f"  {tid:<32} error, no evidence  ({len(runs)} run(s), last {runs[-1][0]})")
                 else:
-                    print(f"  {tid:<24} ungeprueft")
+                    print(f"  {tid:<32} untested")
                 continue
-            gepr += 1
+            tested += 1
             dt, v = ev[-1]
-            if v == "+": best += 1
-            elif v == "-": durch += 1
-            print(f"  {tid:<24} {v}  ({dt}" + (f", {len(ev)} Laeufe" if len(ev) > 1 else "") + ")")
+            if v == "+": passed += 1
+            elif v == "-": failed += 1
+            print(f"  {tid:<32} {v}  ({dt}" + (f", {len(ev)} runs" if len(ev) > 1 else "") + ")")
         if not tids:
-            print("  (keine Aufgabe traegt dieses Profil)")
-        elif gepr == 0 and fehl:
-            urteil = f"SCHAETZUNG -- {fehl} von {len(tids)} versucht, nur Fehler, kein einziges Urteil"
-        elif gepr == 0:
-            urteil = "SCHAETZUNG -- kein einziger Lauf mit diesem Modell auf diesen Aufgaben"
-        elif durch:
-            urteil = f"belegt, mit Durchfall: {gepr} von {len(tids)} geprueft, {best} bestanden, {durch} durchgefallen"
+            print("  (no task carries this profile)")
+        elif tested == 0 and errored:
+            print(f"  => ESTIMATE -- {errored} of {len(tids)} attempted, only errors, not one verdict\n")
+            continue
+        elif tested == 0:
+            print("  => ESTIMATE -- not a single run with this model on these tasks\n")
+            continue
+        elif failed:
+            print(f"  => evidenced, with failures: {tested} of {len(tids)} tested, {passed} passed, {failed} failed\n")
+            continue
         else:
-            urteil = f"belegt: {gepr} von {len(tids)} geprueft, alle bestanden" + (
-                "" if gepr == len(tids) else f" -- {len(tids) - gepr} noch ungeprueft")
-        print(f"  => {urteil}\n")
+            rest = "" if tested == len(tids) else f" -- {len(tids) - tested} still untested"
+            print(f"  => evidenced: {tested} of {len(tids)} tested, all passed{rest}\n")
+            continue
 
-    print("Vertraulichkeitsachse: Profile mit gehostetem Modell, und ob ein lokales\n"
-          "Modell auf deren Aufgaben ueberhaupt belegt ist. Ein local-first-Zweig\n"
-          "darf das gehostete Modell nicht als Standard haben; hier steht, ob er\n"
-          "stattdessen auf nachgewiesene lokale Faehigkeit zurueckgreifen kann.\n")
-    # Nach norm() traegt ein lokales Modell keinen Anbieter-Praefix mehr;
-    # alles mit Schraegstrich ist gehostet.
+    print("Confidentiality axis: profiles with a hosted model, and whether any local\n"
+          "model is evidenced on their tasks. A local-first branch may not have the\n"
+          "hosted model as its default; this says whether it could fall back on\n"
+          "measured local capability instead.\n")
+    # After norm() a local model carries no provider prefix; anything with a
+    # slash is hosted.
     local_models = sorted({m for (m, _) in results if "/" not in m})
     for p, spec in profiles.items():
-        model = spec["gross"]
+        model = spec["large"]
         if model.startswith("ollama/"):
             continue
         tids = sorted(by_profile.get(p, []))
-        print(f"== {p}  ({model}, gehostet) ==")
+        print(f"== {p}  ({model}, hosted) ==")
         any_local = False
         for lm in local_models:
             hits = [(tid, evidence(results, lm, tid)) for tid in tids]
             hits = [(tid, ev[-1][1]) for tid, ev in hits if ev]
             if hits:
                 any_local = True
-                print(f"  lokal belegt: {lm}  " + "  ".join(f"{tid} {v}" for tid, v in hits))
+                print(f"  local evidence: {lm}  " + "  ".join(f"{tid} {v}" for tid, v in hits))
         if not any_local:
-            print("  kein lokales Modell auf einer dieser Aufgaben belegt -- ein local-first-Zweig\n"
-                  "  muesste hier raten, nicht messen")
+            print("  no local model evidenced on any of these tasks -- a local-first branch\n"
+                  "  would have to guess here, not measure")
         print()
 
 

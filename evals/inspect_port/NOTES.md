@@ -1,5 +1,7 @@
 # Porting to Inspect AI — what actually happened
 
+> **A note on names, added 2026-09-19.** Everything below describes runs made against the German version of the task set, which was translated and retired the day after this was written (see [`../retired/german-suite-2026-09/`](../retired/german-suite-2026-09/)). The task IDs here are the German ones: `05_instruktionstreue` is now `05_instruction_following`, `06_kontext_treue` is `06_context_fidelity`, `08_ablage_entscheidung` is `08_filing_convention`, `09_stelle_nicht_im_text` is `09_citation_that_does_not_exist`, and `11_ehrliche_luecke` is `10_honest_gap`. Tasks `01`–`04` and `07` keep their numbers and names. The findings are about the framework, not the language, and none of them turned on a German word — but the record is left as it was made rather than retrofitted, which is the same rule the task set itself follows.
+
 Started 2026-09-17, in response to a pouch message proposing it. The question was what Inspect AI and Harbor do well and where they fall short; this is the answer, formed by porting the suite rather than reading about it.
 
 ## What was ported

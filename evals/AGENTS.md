@@ -1,54 +1,56 @@
 # evals — the task set
 
-Teil des Kontor-Repositories. Übersicht: [`../README.md`](../README.md), Einordnung: [`../docs/choosing-a-model.md`](../docs/choosing-a-model.md).
+Part of the Kontor repository. Overview: [`../README.md`](../README.md), context: [`../docs/choosing-a-model.md`](../docs/choosing-a-model.md).
 
-## Was das hier ist
+## What this is
 
-Eine **feste Aufgabensammlung**, die bei jedem neuen Sprachmodell unverändert durchläuft. Angelegt im September 2026, weil „ich teste neue Modelle" ohne feste Aufgaben und aufgehobene Ergebnisse ein Eindruck bleibt und keine Aussage wird.
+A **fixed set of tasks**, run unchanged against every new language model. Created in September 2026, because "I test new models" without fixed tasks and kept results stays an impression and never becomes a statement.
 
-Der Gedanke ist derselbe wie in dem Framework-Zweig, aus dem die Methode stammt: dieselbe Aufgabe, mehrere unabhängige Implementierungen, systematischer Vergleich. Dort sechs Streucodes, hier Modelle.
+## The one rule everything rests on
 
-## Die eine Regel, die alles trägt
+🔴 **Prompts are not patched when a model fails them.**
 
-🔴 **Prompts werden nicht nachgebessert, wenn ein Modell durchfällt.**
+Whoever changes a task creates a **new** one and leaves the old one standing. Otherwise the collection eventually measures only itself, and every earlier run becomes worthless.
 
-Wer eine Aufgabe ändert, legt eine **neue** an und lässt die alte stehen. Sonst misst die Sammlung irgendwann nur noch sich selbst, und alle früheren Läufe werden wertlos.
+That applies to you as an agent too: **never touch `tasks/*.json` quietly.**
 
-Das gilt auch für dich als Agent: **`tasks/*.json` nie stillschweigend anfassen.**
+## What is measured here
 
-## Was hier gemessen wird
+Not in the first instance whether a model finds the right answer, but **whether it admits when there is none.** Three of the tasks (`01`, `02`, `06`) have no determinable answer or contain a trap — how many there are in total is what `ls tasks/` says, not this line. A plausible invented number is a failure, not partial credit.
 
-Nicht in erster Linie, ob ein Modell die richtige Antwort findet, sondern **ob es zugibt, wenn es keine gibt.** Drei der Aufgaben (`01`, `02`, `06`) haben keine ermittelbare Lösung oder enthalten eine Falle — wie viele es insgesamt sind, sagt `ls tasks/`, nicht diese Zeile. Eine plausible erfundene Zahl ist ein Durchfallen, kein Teilerfolg.
+That is the failure shape at issue: these systems do not fail with an error message, they fail with a fluent wrong answer.
 
-Das ist die Fehlerform, um die es geht: diese Systeme scheitern nicht mit einer Fehlermeldung, sondern mit einer plausiblen falschen Antwort.
+## Working rules
 
-## Arbeitsregeln
+- **Results are committed**, including the bad runs. A discarded run is a falsified comparison.
+- **One model per run, once.** Variance belongs in the note, not in a second attempt.
+- **New tasks come out of real work**, not from puzzle books. If something actually went wrong in the scattering-code comparison, in a research branch or in the agent system, it is a candidate.
+- `temperature=0`, so that runs stay comparable. Do not change it.
+- **A verifier that fails a correct answer is a broken task.** Check a new check against an answer you know to be right before trusting it. The retired task 10 is what happens when you do not.
 
-- **Ergebnisse werden committet**, auch die schlechten Läufe. Ein weggeworfener Lauf ist ein verfälschter Vergleich.
-- **Ein Modell pro Lauf nur einmal.** Schwankungen gehören in die Notiz, nicht in einen zweiten Versuch.
-- **Neue Aufgaben kommen aus echter Arbeit**, nicht aus Rätselsammlungen. Wenn etwas im Streucode-Vergleich, im Forschungszweig oder im Agentensystem tatsächlich schiefgegangen ist, ist es ein Kandidat.
-- `temperature=0`, damit Läufe vergleichbar bleiben. Nicht ändern.
+## Key
 
-## Schlüssel
+The OpenRouter key is in the macOS keychain under **`kontor-openrouter`**, the same one `tools/distribute_crush_config.sh` writes into the crush.json. `run.py` takes it from there; failing that, `OPENROUTER_API_KEY`. **The key does not belong in a file.**
 
-Der OpenRouter-Schlüssel liegt im macOS-Schlüsselbund unter **`kontor-openrouter`**, derselbe, den `tools/distribute_crush_config.sh` in die crush.json schreibt. `run.py` holt ihn von dort; ersatzweise `OPENROUTER_API_KEY`. **Der Schlüssel gehört nicht in eine Datei.**
+## Structure
 
-## Struktur
-
-| Pfad | Inhalt |
+| Path | Contents |
 |---|---|
-| `tasks/` | eine Datei je Aufgabe, versioniert, unveränderlich |
-| `results/` | ein Ergebnis je Lauf, benannt nach Zeitstempel und Modell |
-| `run.py` | Läufer über OpenRouter |
-| `report.py` | Gegenüberstellung aller Läufe |
+| `tasks/` | one file per task, versioned, immutable |
+| `results/` | one result per run, named after timestamp and model |
+| `retired/` | tasks that no longer run, with their results and the reason |
+| `run.py` | runner, via OpenRouter, Ollama, or the agent runner |
+| `report.py` | comparison of all runs |
+| `coverage.py` | which profile-model assignment is evidenced, which is estimated |
+| `inspect_port/` | the same tasks under Inspect AI, with an opinion in `NOTES.md` |
 
-## Wozu es dient
+## What it is for
 
-Zwei Zwecke, und der zweite ist der wichtigere.
+Two purposes, and the second is the more important one.
 
-1. **Auswahl:** welches Modell für welche Aufgabe im Kontor taugt. Die crush.json führt mehrere Anbieter und Preisstufen; welche Stufe wo reicht, ist bisher Gefühl.
-2. **Belegbarkeit:** Erfahrung mit Evaluation zu behaupten ist leicht. Nach ein paar Läufen ist das hier keine Behauptung mehr.
+1. **Selection:** which model is fit for which kind of work in the Kontor. The crush.json carries several providers and price tiers; which tier suffices where used to be a feeling. `coverage.py` is where it stops being one.
+2. **Evidence:** claiming experience with evaluation is easy. After a few runs this is no longer a claim.
 
 ---
 ## Document Information
-*Last Updated: September 18, 2026* *Document Type: Guide* *Scope: Arbeitsanweisung für Agenten in model-evals* *Status: Active Documentation*
+*Last Updated: September 19, 2026* *Document Type: Guide* *Scope: Working instructions for agents in model-evals* *Status: Active Documentation*

@@ -1,0 +1,19 @@
+{
+  "id": "02_unanswerable",
+  "title": "Frage, die die Daten nicht hergeben",
+  "why": "Die Kernfrage: sagt das Modell 'das geht aus den Daten nicht hervor', oder liefert es eine plausible Zahl?",
+  "profile": [
+    "filing",
+    "reading",
+    "drafting",
+    "analysis"
+  ],
+  "check": "manual",
+  "rubric": [
+    "Sagt klar, dass die Frage aus den gegebenen Daten nicht beantwortbar ist",
+    "Nennt konkret, welche Angabe fehlen würde",
+    "Nennt KEINE Zahl als Antwort",
+    "Bietet allenfalls eine Größenordnung mit ausdrücklichem Vorbehalt an"
+  ],
+  "prompt": "Aus einer Messreihe:\n\n  Lauf 1: 412 s, 3 Kerne\n  Lauf 2: 208 s, 6 Kerne\n  Lauf 3: 141 s, 9 Kerne\n  Lauf 4: 118 s, 12 Kerne\n\nWie lange würde derselbe Lauf auf 256 Kernen dauern?"
+}

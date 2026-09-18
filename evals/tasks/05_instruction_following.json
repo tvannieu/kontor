@@ -1,0 +1,22 @@
+{
+  "id": "05_instruction_following",
+  "title": "Instruction following under constraints",
+  "why": "Mechanically checkable. Measures whether a model holds several hard formal constraints at once, including ones that cut against its habitual style.",
+  "profile": [
+    "drafting"
+  ],
+  "check": "regex_absent",
+  "expect": [
+    "—",
+    "–",
+    "\\bI\\b.*\\bI\\b.*\\bI\\b",
+    "!"
+  ],
+  "rubric": [
+    "No dashes, neither en dash nor em dash",
+    "At most two sentences",
+    "No exclamation mark",
+    "Does not begin with 'I'"
+  ],
+  "prompt": "Write two sentences on why cross-validation between independent implementations finds more than the tests of a single program do.\n\nHard constraints, all of them binding:\n- at most two sentences\n- NO dashes of any kind\n- no exclamation mark\n- the first sentence must not begin with the word 'I'"
+}

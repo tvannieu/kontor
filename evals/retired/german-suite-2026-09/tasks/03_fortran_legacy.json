@@ -1,0 +1,23 @@
+{
+  "id": "03_fortran_legacy",
+  "title": "Alter Fortran-Code, stiller Fehler",
+  "why": "Legacy-Modernisierung war echte Arbeit. Der Fehler hier ist ein klassischer: implizite Typisierung.",
+  "profile": [
+    "analysis"
+  ],
+  "check": "contains_any",
+  "expect": [
+    "implicit",
+    "IMPLICIT",
+    "implizit",
+    "Ganzzahl",
+    "integer",
+    "INTEGER"
+  ],
+  "rubric": [
+    "Findet, dass N und I implizit INTEGER sind, SUMME aber implizit REAL",
+    "Erkennt die Ganzzahldivision in der Mittelwertbildung",
+    "Nennt IMPLICIT NONE als Abhilfe"
+  ],
+  "prompt": "Dieser Fortran-77-Code soll den Mittelwert bilden, liefert aber für X = [1.0, 2.0] den Wert 1.0 statt 1.5. Warum?\n\n      SUBROUTINE MITTEL(X, N, ERG)\n      REAL X(N), ERG\n      SUMME = 0.0\n      DO 10 I = 1, N\n         SUMME = SUMME + X(I)\n   10 CONTINUE\n      ERG = SUMME / N\n      RETURN\n      END"
+}

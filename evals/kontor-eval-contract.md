@@ -7,22 +7,22 @@
 
 ## Manual ratings must be numeric
 
-`report.py` classifies a manual task's mark from `manuell.bewertung` alone:
+`report.py` classifies a manual task's mark from `manual.rating` alone:
 
 ```
 {1: "+", 0.5: "o", 0: "-"}
 ```
 
-Anything else — a German label like `"bestanden"` or `"fehlgeschlagen"`, or any
+Anything else — a word like `"passed"` or `"failed"`, or any
 non-numeric value — falls through to `"?"` (unbewertet) and does not appear as
 a pass/fail/partial in the table. The rubric fields in `tasks/*.json` are German
 descriptions for the human rater; they are NOT the rating value.
 
 When rating an existing result:
 1. Read the task's `rubric` to know what each level means.
-2. Write `manuell.bewertung` as `1`, `0.5`, or `0`.
-3. Write `manuell.notiz` as the German rationale (mirror the rubric language —
-   the notes should read like the rubric, not like a paraphrase in English).
+2. Write `manual.rating` as `1`, `0.5`, or `0`.
+3. Write `manual.note` as the rationale, mirroring the rubric's own language —
+   the note should read like the rubric, not like a loose paraphrase of it.
 4. Run `python3 evals/report.py` and confirm the cell changed from `?` to `+`/`o`/`-`.
 
 ## Error codes mean different things — don't lump them as `!`

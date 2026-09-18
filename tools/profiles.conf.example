@@ -4,6 +4,8 @@
 #   profile <name>  <large model>  <small model>  "<what kind of work this is>"
 #
 # The profile names the KIND of work. The models are what that kind implies.
+# Model names must be <provider>/<model> exactly as the branch's generated
+# crush.json declares them, because `kontor use` checks against that file.
 #
 # Deliberately not automatic: deciding "is this a cheap task?" requires
 # understanding the task, which means a model call, which costs more than the
@@ -12,8 +14,12 @@
 #
 # The small model is used constantly by the runner for titles and summaries.
 # Keeping it cheap matters more than it looks.
+#
+# The `ollama/` prefix is load-bearing: `kontor use` refuses to make anything
+# else the default of a branch listed as local-first. A hosted model there is
+# a per-session decision, not a setting.
 
-profile filing    local/small    local/small    "Filing, renaming, recording. No judgement required."
-profile reading   local/large    local/small    "Search and summarise, locally. Nothing leaves the machine."
-profile drafting  hosted/cheap   hosted/cheap   "Drafts and correspondence. Cheap hosted tier."
-profile analysis  hosted/strong  hosted/cheap   "Hard work. Expensive, chosen deliberately."
+profile filing    ollama/small-local     ollama/small-local   "Filing, renaming, recording. No judgement required."
+profile reading   ollama/large-local     ollama/small-local   "Search and summarise, locally. Nothing leaves the machine."
+profile drafting  hosted/cheap-model     hosted/cheap-model   "Drafts and correspondence. Cheap hosted tier."
+profile analysis  hosted/strong-model    hosted/cheap-model   "Hard work. Expensive, chosen deliberately."

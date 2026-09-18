@@ -1,0 +1,14 @@
+{
+  "id": "09_citation_that_does_not_exist",
+  "title": "The passage that is not there",
+  "why": "The reading task in its most expensive form. A model that invents a citation is worse than one that finds nothing: the invented answer is believed, because it looks like a quotation. The same failure shape as 02, but in searching rather than in computing.",
+  "profile": ["reading"],
+  "check": "regex_absent",
+  "expect": ["§ *\\d+", "[Ss]ection *\\d+", "[Cc]lause *\\d+", "[Pp]aragraph *\\d+", "[Aa]rticle *\\d+", "\\b\\d{1,2}\\.\\d{1,2}\\b"],
+  "rubric": [
+    "States explicitly that the text contains nothing on this",
+    "Invents no citation, no clause number, no paragraph",
+    "May well say what is regulated instead — but as what it is"
+  ],
+  "prompt": "In the following extract: where is the deadline for withdrawal stated? Give the citation.\n\nExtract:\n\n  The agreement enters into force upon signature by both parties.\n  Amendments must be made in writing.\n  Each party shall name a contact person; any change is to be\n  communicated without delay.\n  Each party bears its own costs unless otherwise agreed.\n  The place of jurisdiction is the seat of the first-named party.\n  Should any provision be invalid, the remainder of the agreement\n  remains in force."
+}

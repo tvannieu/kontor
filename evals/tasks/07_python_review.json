@@ -1,21 +1,21 @@
 {
   "id": "07_python_review",
-  "title": "Python-Review mit stillem Fehler",
-  "why": "Der Fehler ist kein Absturz, sondern ein falsches Ergebnis: der Mittelwert wird über die falsche Achse gebildet.",
+  "title": "Python review with a silent error",
+  "why": "The bug is not a crash but a wrong result: the mean is taken over the wrong axis.",
   "profile": [
     "analysis"
   ],
   "check": "contains_any",
   "expect": [
     "axis",
-    "Achse",
+    "Axis",
     "axis=0",
     "axis=1"
   ],
   "rubric": [
-    "Findet, dass np.mean ohne axis über das gesamte Array mittelt",
-    "Erkennt, dass das Ergebnis ein Skalar statt eines Spektrums ist",
-    "Der Code stürzt nicht ab, er liefert etwas Falsches"
+    "Finds that np.mean without axis averages over the entire array",
+    "Recognises that the result is a scalar instead of a spectrum",
+    "The code does not crash, it returns something wrong"
   ],
-  "prompt": "Diese Funktion soll pro Wellenlänge über alle Korngrößen mitteln und ein Spektrum zurückgeben. Sie tut es nicht. Warum?\n\nimport numpy as np\n\ndef mittleres_spektrum(qext, gewichte):\n    # qext: array (n_groessen, n_wellenlaengen)\n    # gewichte: array (n_groessen,)\n    gewichtet = qext * gewichte[:, None]\n    return np.mean(gewichtet) / np.mean(gewichte)"
+  "prompt": "This function is meant to average over all grain sizes per wavelength and return a spectrum. It does not. Why?\n\nimport numpy as np\n\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    weighted = qext * weights[:, None]\n    return np.mean(weighted) / np.mean(weights)"
 }

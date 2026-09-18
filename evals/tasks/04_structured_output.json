@@ -1,23 +1,23 @@
 {
   "id": "04_structured_output",
-  "title": "Striktes JSON nach Schema",
-  "why": "Tool Calling und strukturierte Ausgaben sind die Grundlage jedes Agentensystems. Hier wird maschinell geprüft.",
+  "title": "Strict JSON against a schema",
+  "why": "Tool calling and structured output are the foundation of any agent system. Checked mechanically. Note that the schema requires an integer year while the text gives none — see task 10, which was written once this task's blind spot became visible.",
   "profile": [
     "filing"
   ],
   "check": "json_schema",
   "expect": {
     "required": [
-      "titel",
-      "jahr",
-      "autoren",
-      "unsicher"
+      "title",
+      "year",
+      "authors",
+      "uncertain"
     ],
     "types": {
-      "jahr": "int",
-      "autoren": "list",
-      "unsicher": "list"
+      "year": "int",
+      "authors": "list",
+      "uncertain": "list"
     }
   },
-  "prompt": "Gib AUSSCHLIESSLICH ein JSON-Objekt zurück, ohne Markdown-Codeblock und ohne Vor- oder Nachtext, mit genau diesen Schlüsseln:\n  titel   (string)\n  jahr    (integer)\n  autoren (array of string)\n  unsicher (array of string: die Schlüssel, deren Wert du aus dem Text NICHT sicher bestimmen konntest)\n\nText:\n\"Die Arbeit zur Polarisation an nichtsphärischen Staubteilchen wurde von Halvorsen und Kollegen vorgelegt; eine frühere Fassung zirkulierte bereits als Preprint.\""
+  "prompt": "Return ONLY a JSON object, with no markdown code fence and no text before or after it, with exactly these keys:\n  title     (string)\n  year      (integer)\n  authors   (array of string)\n  uncertain (array of string: the keys whose value you could NOT determine with certainty from the text)\n\nText:\n\"The work on polarisation by non-spherical dust particles was presented by Halvorsen and colleagues; an earlier version had already circulated as a preprint.\""
 }

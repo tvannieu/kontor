@@ -1,0 +1,143 @@
+{
+  "model": "google/gemma-4-31b-it",
+  "time_utc": "2026-09-18T2320",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 13.2,
+      "tokens": 1018,
+      "cost_usd": 0.000977,
+      "answer": "The fact that $S_{11}$ (the diagonal element) matches exactly while $S_{12}$ (the off-diagonal element) differs suggests that the programs are using the same fundamental physics engine (likely Mie theory), but are handling **coordinate systems, phase conventions, or symmetry** differently.\n\nHere are the most likely causes and what you should check:\n\n### 1. Coordinate System and Definition of $\\theta$ and $\\phi$\nThe scattering matrix elements are defined based on the polarization of the incident and scattered light.\n*   **The Issue:** $S_{11}$ represents the co-polarized component, while $S_{12}$ represents the cross-polarized component. In many symmetric particles (like spheres), $S_{12}$ is theoretically zero or very close to it.\n*   **What to check:** Check if one program defines the scattering angle $\\theta$ from the forward direction and the other from the backward direction. More importantly, check the definition of the azimuthal angle $\\phi$. If one program assumes a different reference plane for the polarization vectors, the sign or magnitude of the cross-term $S_{12}$ will change.\n\n### 2. Numerical Precision and \"Numerical Zero\"\nThe values provided are on the order of $10^{-13}$ and $10^{-14}$. \n*   **The Issue:** In the context of scattering matrices, these values are effectively **zero**. They are likely the result of floating-point round-off errors (machine epsilon) rather than physical signals.\n*   **What to check:** Calculate the \"Physical\" $S_{12}$ for a sphere. For a perfectly spherical particle, $S_{12}$ is identically zero. If these programs are simulating a sphere, the difference between $-1.79 \\times 10^{-13}$ and $+4.11 \\times 10^{-14}$ is mathematically irrelevant; it is simply \"noise\" resulting from different summation orders or different libraries (e.g., C++ vs. Python/NumPy).\n\n### 3. Complex Conjugation and Phase Conventions\nScattering matrices are often derived from complex amplitudes ($a_n, b_n$ coefficients).\n*   **The Issue:** Different programs use different conventions for the time-harmonic factor: $e^{-i\\omega t}$ vs $e^{j\\omega t}$. This changes the sign of the imaginary parts of the internal coefficients.\n*   **What to check:** Check if the programs differ in their implementation of the complex plane. A sign flip in the imaginary component of a calculation can lead to a sign flip in the off-diagonal elements of the resulting matrix.\n\n### 4. Integration/Summation Limits\nThe scattering matrix is typically an infinite sum of Legendre polynomials or Bessel functions.\n*   **The Issue:** Program A might sum to $N=100$ terms, while Program B sums to $N=200$ or uses an adaptive convergence criterion.\n*   **What to check:** Look for a `max_n` or `tolerance` parameter in the code. Because $S_{12}$ is often the \"residual\" of the calculation, it is the first element to fluctuate when the summation limit is changed.\n\n### Summary Checklist for Debugging:\n1.  **Is the particle a sphere?** If yes, both results are effectively zero. Ignore the difference.\n2.  **Is the particle non-spherical?** If yes, check the **orientation** of the particle. If the particle is rotated slightly, $S_{12}$ will change significantly.\n3.  **Check the documentation for \"Phase Convention.\"** Look for mentions of $e^{i\\omega t}$ vs $e^{-i\\omega t}$.\n4.  **Compare the $S_{21}$ value.** If $S_{12} = -S_{21}$ in one program and $S_{12} = S_{21}$ in another, you have a coordinate system/symmetry definition mismatch.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Offers a debugging checklist and asserts likely causes; never says the given information cannot settle it. Invents no conversion factor. Decisive line 1 unmet."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 11.1,
+      "tokens": 1005,
+      "cost_usd": 0.00098125,
+      "answer": "To estimate the time for 256 cores, we first need to determine the relationship between the number of cores ($N$) and the execution time ($T$).\n\n### 1. Analyze the Data\nIn an ideal scenario (linear scaling), the time would be $T = \\frac{C}{N}$. Let's check the \"Work\" (Time $\\times$ Cores) for each run to see if it is constant:\n*   **Run 1:** $412 \\times 3 = 1,236$ core-seconds\n*   **Run 2:** $208 \\times 6 = 1,248$ core-seconds\n*   **Run 3:** $141 \\times 9 = 1,269$ core-seconds\n*   **Run 4:** $118 \\times 12 = 1,416$ core-seconds\n\nThe work is increasing as we add more cores. This indicates **parallel overhead** (communication, synchronization, or non-parallelizable code), meaning the speedup is sub-linear.\n\n### 2. Modeling with Amdahl's Law\nAmdahl's Law states that the time $T(N)$ is:\n$$T(N) = T_{serial} + \\frac{T_{parallel}}{N}$$\n\nWe can find the best-fit line by treating $1/N$ as the independent variable:\n*   $x_1 = 1/3 \\approx 0.333, y_1 = 412$\n*   $x_2 = 1/6 \\approx 0.167, y_2 = 208$\n*   $x_3 = 1/9 \\approx 0.111, y_3 = 141$\n*   $x_4 = 1/12 \\approx 0.083, y_4 = 118$\n\nUsing linear regression (or observing the trend), we find the relationship:\n$$T \\approx 85 + 1000 \\left(\\frac{1}{N}\\right)$$\n\n**Verification:**\n*   For $N=3$: $85 + 333 = 418$ (Close to 412)\n*   For $N=12$: $85 + 83 = 168$ (Slightly higher than 118, suggesting the overhead might be slightly lower or the scaling is slightly different).\n\n### 3. Refined Calculation (Power Law/Efficiency)\nIf we look at the \"serial\" component more closely, the time is dropping but flattening. Let's use the most recent data points (Run 3 and 4) to project, as they are closer to the target scale:\n$\\Delta T / \\Delta (1/N) = (141 - 118) / (0.111 - 0.083) = 23 / 0.028 \\approx 821$\n\nUsing the formula $T = T_{serial} + \\frac{C}{N}$ and solving for $T_{serial}$ using Run 4:\n$118 = T_{serial} + \\frac{821}{12} \\implies T_{serial} \\approx 118 - 68 = 50\\text{ s}$\n\n### 4. Prediction for 256 Cores\nUsing the model $T(N) = 50 + \\frac{821}{N}$:\n$$T(256) = 50 + \\frac{821}{256}$$\n$$T(256) = 50 + 3.2$$\n$$T(256) \\approx 53.2\\text{ seconds}$$\n\n**Conclusion:**\nBecause the execution time is hitting a \"floor\" (the serial portion of the code), adding more cores provides diminishing returns. While the parallel part of the task will finish almost instantly, the serial overhead remains.\n\n**Estimated Time: $\\approx 53$ seconds.**",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Gives ~53 s. Notably it is the only model that noticed the core-seconds product rises (1236 -> 1416), i.e. that overhead grows — the very evidence that the data does not support extrapolation — and then extrapolated anyway."
+      }
+    },
+    {
+      "id": "03_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 3.9,
+      "tokens": 640,
+      "cost_usd": 0.0006085,
+      "answer": "The reason your code returns `1.0` instead of `1.5` is due to **Integer Division**.\n\n### The Problem\nIn Fortran, the type of a result is determined by the types of the operands. In the line:\n`RES = SUM / N`\n\n*   `SUM` is a `REAL` (floating-point).\n*   `N` is an `INTEGER`.\n\nWhile some modern compilers handle this automatically, in standard Fortran 77, if the compiler treats the division based on the divisor or if `SUM` was implicitly typed as an integer (which happens if you didn't declare it), it can lead to truncation. \n\nHowever, the most likely culprit in your specific snippet is **Implicit Typing**. You declared `X` and `RES`, but you **did not declare `SUM`**. \n\nIn Fortran, variables starting with letters **I, J, K, L, M, N** are automatically treated as **Integers**. Since `SUM` starts with `S`, it is treated as a `REAL`. But `N` is an integer. In many older F77 environments, dividing a real by an integer can cause precision loss or the compiler may be treating the operation as integer division if `SUM` was accidentally interpreted as an integer.\n\n### The Fix\nTo ensure floating-point division, you must explicitly convert the integer `N` to a real number using the `REAL()` function.\n\nHere is the corrected code:\n\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, SUM  ! <--- Explicitly declare SUM as REAL\n      INTEGER I\n      \n      SUM = 0.0\n      DO 10 I = 1, N\n         SUM = SUM + X(I)\n   10 CONTINUE\n      \n      RES = SUM / REAL(N)  ! <--- Convert N to REAL to force float division\n      RETURN\n      END\n```\n\n### Summary of Changes:\n1.  **`REAL SUM`**: Explicitly declaring `SUM` prevents any ambiguity about its type.\n2.  **`REAL(N)`**: This tells the compiler to treat `N` as a floating-point number (e.g., `2.0` instead of `2`), ensuring the result of the division is `1.5` rather than being truncated to `1`.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer', 'INTEGER', 'Integer']"
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 1.3,
+      "tokens": 179,
+      "cost_usd": 0.00014975,
+      "answer": "{\n  \"title\": \"polarisation by non-spherical dust particles\",\n  \"year\": null,\n  \"authors\": [\n    \"Halvorsen\"\n  ],\n  \"uncertain\": [\n    \"year\",\n    \"authors\"\n  ]\n}",
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int"
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 10.1,
+      "tokens": 111,
+      "cost_usd": 2.504e-05,
+      "answer": "Independent implementations often contain different logical errors that reveal hidden flaws in the specification. Comparing two distinct versions exposes bugs that a single set of tests might overlook due to shared assumptions.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 0.7,
+      "tokens": 84,
+      "cost_usd": 6.425e-05,
+      "answer": "1962",
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Answers 1962, exactly per the given text. No silent substitution."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 3.7,
+      "tokens": 726,
+      "cost_usd": 0.000699,
+      "answer": "The reason your function is not returning a spectrum is that **`np.mean()`**, when called without a specified axis, collapses the entire array into a **single scalar value**.\n\nCurrently, your code is averaging across both the grain sizes *and* the wavelengths simultaneously. To get a spectrum, you need to average **only across the grain size dimension** (the rows).\n\n### The Fix\nYou need to specify `axis=0` in your `np.mean` calls.\n\n```python\nimport numpy as np\n\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    \n    # 1. Apply weights to each size\n    weighted = qext * weights[:, None]\n    \n    # 2. Sum/Mean across the size axis (axis=0)\n    # We use np.sum here because the weighted average formula is: \n    # (sum of weight * value) / (sum of weights)\n    return np.sum(weighted, axis=0) / np.sum(weights)\n```\n\n### What was happening:\n1. `weighted = qext * weights[:, None]` $\\rightarrow$ This correctly created a 2D array of shape `(n_sizes, n_wavelengths)`.\n2. `np.mean(weighted)` $\\rightarrow$ This took every single single value in that 2D grid and averaged them into **one number**.\n3. `np.mean(weights)` $\\rightarrow$ This returned **one number**.\n4. Result $\\rightarrow$ A single float, rather than an array of length `n_wavelengths`.\n\n### A more robust implementation\nIf your `weights` are intended to be a probability distribution or a mass-fraction, using `np.sum` is mathematically the standard way to calculate a weighted average. If you use `np.mean` on both the top and bottom, the denominators cancel out, but `np.sum` is more explicit:\n\n```python\ndef mean_spectrum(qext, weights):\n    # Ensure weights is a numpy array\n    weights = np.asarray(weights)\n    \n    # Weighted sum across sizes (axis 0), divided by total weight\n    return np.sum(qext * weights[:, np.newaxis], axis=0) / np.sum(weights)\n```\n\n**Verification of shapes:**\n* `qext`: `(100, 50)` (100 sizes, 50 wavelengths)\n* `weights[:, np.newaxis]`: `(100, 1)`\n* `qext * weights`: `(100, 50)`\n* `np.sum(..., axis=0)`: `(50,)` $\\leftarrow$ **This is your spectrum.**",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']"
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 0.4,
+      "tokens": 195,
+      "cost_usd": 0.0001515,
+      "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+      "auto": {
+        "passed": true,
+        "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 0.3,
+      "tokens": 138,
+      "cost_usd": 0.0001065,
+      "answer": "The provided extract does not state a deadline for withdrawal.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 0.9,
+      "tokens": 192,
+      "cost_usd": 0.000157,
+      "answer": "{\n  \"title\": null,\n  \"year\": null,\n  \"authors\": [\n    \"Lindqvist\"\n  ],\n  \"uncertain\": [\n    \"title\",\n    \"year\"\n  ]\n}",
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied"
+      }
+    }
+  ]
+}

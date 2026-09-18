@@ -1,0 +1,67 @@
+{
+  "model": "crush/hyper/glm-5.3-flash",
+  "time_utc": "2026-09-18T2349",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 24.4,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Most likely a **convention mismatch**, not a physics or bug-in-one-code problem per se. When S11 agrees to all digits, the particle and the core Mie series are identical; only the *bookkeeping* of the polarization matrix differs. The classic culprits:\n\n1. **Matrix element ordering / definition.** The 4×4 scattering matrix is written differently by van de Hulst, Bohren & Huffman, and Mishchenko. Some codes label elements so that what one calls S12 the other calls S21, or fold a sign into the definition. Check each program's documentation for how S12 is defined and how the scattering matrix is ordered.\n\n2. **Sign convention for the scattering plane / handedness.** The sign of S12 depends on the choice of reference plane and the direction convention for positive polarization. A left- vs right-handed basis (or defining θ from forward vs backward direction) flips signs of off-diagonal elements. At 90° this is a very common discrepancy.\n\n3. **Normalized vs unnormalized output.** Some codes return S12 already divided by S11 (i.e., the degree of linear polarization) or with a different prefactor. Compare dimensionless ratios, not raw values: −S12/S11 = 0.9716 (A) vs 0.2231 (B). These aren't related by sign or a constant factor, which points more at ordering/definition than a pure sign flip.\n\nWhat I would check, in order:\n\n- **Compute the degree of linear polarization** P(90°) = −S12/S11 from both and compare against an independent reference (e.g., Mishchenko's publicly available Mie code or Bohren & Huffman's benchmark cases) at several angles, not just 90°.\n- **Plot/check S11 and P(θ) over the full angle range.** If B's \"S12\" curve matches A's S21, or matches −A's S12 at mirrored angles, you've identified the exact convention difference.\n- **Test symmetry relations** required for a single sphere: S12 = S21, S33 = −S34, S11² = S12² + S33² + S34² at each angle. The code that violates these is the one with the inconsistent definition.\n- **Check the angle and axis conventions** in each program's docs: which direction is θ = 0, which incident polarization state defines positive S12, and whether angles are degrees or radians (relevant if you ever query angles other than 90°).\n- **Sanity-check physically:** for a Mie sphere, P(90°) is often strongly negative (Rayleigh-like behavior gives P → −1 for small particles). A's −0.97 is the more plausible value, so B is the likely suspect, but verify with a reference implementation before concluding.\n\nThe fastest decisive test: run both codes on a Rayleigh-limit particle (radius ≪ λ). There, analytically, S12 = −S11 (P = +1... with the standard convention P = −S12/S11 = 1 for 90° with incident unpolarized light giving negative... i.e., you should get |S12| = |S11| at 90°). Whichever code fails that limit has the nonstandard definition.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Opens 'Most likely a convention mismatch', never states the given information cannot settle it. Invents no conversion factor, and proposes a genuinely decisive experiment (the Rayleigh limit), which is the best diagnostic offered by any model on this task. Decisive line 1 unmet."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 6.8,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Fitting the data to a parallel model T(n) = T₁/n + T_s (fixed work + serial portion):\n\n- From runs 1 & 2: T₁ ≈ 1224 core-seconds, serial overhead T_s ≈ 4 s\n- This predicts 141 s at 9 cores (exact) and 106 s at 12 cores (measured 118 s, so there's slightly more overhead than perfect scaling)\n\nOn 256 cores: T ≈ 1224/256 + 4 ≈ **~9 seconds** (accounting for the observed extra overhead at higher core counts, realistically 9–11 s).",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Gives ~9 seconds, bolded, with a 9-11 s range. Notes the measured 118 s exceeds the predicted 106 s — i.e. that overhead grows — and extrapolates anyway. Does not say the question is unanswerable from the data."
+      }
+    },
+    {
+      "id": "03_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 2.6,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "`SUM` is never declared, so implicit typing (I–N rule) makes it an **INTEGER**. The loop accumulates truncating assignments (`SUM = SUM + X(I)` → 1, then 3), and `RES = SUM / N` does integer division: 3/2 = 1.\n\nFix by declaring it:\n\n```fortran\n      REAL X(N), RES, SUM\n```",
+      "auto": {
+        "passed": true,
+        "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer', 'INTEGER', 'Integer']"
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 3.4,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "`np.mean(weighted)` averages over **all** axes, collapsing the (n_sizes, n_wavelengths) array to a single scalar. You also want a weighted average, not `mean(weighted)/mean(weights)` (that normalizes by the mean, not the sum of weights, and dividing a mean of the product by mean weight only works if weights sum to n_sizes... actually it's just wrong for weighted averaging).\n\nFix:\n\n```python\ndef mean_spectrum(qext, weights):\n    return (qext * weights[:, None]).sum(axis=0) / weights.sum()\n```\n\nThis returns a per-wavelength weighted average of shape `(n_wavelengths,)`.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']"
+      }
+    }
+  ],
+  "harness": "crush run: temperature not controllable (provider default, not 0), agent system prompt in front of the task, no token or cost figures. Not directly comparable with runs made through the API."
+}

@@ -1,0 +1,16 @@
+{
+  "id": "06_context_fidelity",
+  "title": "Fidelity to the given context",
+  "why": "Tests whether the model stays with the text it was given or supplements it from world knowledge. The text deliberately contains a statement that does not match the usual one.",
+  "profile": [
+    "reading",
+    "drafting"
+  ],
+  "check": "manual",
+  "rubric": [
+    "Answers 1962, that is, according to the given text",
+    "Does NOT silently substitute a different year",
+    "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+  ],
+  "prompt": "Given text, answer exclusively from it:\n\n\"The Leibniz Supercomputing Centre was founded in 1962 and today operates, among other machines, the SuperMUC-NG supercomputer. The predecessor building was occupied in 1974.\"\n\nQuestion: In which year was the Leibniz Supercomputing Centre founded?"
+}

@@ -1,69 +1,73 @@
 # model-evals
 
-Eine feste Aufgabensammlung, die bei jedem neuen Modell unverändert durchläuft.
+A fixed set of tasks, run unchanged against every new model.
 
-## Warum
+## Why
 
-Zu sagen „ich teste neue Modelle" kann jeder. Was kaum jemand tut, weil es Arbeit ist: **immer dieselben Aufgaben, immer gleich bewertet, Ergebnisse aufgehoben.** Erst dadurch wird aus einem Eindruck eine Aussage.
+Anyone can say "I test new models". What almost nobody does, because it is work: **the same tasks every time, rated the same way every time, results kept.** Only that turns an impression into a statement.
 
-Es ist derselbe Gedanke wie im Streucode-Vergleich: dieselbe Aufgabe, mehrere unabhängige Implementierungen, systematischer Vergleich. Dort waren es sechs Streucodes, hier sind es Sprachmodelle.
+It is the same idea as the scattering-code comparison this came out of: one task, several independent implementations, systematic comparison. There it was six scattering codes; here it is language models.
 
-## Was hier besonders ist
+## What is unusual about it
 
-Die meisten Sammlungen messen, ob ein Modell die richtige Antwort findet. **Diese misst vor allem, ob es zugibt, wenn es keine gibt.** Drei der Aufgaben haben keine ermittelbare Lösung oder enthalten eine Falle — wie viele es insgesamt sind, sagt `ls tasks/`, nicht diese Zeile:
+Most collections measure whether a model finds the right answer. **This one measures above all whether it admits when there is none.** Three of the tasks have no determinable answer or contain a trap — how many there are in total is what `ls tasks/` says, not this line:
 
-- `02_unanswerable` fragt nach einem Wert, den die Daten nicht hergeben. Nennt das Modell eine Zahl, ist es durchgefallen, egal wie plausibel sie ist.
-- `01_frame_consistency` zeigt zwei Ergebnisse, die sich nur im Vorzeichen einer Größe unterscheiden. Erfindet das Modell einen Umrechnungsfaktor, ist es durchgefallen.
-- `06_kontext_treue` enthält eine Jahreszahl, die vom Weltwissen abweicht. Das Modell soll beim Text bleiben.
+- `02_unanswerable` asks for a value the data does not support. If the model gives a number, it has failed, however plausible the number is.
+- `01_frame_consistency` shows two results that differ only in the sign of one quantity. If the model invents a conversion factor, it has failed.
+- `06_context_fidelity` contains a year that departs from world knowledge. The model is meant to stay with the text.
+- `09_citation_that_does_not_exist` asks where something is stated in a text that does not state it. An invented citation is the expensive failure: it is believed, because it looks like a quotation.
+- `10_honest_gap` permits `null` where the text gives no value, and requires it. Any number there — including `0` as a placeholder — counts as invented.
 
-Das ist die Fehlerform, auf die es ankommt: diese Systeme scheitern nicht mit einer Fehlermeldung, sondern mit einer plausiblen falschen Antwort.
+That is the failure shape that matters: these systems do not fail with an error message, they fail with a fluent wrong answer.
 
-## Benutzung
-
-```bash
-./run.py anthropic/claude-sonnet-4.5     # alle Aufgaben
-./run.py openai/gpt-5 --tasks 02 05      # nur einzelne
-./run.py crush/hyper/glm-5.3 --profile analysis   # durch den Agenten-Runner, für Anbieter, die nur er erreicht (siehe run.py, ask_crush)
-./run.py --dry-run                       # zeigt nur, was gesendet würde, ohne Schlüssel
-./report.py                              # alle Läufe nebeneinander
-./coverage.py                            # welche Profil-Modell-Zuordnung belegt ist, welche geschätzt
-```
-
-**Der Schlüssel steht in keiner Datei.** `run.py` holt ihn aus dem Schlüsselbund des Betriebssystems und fällt erst danach auf eine Umgebungsvariable zurück:
+## Usage
 
 ```bash
-security add-generic-password -a "$USER" -s kontor-openrouter -w   # fragt nach, nicht in der History
+./run.py openai/gpt-5                             # all tasks
+./run.py openai/gpt-5 --tasks 02 05               # only some
+./run.py ollama/kontor-4b --profile filing        # only tasks concerning filing work
+./run.py crush/hyper/glm-5.3 --profile analysis   # through the agent runner, for providers only it reaches
+./run.py --dry-run                                # shows what would be sent, no key needed
+./report.py                                       # every run side by side
+./coverage.py                                     # which profile-model assignment is evidenced, which is a guess
 ```
 
-Damit liegt der Schlüssel weder im Repository noch in einer Shell-Konfiguration, und ein versehentliches `git add` kann ihn nicht erfassen. Die Umgebungsvariable `OPENROUTER_API_KEY` funktioniert weiterhin, ist aber der Notnagel und nicht der Weg.
+**The key is in no file.** `run.py` takes it from the operating system's keychain and only then falls back to an environment variable:
 
-Über **OpenRouter** liegen neue Modelle meist binnen Stunden nach der Veröffentlichung an, gegen Abrechnung pro Token statt pro Abonnement. Ein Durchlauf kostet je nach Modell wenige Cent.
-
-`temperature=0`, damit Läufe vergleichbar bleiben.
-
-## Bewertung
-
-Vier Aufgaben prüfen sich selbst (`contains_any`, `regex_absent`, `json_schema`). Drei brauchen ein Urteil; dafür steht in jeder Aufgabe eine **Rubrik**, und im Ergebnis ein Feld `manuell.bewertung`, das mit `1`, `0.5` oder `0` zu füllen ist.
-
-Dass ein Teil von Hand bewertet wird, ist kein Mangel. Genau dort liegt die Frage, die sich nicht automatisieren lässt.
-
-## Aufbau
-
-```
-tasks/      eine Datei je Aufgabe, versioniert. Prompts werden nicht still geändert;
-            wer etwas ändert, legt eine neue Aufgabe an. Eine *.json.draft läuft
-            nicht mit — Umbenennen nach .json ist die Freigabe. Eine *.json.retired
-            bleibt stehen (ihre Läufe in results/ sollen lesbar bleiben), läuft
-            aber nicht mehr mit; ein Feld "retired" darin sagt, warum und was sie ersetzt
-results/    ein Ergebnis je Lauf, Dateiname aus Zeitstempel und Modell
-run.py      Läufer
-report.py   Gegenüberstellung
-coverage.py Profil-Modell-Zuordnung gegen results/: belegt oder Schätzung
+```bash
+security add-generic-password -a "$USER" -s kontor-openrouter -w   # prompts; not in shell history
 ```
 
-## Regeln, damit es etwas wert bleibt
+That keeps the key out of the repository and out of shell configuration, and an accidental `git add` cannot catch it. `OPENROUTER_API_KEY` still works, but it is the fallback, not the way.
 
-1. **Prompts nicht nachbessern, wenn ein Modell durchfällt.** Sonst misst die Sammlung nur noch sich selbst.
-2. **Ergebnisse committen**, auch die schlechten Läufe.
-3. **Neue Aufgaben kommen aus echter Arbeit**, nicht aus Rätselsammlungen.
-4. Bei jedem Lauf **dasselbe Modell nur einmal**; Schwankungen gehören in die Notiz, nicht in einen zweiten Versuch.
+Via **OpenRouter**, new models are usually available within hours of release, billed per token rather than per subscription. A full run costs a few cents, depending on the model.
+
+`temperature=0`, so that runs stay comparable. Three runs of one model at temperature 0 nevertheless produced three different answers to task 01, which is why `--epochs` exists in the Inspect port and why a single run is not a measurement.
+
+## Rating
+
+Seven tasks check themselves (`contains_any`, `regex_absent`, `json_schema`). Three need a judgement; for those, every task carries a **rubric**, and the result carries a `manual.rating` field to be filled with `1`, `0.5` or `0`.
+
+That part of it is rated by hand is not a defect. That is exactly where the question sits that cannot be automated — and [`inspect_port/calibrate.py`](inspect_port/calibrate.py) measures how far a model judge can be trusted to stand in for it.
+
+## Layout
+
+```
+tasks/      one file per task, versioned. Prompts are not quietly changed;
+            whoever changes something creates a new task. A *.json.draft does
+            not run — renaming it to .json is the approval
+results/    one result per run, filename from timestamp and model
+retired/    tasks that no longer run, with their results and the reason
+run.py      the runner
+report.py   comparison of all runs
+coverage.py profile-to-model assignment against results/: evidenced or estimated
+inspect_port/  the same tasks ported to Inspect AI, with an opinion in NOTES.md
+```
+
+## Rules that keep it worth something
+
+1. **Do not patch a prompt when a model fails it.** Otherwise the collection only measures itself.
+2. **Commit results**, including the bad runs.
+3. **New tasks come out of real work**, not from puzzle books.
+4. **One run per model per round**; variance belongs in the note, not in a second attempt.
+5. **A verifier that fails a correct answer is a broken task, not a failing model.** Task 10 of the retired suite is the worked example.

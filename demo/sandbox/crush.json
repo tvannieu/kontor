@@ -1,0 +1,83 @@
+{
+  "$schema": "https://charm.land/crush.json",
+  "providers": {
+    "ollama": {
+      "id": "ollama",
+      "name": "Ollama (local)",
+      "type": "ollama",
+      "base_url": "http://127.0.0.1:11434/v1",
+      "discover_models": false,
+      "models": [
+        {
+          "id": "kontor-8b:latest",
+          "name": "Kontor 8B",
+          "context_window": 16384,
+          "default_max_tokens": 8192,
+          "cost_per_1m_in": 0,
+          "cost_per_1m_out": 0,
+          "cost_per_1m_in_cached": 0,
+          "cost_per_1m_out_cached": 0,
+          "can_reason": true,
+          "supports_attachments": true
+        },
+        {
+          "id": "kontor-4b:latest",
+          "name": "Kontor 4B",
+          "context_window": 16384,
+          "default_max_tokens": 4096,
+          "cost_per_1m_in": 0,
+          "cost_per_1m_out": 0,
+          "cost_per_1m_in_cached": 0,
+          "cost_per_1m_out_cached": 0,
+          "can_reason": true,
+          "supports_attachments": true
+        }
+      ]
+    },
+    "hyper": {
+      "id": "hyper",
+      "name": "Charm Hyper",
+      "type": "hyper",
+      "base_url": "https://hyper.charm.land/api/v1/fantasy",
+      "discover_models": false,
+      "models": [
+        {
+          "id": "qwen3.8-flash",
+          "name": "Qwen3.8 Flash",
+          "context_window": 1000000,
+          "default_max_tokens": 32000,
+          "cost_per_1m_in": 0.15,
+          "cost_per_1m_out": 0.47,
+          "cost_per_1m_in_cached": 0,
+          "cost_per_1m_out_cached": 0.016,
+          "can_reason": true,
+          "supports_attachments": true
+        },
+        {
+          "id": "glm-5.3",
+          "name": "GLM 5.3",
+          "context_window": 1048576,
+          "default_max_tokens": 32000,
+          "cost_per_1m_in": 1.52,
+          "cost_per_1m_out": 4.79,
+          "cost_per_1m_in_cached": 0,
+          "cost_per_1m_out_cached": 0.28,
+          "can_reason": true,
+          "supports_attachments": true
+        }
+      ]
+    }
+  },
+  "models": {
+    "large": {
+      "model": "kontor-4b:latest",
+      "provider": "ollama",
+      "max_tokens": 8192
+    },
+    "small": {
+      "model": "kontor-4b:latest",
+      "provider": "ollama",
+      "max_tokens": 4096
+    }
+  }
+}

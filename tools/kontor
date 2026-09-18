@@ -28,7 +28,7 @@ cfg="$repo/crush.json"
 
 case "${1:-}" in
   profiles|"")
-    printf '%-10s %-26s %s\n' PROFILE MODELL ZWECK
+    printf '%-10s %-26s %s\n' PROFILE MODEL PURPOSE
     while read -r p; do
       printf '%-10s %-26s %s\n' "$p" "$(field "$p" 3)" "$(field "$p" 0)"
     done < <(names)
@@ -86,8 +86,8 @@ for slot,spec in (("large",large),("small",small)):
     c["models"][slot] = {**c["models"].get(slot,{}), "provider":prov, "model":mid}
 json.dump(c, open(cfg,"w"), indent=2); open(cfg,"a").write("\n")
 PY
-    printf 'kontor: %s ist jetzt %s — %s\n' "$(basename "$repo")" "$p" "$l"
-    printf '⚠️  Die naechste Verteilung setzt das zurueck. Fuer dauerhaft: profiles.conf.\n'
+    printf 'kontor: %s is now %s — %s\n' "$(basename "$repo")" "$p" "$l"
+    printf 'Note: the next distribution resets this. For good: profiles.conf.\n'
     ;;
 
   *) echo "usage: kontor [profiles|which|run <p> \"...\"|use <p>]" >&2; exit 2 ;;

@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
-"""Stellt alle Läufe nebeneinander. Ohne Argumente: Übersicht über alles."""
+"""Puts every run side by side. Without arguments: an overview of all of them."""
 import json, sys
 from pathlib import Path
 
 R = Path(__file__).resolve().parent / "results"
 runs = sorted(R.glob("*.json"))
 if not runs:
-    sys.exit("Noch keine Läufe in results/.")
+    sys.exit("No runs in results/ yet.")
 
-zeilen, modelle, kosten = {}, [], {}
+rows, models, costs = {}, [], {}
 for f in runs:
     d = json.loads(f.read_text(encoding="utf-8"))
-    name = f"{d['modell']}  ({d['zeit_utc'][:10]})"
-    modelle.append(name)
-    lauf_kosten = [a["kosten_usd"] for a in d["aufgaben"] if a.get("kosten_usd") is not None]
-    kosten[name] = sum(lauf_kosten) if lauf_kosten else None
-    for a in d["aufgaben"]:
-        if "fehler" in a:
+    name = f"{d['model']}  ({d['time_utc'][:10]})"
+    models.append(name)
+    run_costs = [t["cost_usd"] for t in d["tasks"] if t.get("cost_usd") is not None]
+    costs[name] = sum(run_costs) if run_costs else None
+    for t in d["tasks"]:
+        if "error" in t:
             mark = "!"
-        elif "automatisch" in a:
-            mark = "+" if a["automatisch"]["bestanden"] else "-"
+        elif "auto" in t:
+            mark = "+" if t["auto"]["passed"] else "-"
         else:
-            b = a.get("manuell", {}).get("bewertung")
-            mark = {1: "+", 0.5: "o", 0: "-"}.get(b, "?")
-        zeilen.setdefault(a["id"], {})[name] = mark
+            r = t.get("manual", {}).get("rating")
+            mark = {1: "+", 0.5: "o", 0: "-"}.get(r, "?")
+        rows.setdefault(t["id"], {})[name] = mark
 
-w = max(len(i) for i in zeilen) + 2
-print(" " * w + "  ".join(f"{i+1:>3}" for i in range(len(modelle))))
-for tid in sorted(zeilen):
-    print(f"{tid:<{w}}" + "  ".join(f"{zeilen[tid].get(m,' '):>3}" for m in modelle))
-print("\nLegende:  + bestanden   o teilweise   - durchgefallen   ? unbewertet   ! Fehler\n")
-for i, m in enumerate(modelle, 1):
-    k = kosten[m]
-    kost_str = f"  ${k:.5f}" if k is not None else "  lokal / nicht erfasst"
-    print(f"  {i}: {m}{kost_str}")
+w = max(len(i) for i in rows) + 2
+print(" " * w + "  ".join(f"{i+1:>3}" for i in range(len(models))))
+for tid in sorted(rows):
+    print(f"{tid:<{w}}" + "  ".join(f"{rows[tid].get(m,' '):>3}" for m in models))
+print("\nKey:  + passed   o partial   - failed   ? unrated   ! error\n")
+for i, m in enumerate(models, 1):
+    c = costs[m]
+    cost_str = f"  ${c:.5f}" if c is not None else "  local / not recorded"
+    print(f"  {i}: {m}{cost_str}")

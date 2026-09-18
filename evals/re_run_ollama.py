@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Re-run all 7 eval tasks against both Ollama models.
+"""Re-run the eval tasks against both Ollama models.
 
 kontor-8b:latest needs num_ctx=4096 (16K doesn't fit in the machine's current
 memory state — it's loaded at 6.5GB, only ~148MB free, load avg 24/29/18).
@@ -62,7 +62,7 @@ def run_model(model, task_ids, num_ctx=None):
     print(f"Model: {model}  tasks: {task_ids}  num_ctx: {num_ctx}")
     print(f"{'='*60}")
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M")
-    run = {"modell": f"ollama/{model}", "zeit_utc": stamp, "aufgaben": []}
+    run = {"model": f"ollama/{model}", "time_utc": stamp, "tasks": []}
 
     for tid in task_ids:
         t = TASK_PROMPTS[tid]
@@ -70,28 +70,28 @@ def run_model(model, task_ids, num_ctx=None):
         text, dur, usage, err = call_ollama(model, t["prompt"], num_ctx, timeout=600)
 
         if err:
-            print(f"FEHLER: {err[:120]}")
-            run["aufgaben"].append({"id": tid, "fehler": err[:200]})
+            print(f"ERROR: {err[:120]}")
+            run["tasks"].append({"id": tid, "error": err[:200]})
             continue
 
-        rec = {"id": tid, "titel": t["title"], "sekunden": dur,
-               "tokens": usage.get("total_tokens"), "antwort": text}
+        rec = {"id": tid, "title": t["title"], "seconds": dur,
+               "tokens": usage.get("total_tokens"), "answer": text}
 
         check_fn = CHECKS.get(t.get("check", "manual"))
         if check_fn and t.get("expect") is not None:
             ok, note = check_fn(text, t["expect"])
-            rec["automatisch"] = {"bestanden": ok, "notiz": note}
-            print(f"{'BESTANDEN' if ok else 'DURCHGEFALLEN'}  ({note})  {dur}s")
+            rec["auto"] = {"passed": ok, "note": note}
+            print(f"{'PASS' if ok else 'FAIL'}  ({note})  {dur}s")
         else:
-            rec["manuell"] = {"bewertung": None, "rubrik": t.get("rubric", []), "notiz": ""}
-            print(f"zu bewerten  {dur}s")
+            rec["manual"] = {"rating": None, "rubric": t.get("rubric", []), "note": ""}
+            print(f"to be rated  {dur}s")
 
-        run["aufgaben"].append(rec)
+        run["tasks"].append(rec)
 
     RESULTS_DIR.mkdir(exist_ok=True)
     out = RESULTS_DIR / f"{stamp}_ollama_{model.replace(':', '_')}.json"
     out.write_text(json.dumps(run, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\nGeschrieben: {out.name}")
+    print(f"\nWritten: {out.name}")
     return out
 
 def main():
@@ -111,7 +111,7 @@ def main():
     for model, num_ctx in models:
         ids = TASK_IDS if task_filter is None else [t for t in TASK_IDS if any(t.startswith(f) for f in task_filter)]
         if not ids:
-            print(f"Keine Aufgaben für Filter {task_filter}")
+            print(f"No tasks matching filter {task_filter}")
             continue
         run_model(model, ids, num_ctx)
 

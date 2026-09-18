@@ -69,9 +69,9 @@ def gather(tasks):
             d = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
-        for a in d["aufgaben"]:
-            if a["id"] in tasks and a.get("manuell", {}).get("bewertung") is not None:
-                add(a["id"], d["modell"], a["antwort"], HUMAN.get(a["manuell"]["bewertung"]), f.name)
+        for a in d["tasks"]:
+            if a["id"] in tasks and a.get("manual", {}).get("rating") is not None:
+                add(a["id"], d["model"], a["answer"], HUMAN.get(a["manual"]["rating"]), f.name)
     for f in sorted(glob.glob(str(LOGS / "*kontor-manual*.eval"))):
         log = read_eval_log(f)
         if log.status != "success":

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Läuft die feste Aufgabensammlung gegen ein Modell und legt das Ergebnis ab.
+Run the fixed task set against one model and record the result.
 
     ./run.py anthropic/claude-sonnet-4.5
     ./run.py openai/gpt-5 --tasks 02 05
-    ./run.py ollama/kontor-4b --profile filing   nur die Aufgaben, die Ablage-Arbeit betreffen
-    ./run.py crush/hyper/glm-5.3 --profile analysis   durch den Agenten-Runner, für Anbieter, die nur er erreicht
+    ./run.py ollama/kontor-4b --profile filing      only the tasks that concern filing work
+    ./run.py crush/hyper/glm-5.3 --profile analysis through the agent runner, for providers only it reaches
 
-Ohne Schlüssel:  ./run.py --dry-run   zeigt, was gesendet würde.
+Without a key:  ./run.py --dry-run   shows what would be sent.
 """
 import argparse, atexit, json, os, shutil, subprocess, sys, tempfile, time, re, urllib.request, urllib.error
 from datetime import datetime, timezone
@@ -19,12 +19,12 @@ API = "https://openrouter.ai/api/v1/chat/completions"
 
 
 def load_tasks(only=None, profile=None):
-    """only: Aufgaben-Präfixe. profile: nur Aufgaben, die dieses Profil betreffen.
+    """only: task-id prefixes. profile: only tasks that concern this profile.
 
-    Ein Profil ist eine Art von Arbeit, kein Zweig. Aufgaben ohne profile-Feld
-    gelten für alle — wer keine Zuordnung hat, wird nicht stillschweigend
-    ausgeschlossen. Jede Prüfung hat eine Population, die sie ausschliesst;
-    hier ist sie leer und das ist Absicht."""
+    A profile is a kind of work, not a branch. Tasks without a profile field
+    apply to all of them — anything unassigned is not silently excluded.
+    Every check has a population it leaves out; here that population is
+    empty, deliberately."""
     out = []
     for f in sorted(TASKS.glob("*.json")):
         t = json.loads(f.read_text(encoding="utf-8"))
@@ -40,20 +40,18 @@ _CRUSH_CWD = None
 
 
 def ask_crush(name, prompt, timeout):
-    """Ein 'crush/'-Präfix bedeutet: durch den Agenten-Runner, nicht direkt.
+    """A 'crush/' prefix means: through the agent runner, not directly.
 
-    Nötig für Anbieter, die nur crush selbst erreicht -- die Hyper-Modelle
-    sprechen Charms eigenes Protokoll, nicht das OpenAI-Format, und crush
-    hält das Login dazu. Zwei Einschränkungen, die im Ergebnis stehen müssen:
-    die Temperatur ist nicht steuerbar (Anbieter-Standard, nicht 0), und
-    crush legt seinen Agenten-Systemprompt vor die Aufgabe. Läufe hierüber
-    sind deshalb ein anderes Geschirr als die direkten Aufrufe und werden
-    im Ergebnis als solches markiert.
+    Needed for providers only crush itself reaches — the Hyper models speak
+    Charm's own protocol rather than the OpenAI format, and crush holds the
+    login for it. Two limitations belong in the result: the temperature is
+    not controllable (the provider's default, not 0), and crush puts its
+    agent system prompt in front of the task. Runs made this way are a
+    different harness from the direct calls and are marked as one.
 
-    crush liest seine Anbieter aus der crush.json des Arbeitsverzeichnisses,
-    darum bekommt ein Wegwerf-Verzeichnis eine Kopie der von Kontor
-    verteilten -- so landet auch die Sitzungsdatenbank dort und nicht im
-    Repository."""
+    crush reads its providers from the crush.json of the working directory,
+    so a throwaway directory gets a copy of the one Kontor distributes —
+    which also keeps its session database out of the repository."""
     global _CRUSH_CWD
     if _CRUSH_CWD is None:
         _CRUSH_CWD = tempfile.mkdtemp(prefix="kontor-evals-crush-")
@@ -69,14 +67,14 @@ def ask_crush(name, prompt, timeout):
 
 
 def ask(model, prompt, key, temperature=0.0, timeout=600):
-    """Ein 'ollama/'-Präfix bedeutet: lokal, und zwar ausschliesslich.
+    """An 'ollama/' prefix means: local, and local only.
 
-    Früher wurde erst OpenRouter versucht und bei HTTP 400 lokal nachgefasst,
-    mit unverändertem Modellnamen -- den Ollama nicht kennt. Der zweite Fehler
-    wurde dann von einem nackten `except Exception: pass` verschluckt und der
-    erste gemeldet. Die Fehlermeldung zeigte damit auf den falschen Dienst.
-    Jetzt wird geroutet statt geraten, und ein lokaler Fehler wird als lokaler
-    Fehler gemeldet."""
+    An earlier version tried OpenRouter first and fell back to local on
+    HTTP 400, with the model name unchanged — a name Ollama does not know.
+    The second error was then swallowed by a bare `except Exception: pass`
+    and the first one reported, so the message pointed at the wrong service.
+    It routes now instead of guessing, and a local failure is reported as a
+    local failure."""
     if model.startswith("crush/"):
         return ask_crush(model.split("/", 1)[1], prompt, timeout)
     local = model.startswith("ollama/")
@@ -100,8 +98,8 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
         url, headers = API, {
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/kontor-evals",
-            "X-Title": "model-evals",
+            "HTTP-Referer": "https://github.com/tvannieu/kontor",
+            "X-Title": "kontor-evals",
         }
 
     req = urllib.request.Request(url, data=body, headers=headers)
@@ -109,20 +107,20 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         d = json.loads(r.read())
     msg = d["choices"][0]["message"]
-    # Denkende Modelle legen die Ausgabe in ein eigenes Feld und lassen
-    # content leer, wenn das Token-Budget vorher aufgebraucht ist.
+    # Reasoning models put the output in a field of their own and leave
+    # content empty when the token budget runs out before the answer.
     text = msg.get("content") or msg.get("reasoning") or ""
     return text, round(time.time() - t0, 1), d.get("usage", {})
 
 
 def check_contains_any(ans, expect):
     hits = [e for e in expect if e.lower() in ans.lower()]
-    return (bool(hits), f"gefunden: {hits}" if hits else f"keiner von {expect}")
+    return (bool(hits), f"found: {hits}" if hits else f"none of {expect}")
 
 
 def check_regex_absent(ans, expect):
     hits = [p for p in expect if re.search(p, ans)]
-    return (not hits, "sauber" if not hits else f"verboten, aber vorhanden: {hits}")
+    return (not hits, "clean" if not hits else f"forbidden but present: {hits}")
 
 
 def check_json_schema(ans, expect):
@@ -131,30 +129,30 @@ def check_json_schema(ans, expect):
     try:
         o = json.loads(raw)
     except Exception as e:
-        return (False, f"kein gültiges JSON: {e}")
+        return (False, f"not valid JSON: {e}")
     missing = [k for k in expect.get("required", []) if k not in o]
     if missing:
-        return (False, f"Schlüssel fehlen: {missing}")
+        return (False, f"missing keys: {missing}")
     kinds = {"int": int, "list": list, "str": str}
     for k, want in expect.get("types", {}).items():
         if k in o and not isinstance(o[k], kinds[want]):
-            return (False, f"{k} ist {type(o[k]).__name__}, erwartet {want}")
-    # Zwei optionale Zusaetze (18.09.2026, fuer Aufgabe 10): Schluessel, die
-    # null sein MUESSEN -- weil der Text den Wert nicht hergibt und jede Zahl
-    # dort erfunden waere -- und Listen, die bestimmte Eintraege enthalten
-    # muessen. Aufgabe 04 kann eine ehrlich markierte Luecke nicht von einem
-    # plausiblen Ratewert unterscheiden; hiermit kann es eine Aufgabe.
+            return (False, f"{k} is {type(o[k]).__name__}, expected {want}")
+    # Two optional additions (2026-09-18, for task 10): keys that MUST be
+    # null — because the text does not supply the value and any number there
+    # would be invented — and lists that must contain particular entries.
+    # Task 04 cannot tell an honestly marked gap from a plausible guess;
+    # with these, a task can.
     for k in expect.get("null", []):
         if k not in o:
-            return (False, f"{k} fehlt")
+            return (False, f"{k} missing")
         if o[k] is not None:
-            return (False, f"{k} ist {o[k]!r}, aber der Text gibt keinen Wert her: erfunden")
+            return (False, f"{k} is {o[k]!r}, but the text supplies no value: invented")
     for k, items in expect.get("list_contains", {}).items():
         have = o.get(k) if isinstance(o.get(k), list) else []
         missing = [i for i in items if i not in have]
         if missing:
-            return (False, f"{k} nennt nicht: {missing}")
-    return (True, "Schema erfüllt")
+            return (False, f"{k} does not list: {missing}")
+    return (True, "schema satisfied")
 
 
 CHECKS = {"contains_any": check_contains_any,
@@ -163,7 +161,7 @@ CHECKS = {"contains_any": check_contains_any,
 
 
 def get_key():
-    """Erst der Schlüsselbund, wie Kontor ihn benutzt, dann die Umgebungsvariable."""
+    """The OS keychain first, the way Kontor uses it, then the environment."""
     import subprocess
     try:
         out = subprocess.run(
@@ -178,38 +176,38 @@ def get_key():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("model", nargs="?", help="z.B. anthropic/claude-sonnet-4.5")
-    ap.add_argument("--tasks", nargs="*", help="nur diese Präfixe, z.B. 02 05")
-    ap.add_argument("--profile", help="nur Aufgaben dieses Profils, z.B. filing")
+    ap.add_argument("model", nargs="?", help="e.g. anthropic/claude-sonnet-4.5")
+    ap.add_argument("--tasks", nargs="*", help="only these prefixes, e.g. 02 05")
+    ap.add_argument("--profile", help="only tasks of this profile, e.g. filing")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
     tasks = load_tasks(a.tasks, a.profile)
     if not tasks:
-        sys.exit("Keine Aufgaben gefunden.")
+        sys.exit("No tasks found.")
 
     if a.dry_run:
         for t in tasks:
             print(f"\n=== {t['id']}  ({t['check']})\n{t['prompt'][:300]}")
-        print(f"\n{len(tasks)} Aufgaben.")
+        print(f"\n{len(tasks)} tasks.")
         return
 
     if not a.model:
-        sys.exit("Modell angeben, z.B.:  ./run.py anthropic/claude-sonnet-4.5")
+        sys.exit("Name a model, e.g.:  ./run.py anthropic/claude-sonnet-4.5")
     key = get_key()
     if not key and not a.model.startswith(("ollama/", "crush/")):
-        sys.exit("Kein OpenRouter-Schlüssel gefunden.\n"
-                 "Kontor legt ihn im Schlüsselbund unter 'kontor-openrouter' ab:\n"
+        sys.exit("No OpenRouter key found.\n"
+                 "Kontor keeps it in the OS keychain under 'kontor-openrouter':\n"
                  "  security find-generic-password -s kontor-openrouter -w\n"
-                 "Alternativ:  export OPENROUTER_API_KEY=sk-or-...")
+                 "Alternatively:  export OPENROUTER_API_KEY=sk-or-...")
 
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M")
-    run = {"modell": a.model, "zeit_utc": stamp, "aufgaben": []}
+    run = {"model": a.model, "time_utc": stamp, "tasks": []}
     if a.model.startswith("crush/"):
-        run["geschirr"] = ("crush run: Temperatur nicht steuerbar (Anbieter-Standard, nicht 0), "
-                           "Agenten-Systemprompt vor der Aufgabe, keine Token- oder Kostenzahlen. "
-                           "Nicht direkt vergleichbar mit Läufen über die API.")
-    offen = 0
+        run["harness"] = ("crush run: temperature not controllable (provider default, not 0), "
+                          "agent system prompt in front of the task, no token or cost figures. "
+                          "Not directly comparable with runs made through the API.")
+    open_ratings = 0
 
     for t in tasks:
         print(f"  {t['id']} ... ", end="", flush=True)
@@ -217,38 +215,38 @@ def main():
             ans, dur, usage = ask(a.model, t["prompt"], key)
         except urllib.error.HTTPError as e:
             print(f"HTTP {e.code}")
-            run["aufgaben"].append({"id": t["id"], "fehler": f"HTTP {e.code}: {e.read()[:200].decode(errors='replace')}"})
+            run["tasks"].append({"id": t["id"], "error": f"HTTP {e.code}: {e.read()[:200].decode(errors='replace')}"})
             continue
         except Exception as e:
-            print(f"Fehler: {e}")
-            run["aufgaben"].append({"id": t["id"], "fehler": str(e)})
+            print(f"Error: {e}")
+            run["tasks"].append({"id": t["id"], "error": str(e)})
             continue
 
-        rec = {"id": t["id"], "titel": t["title"], "sekunden": dur,
-               "tokens": usage.get("total_tokens"), "kosten_usd": usage.get("cost"),
-               "antwort": ans}
-        kost = f"  ${rec['kosten_usd']:.5f}" if rec["kosten_usd"] is not None else ""
+        rec = {"id": t["id"], "title": t["title"], "seconds": dur,
+               "tokens": usage.get("total_tokens"), "cost_usd": usage.get("cost"),
+               "answer": ans}
+        cost = f"  ${rec['cost_usd']:.5f}" if rec["cost_usd"] is not None else ""
         fn = CHECKS.get(t["check"])
         if fn:
             ok, note = fn(ans, t["expect"])
-            rec["automatisch"] = {"bestanden": ok, "notiz": note}
-            print(("BESTANDEN" if ok else "DURCHGEFALLEN") + f"  ({note})  {dur}s{kost}")
+            rec["auto"] = {"passed": ok, "note": note}
+            print(("PASS" if ok else "FAIL") + f"  ({note})  {dur}s{cost}")
         else:
-            rec["manuell"] = {"bewertung": None, "rubrik": t.get("rubric", []), "notiz": ""}
-            offen += 1
-            print(f"zu bewerten  {dur}s{kost}")
-        run["aufgaben"].append(rec)
+            rec["manual"] = {"rating": None, "rubric": t.get("rubric", []), "note": ""}
+            open_ratings += 1
+            print(f"to be rated  {dur}s{cost}")
+        run["tasks"].append(rec)
 
     RESULTS.mkdir(exist_ok=True)
     out = RESULTS / f"{stamp}_{a.model.replace('/', '_')}.json"
     out.write_text(json.dumps(run, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\nGeschrieben: {out.relative_to(ROOT)}")
-    kosten = [r["kosten_usd"] for r in run["aufgaben"] if r.get("kosten_usd") is not None]
-    if kosten:
-        print(f"Kosten (OpenRouter, gemeldet): ${sum(kosten):.5f}")
-    if offen:
-        print(f"{offen} Aufgaben warten auf deine Bewertung. Feld 'manuell.bewertung' "
-              f"auf 1, 0.5 oder 0 setzen und 'notiz' ausfüllen.")
+    print(f"\nWritten: {out.relative_to(ROOT)}")
+    costs = [r["cost_usd"] for r in run["tasks"] if r.get("cost_usd") is not None]
+    if costs:
+        print(f"Cost (as reported by OpenRouter): ${sum(costs):.5f}")
+    if open_ratings:
+        print(f"{open_ratings} tasks await your rating. Set the field 'manual.rating' "
+              f"to 1, 0.5 or 0 and fill in 'note'.")
 
 
 if __name__ == "__main__":
