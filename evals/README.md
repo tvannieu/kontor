@@ -52,7 +52,9 @@ Dass ein Teil von Hand bewertet wird, ist kein Mangel. Genau dort liegt die Frag
 ```
 tasks/      eine Datei je Aufgabe, versioniert. Prompts werden nicht still geändert;
             wer etwas ändert, legt eine neue Aufgabe an. Eine *.json.draft läuft
-            nicht mit — Umbenennen nach .json ist die Freigabe
+            nicht mit — Umbenennen nach .json ist die Freigabe. Eine *.json.retired
+            bleibt stehen (ihre Läufe in results/ sollen lesbar bleiben), läuft
+            aber nicht mehr mit; ein Feld "retired" darin sagt, warum und was sie ersetzt
 results/    ein Ergebnis je Lauf, Dateiname aus Zeitstempel und Modell
 run.py      Läufer
 report.py   Gegenüberstellung
