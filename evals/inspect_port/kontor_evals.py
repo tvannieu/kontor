@@ -15,7 +15,7 @@ Two Inspect tasks, matching the split run.py already makes:
                       is the part actually worth having an opinion about,
                       see NOTES.md.
 
-Usage:
+Usage (once: python3 -m venv evals/.venv && evals/.venv/bin/pip install -r evals/inspect_port/requirements.txt):
     inspect eval evals/inspect_port/kontor_evals.py@kontor_auto \\
         --model ollama/kontor-4b:latest
     inspect eval evals/inspect_port/kontor_evals.py@kontor_manual \\

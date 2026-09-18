@@ -1,0 +1,9 @@
+# The two direct dependencies of the Inspect port, pinned to what resolved on
+# 2026-09-17 and was actually run against. openai is not used directly — it is
+# what Inspect's Ollama and OpenRouter providers import under the hood, and
+# Inspect only tells you it's missing at the first model call.
+#
+#   python3 -m venv evals/.venv && source evals/.venv/bin/activate
+#   pip install -r evals/inspect_port/requirements.txt
+inspect_ai==0.3.264
+openai==3.14.1
