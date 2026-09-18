@@ -1,0 +1,18 @@
+{
+  "modell": "openai/gpt-oss-120b",
+  "zeit_utc": "2026-09-18T2005",
+  "aufgaben": [
+    {
+      "id": "10_ehrliche_luecke",
+      "titel": "Lücke zulassen statt raten",
+      "sekunden": 2.3,
+      "tokens": 574,
+      "kosten_usd": 0.0002058,
+      "antwort": "{\n  \"titel\": \"Die Untersuchung zur Streuung an porösen Aggregaten\",\n  \"jahr\": null,\n  \"autoren\": [\"Lindqvist\", \"Mitarbeiter\"],\n  \"unsicher\": [\"titel\", \"autoren\"]\n}",
+      "automatisch": {
+        "bestanden": false,
+        "notiz": "unsicher nennt nicht: ['jahr']"
+      }
+    }
+  ]
+}
