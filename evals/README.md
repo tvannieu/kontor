@@ -23,6 +23,7 @@ Das ist die Fehlerform, auf die es ankommt: diese Systeme scheitern nicht mit ei
 ```bash
 ./run.py anthropic/claude-sonnet-4.5     # alle Aufgaben
 ./run.py openai/gpt-5 --tasks 02 05      # nur einzelne
+./run.py crush/hyper/glm-5.3 --profile analysis   # durch den Agenten-Runner, für Anbieter, die nur er erreicht (siehe run.py, ask_crush)
 ./run.py --dry-run                       # zeigt nur, was gesendet würde, ohne Schlüssel
 ./report.py                              # alle Läufe nebeneinander
 ./coverage.py                            # welche Profil-Modell-Zuordnung belegt ist, welche geschätzt

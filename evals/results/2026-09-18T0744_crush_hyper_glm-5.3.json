@@ -1,0 +1,23 @@
+{
+  "modell": "crush/hyper/glm-5.3",
+  "zeit_utc": "2026-09-18T0744",
+  "aufgaben": [
+    {
+      "id": "01_frame_consistency",
+      "fehler": "crush run: ERROR  \n          \n  Agent processing failed: failed to start agent processing stream: bad request: Invalid input. Please review your    \n  request before trying again.."
+    },
+    {
+      "id": "02_unanswerable",
+      "fehler": "crush run: ERROR  \n          \n  Agent processing failed: failed to start agent processing stream: bad request: Invalid input. Please review your    \n  request before trying again.."
+    },
+    {
+      "id": "03_fortran_legacy",
+      "fehler": "crush run: ERROR  \n          \n  Agent processing failed: failed to start agent processing stream: bad request: Invalid input. Please review your    \n  request before trying again.."
+    },
+    {
+      "id": "07_python_review",
+      "fehler": "crush run: ERROR  \n          \n  Agent processing failed: failed to start agent processing stream: bad request: Invalid input. Please review your    \n  request before trying again.."
+    }
+  ],
+  "geschirr": "crush run: Temperatur nicht steuerbar (Anbieter-Standard, nicht 0), Agenten-Systemprompt vor der Aufgabe, keine Token- oder Kostenzahlen. Nicht direkt vergleichbar mit Läufen über die API."
+}

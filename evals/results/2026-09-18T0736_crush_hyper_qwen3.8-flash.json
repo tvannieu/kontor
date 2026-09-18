@@ -1,0 +1,19 @@
+{
+  "modell": "crush/hyper/qwen3.8-flash",
+  "zeit_utc": "2026-09-18T0736",
+  "aufgaben": [
+    {
+      "id": "05_instruktionstreue",
+      "titel": "Instruktionstreue unter Nebenbedingungen",
+      "sekunden": 8.4,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "Kreuzvalidierung vergleicht die Ausgaben mehrerer unabhängig geschriebener Implementierungen auf denselben Eingaben, wodurch Abweichungen sichtbar werden, die in den Tests eines einzelnen Programms stecken bleiben. Denn eigene Tests bestätigen meist nur die Annahmen des Autors, während ein abweichendes Ergebnis einer zweiten Implementierung genau diese stillschweigenden Fehlannahmen aufdeckt.",
+      "automatisch": {
+        "bestanden": true,
+        "notiz": "sauber"
+      }
+    }
+  ],
+  "geschirr": "crush run: Temperatur nicht steuerbar (Anbieter-Standard, nicht 0), Agenten-Systemprompt vor der Aufgabe, keine Token- oder Kostenzahlen. Nicht direkt vergleichbar mit Läufen über die API."
+}

@@ -5,10 +5,11 @@ Läuft die feste Aufgabensammlung gegen ein Modell und legt das Ergebnis ab.
     ./run.py anthropic/claude-sonnet-4.5
     ./run.py openai/gpt-5 --tasks 02 05
     ./run.py ollama/kontor-4b --profile filing   nur die Aufgaben, die Ablage-Arbeit betreffen
+    ./run.py crush/hyper/glm-5.3 --profile analysis   durch den Agenten-Runner, für Anbieter, die nur er erreicht
 
 Ohne Schlüssel:  ./run.py --dry-run   zeigt, was gesendet würde.
 """
-import argparse, json, os, sys, time, re, urllib.request, urllib.error
+import argparse, atexit, json, os, shutil, subprocess, sys, tempfile, time, re, urllib.request, urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -35,6 +36,38 @@ def load_tasks(only=None, profile=None):
     return out
 
 
+_CRUSH_CWD = None
+
+
+def ask_crush(name, prompt, timeout):
+    """Ein 'crush/'-Präfix bedeutet: durch den Agenten-Runner, nicht direkt.
+
+    Nötig für Anbieter, die nur crush selbst erreicht -- die Hyper-Modelle
+    sprechen Charms eigenes Protokoll, nicht das OpenAI-Format, und crush
+    hält das Login dazu. Zwei Einschränkungen, die im Ergebnis stehen müssen:
+    die Temperatur ist nicht steuerbar (Anbieter-Standard, nicht 0), und
+    crush legt seinen Agenten-Systemprompt vor die Aufgabe. Läufe hierüber
+    sind deshalb ein anderes Geschirr als die direkten Aufrufe und werden
+    im Ergebnis als solches markiert.
+
+    crush liest seine Anbieter aus der crush.json des Arbeitsverzeichnisses,
+    darum bekommt ein Wegwerf-Verzeichnis eine Kopie der von Kontor
+    verteilten -- so landet auch die Sitzungsdatenbank dort und nicht im
+    Repository."""
+    global _CRUSH_CWD
+    if _CRUSH_CWD is None:
+        _CRUSH_CWD = tempfile.mkdtemp(prefix="kontor-evals-crush-")
+        shutil.copy(ROOT.parent / "crush.json", _CRUSH_CWD)
+        atexit.register(shutil.rmtree, _CRUSH_CWD, ignore_errors=True)
+    crush = os.environ.get("KONTOR_CRUSH", "crush")
+    t0 = time.time()
+    r = subprocess.run([crush, "run", "-q", "-c", _CRUSH_CWD, "-m", name, prompt],
+                       capture_output=True, text=True, timeout=timeout, cwd=_CRUSH_CWD)
+    if r.returncode != 0:
+        raise RuntimeError(f"crush run: {r.stderr.strip()[:300]}")
+    return r.stdout.strip(), round(time.time() - t0, 1), {}
+
+
 def ask(model, prompt, key, temperature=0.0, timeout=600):
     """Ein 'ollama/'-Präfix bedeutet: lokal, und zwar ausschliesslich.
 
@@ -44,6 +77,8 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
     erste gemeldet. Die Fehlermeldung zeigte damit auf den falschen Dienst.
     Jetzt wird geroutet statt geraten, und ein lokaler Fehler wird als lokaler
     Fehler gemeldet."""
+    if model.startswith("crush/"):
+        return ask_crush(model.split("/", 1)[1], prompt, timeout)
     local = model.startswith("ollama/")
     name = model.split("/", 1)[1] if local else model
     payload = {
@@ -147,7 +182,7 @@ def main():
     if not a.model:
         sys.exit("Modell angeben, z.B.:  ./run.py anthropic/claude-sonnet-4.5")
     key = get_key()
-    if not key:
+    if not key and not a.model.startswith(("ollama/", "crush/")):
         sys.exit("Kein OpenRouter-Schlüssel gefunden.\n"
                  "Kontor legt ihn im Schlüsselbund unter 'kontor-openrouter' ab:\n"
                  "  security find-generic-password -s kontor-openrouter -w\n"
@@ -155,6 +190,10 @@ def main():
 
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M")
     run = {"modell": a.model, "zeit_utc": stamp, "aufgaben": []}
+    if a.model.startswith("crush/"):
+        run["geschirr"] = ("crush run: Temperatur nicht steuerbar (Anbieter-Standard, nicht 0), "
+                           "Agenten-Systemprompt vor der Aufgabe, keine Token- oder Kostenzahlen. "
+                           "Nicht direkt vergleichbar mit Läufen über die API.")
     offen = 0
 
     for t in tasks:

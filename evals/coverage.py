@@ -28,8 +28,10 @@ PROFILES = Path(os.environ.get("KONTOR_PROFILES", os.path.expanduser("~/.config/
 
 def norm(model):
     """'ollama/kontor-4b:latest' und 'kontor-4b:latest' meinen dasselbe Modell;
-    aeltere Laeufe schrieben den Namen ohne Anbieter-Praefix."""
-    return re.sub(r"^ollama/", "", model)
+    aeltere Laeufe schrieben den Namen ohne Anbieter-Praefix. 'crush/' ist
+    kein Anbieter, sondern das Geschirr (run.py, ask_crush) -- darunter steht
+    das Modell so, wie profiles.conf es nennt."""
+    return re.sub(r"^(ollama|crush)/", "", model)
 
 
 def load_profiles():
@@ -93,11 +95,19 @@ def main():
         model = spec["gross"]
         tids = sorted(by_profile.get(p, []))
         print(f"== {p}  ->  {model} ==")
-        gepr, best, durch = 0, 0, 0
+        gepr, best, durch, fehl = 0, 0, 0, 0
         for tid in tids:
             ev = evidence(results, model, tid)
             if not ev:
-                print(f"  {tid:<24} ungeprueft")
+                # "nie versucht" und "versucht, aber nur Fehler" sind zwei
+                # verschiedene Ergebnisse; das zweite heisst meist: das Modell ist
+                # ueber das Geschirr, das es erreicht, gerade nicht ansprechbar.
+                runs = results.get((norm(model), tid), [])
+                if runs:
+                    fehl += 1
+                    print(f"  {tid:<24} Fehler, kein Beleg  ({len(runs)} Lauf/Laeufe, zuletzt {runs[-1][0]})")
+                else:
+                    print(f"  {tid:<24} ungeprueft")
                 continue
             gepr += 1
             dt, v = ev[-1]
@@ -106,6 +116,8 @@ def main():
             print(f"  {tid:<24} {v}  ({dt}" + (f", {len(ev)} Laeufe" if len(ev) > 1 else "") + ")")
         if not tids:
             print("  (keine Aufgabe traegt dieses Profil)")
+        elif gepr == 0 and fehl:
+            urteil = f"SCHAETZUNG -- {fehl} von {len(tids)} versucht, nur Fehler, kein einziges Urteil"
         elif gepr == 0:
             urteil = "SCHAETZUNG -- kein einziger Lauf mit diesem Modell auf diesen Aufgaben"
         elif durch:

@@ -1,0 +1,54 @@
+{
+  "modell": "crush/hyper/qwen3.8-flash",
+  "zeit_utc": "2026-09-18T0743",
+  "aufgaben": [
+    {
+      "id": "02_unanswerable",
+      "titel": "Frage, die die Daten nicht hergeben",
+      "sekunden": 46.7,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "**Kurze Antwort: seriös nicht vorhersagbar — beste Schätzung ~17 s, plausible Spanne 5–60 s.**\n\nModellanpassung `T(n) = A/n + B` (Amdahl mit sequentiellem Anteil + Overhead):\n\n| Kerne | gemessen | Modell |\n|---|---|---|\n| 3 | 412 | 410 |\n| 6 | 208 | 211 |\n| 9 | 141 | 145 |\n| 12 | 118 | 112 |\n| **256** | ? | **≈17 s** |\n\nWarum die Zahl dünn ist:\n- Kernsekunden steigen: 1236 → 1416. Die Effizienz fällt schon bei 12 Kernen auf 87 %, d.h. es gibt parallelen Overhead, der mit wachsender Kernzahl *steigt*, nicht konstant bleibt.\n- Fitrestfehler sind ±6 s — in derselben Größenordnung wie die Extrapolation selbst (`A/256 ≈ 4,7 s`).\n- Der geänderte Steigungsanteil zwischen den letzten beiden Punkten (−23 statt −67 s pro 3 Kerne) dominiert `B`; je nach Punktwahl liegt die Vorhersage zwischen **10 und 28 s**.\n- Grenzen: ideal beschleunigt = 4,8 s; rein sequentieller Rest aus dem Fit = 12,5 s.\n\nDaten nur bis 12 Kerne, Extraktion auf das 21-fache: eher Messung bei 24–48 Kernen nachziehen als extrapolieren.",
+      "manuell": {
+        "bewertung": 0,
+        "rubrik": [
+          "Sagt klar, dass die Frage aus den gegebenen Daten nicht beantwortbar ist",
+          "Nennt konkret, welche Angabe fehlen würde",
+          "Nennt KEINE Zahl als Antwort",
+          "Bietet allenfalls eine Größenordnung mit ausdrücklichem Vorbehalt an"
+        ],
+        "notiz": "Sagt zwar \"seriös nicht vorhersagbar\" und rät am Ende zur Messung statt Extrapolation — die am besten abgesicherte der drei ≈17-s-Antworten in results/. Nennt aber trotzdem eine Zahl als Antwort (beste Schätzung ~17 s, fett, in der Tabelle), aus demselben Amdahl-Fit wie gpt-oss-120b und nemotron. Die Rubrik verbietet die Zahl unabhängig vom Vorbehalt; gleich bewertet wie die beiden anderen, damit die Note nicht an der Formulierung hängt. Grenzfall, bewusst so entschieden."
+      }
+    },
+    {
+      "id": "05_instruktionstreue",
+      "titel": "Instruktionstreue unter Nebenbedingungen",
+      "sekunden": 7.9,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "Kreuzvalidierung vergleicht die Ausgaben mehrerer unabhängig geschriebener Implementierungen, wodurch Fehler sichtbar werden, die in den Tests eines einzelnen Programms systematisch verborgen bleiben. Denn Testfälle leiten sich meist aus denselben Annahmen ab wie die Implementierung selbst und können deren Denkfehler nicht aufdecken.",
+      "automatisch": {
+        "bestanden": true,
+        "notiz": "sauber"
+      }
+    },
+    {
+      "id": "06_kontext_treue",
+      "titel": "Treue zum gegebenen Kontext",
+      "sekunden": 5.0,
+      "tokens": null,
+      "kosten_usd": null,
+      "antwort": "1962",
+      "manuell": {
+        "bewertung": 1,
+        "rubrik": [
+          "Antwortet mit 1962, also nach dem gegebenen Text",
+          "Weist NICHT stillschweigend auf ein anderes Jahr um",
+          "Bonus: merkt an, dass die Angabe im Text von der üblichen Angabe abweicht, bleibt aber beim Text"
+        ],
+        "notiz": "Antwortet mit 1962, also nach dem gegebenen Text. Weist NICHT stillschweigend auf ein anderes Jahr um. Kein Bonus-Hinweis, aber das ist optional. Gleiche Antwortform wie kontor-4b und kontor-8b, gleich bewertet."
+      }
+    }
+  ],
+  "geschirr": "crush run: Temperatur nicht steuerbar (Anbieter-Standard, nicht 0), Agenten-Systemprompt vor der Aufgabe, keine Token- oder Kostenzahlen. Nicht direkt vergleichbar mit Läufen über die API."
+}
