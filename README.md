@@ -52,9 +52,9 @@ $ ./report.py
 Key:  + passed   o partial   - failed   ? unrated   ! error
 
   1: openai/gpt-oss-120b  (2026-09-18)  $0.00355
-  2: crush/hyper/qwen3.8-flash  (2026-09-18)  hosted; the agent runner reports no usage
+  2: crush/hyper/qwen3.8-flash  (2026-09-18)  unknown — the agent runner reports no usage
   3: google/gemma-4-31b-it  (2026-09-18)  $0.00392
-  4: crush/hyper/glm-5.3-flash  (2026-09-18)  hosted; the agent runner reports no usage
+  4: crush/hyper/glm-5.3-flash  (2026-09-18)  unknown — the agent runner reports no usage
   5: openai/gpt-5-nano  (2026-09-19)  $0.01471
   6: deepseek/deepseek-v4-flash  (2026-09-19)  $0.00159
   7: meta-llama/llama-4-scout  (2026-09-19)  $0.00083
@@ -65,7 +65,7 @@ Key:  + passed   o partial   - failed   ? unrated   ! error
   12: anthropic/claude-sonnet-5  (2026-09-19)  $0.34003
   13: openai/gpt-5  (2026-09-19)  $0.22725
   14: google/gemini-2.5-pro  (2026-09-19)  $0.32043
-  15: mistralai/mistral-large  (2026-09-19)  not recorded
+  15: mistralai/mistral-large  (2026-09-19)  unknown — no usage in the response
 ```
 
 Read the top two rows. Fourteen models with data — nine vendors, two harnesses, and a 400-fold spread in what a run costs, from $0.0008 to $0.34 — pass nearly everything mechanical and fail, without exception, both tasks that have no determinable answer. Column 15 is a provider-side rate limit, not a model failure; column 4 ran only one profile's tasks, hence the gaps.

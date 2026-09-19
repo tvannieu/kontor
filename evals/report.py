@@ -9,17 +9,17 @@ if not runs:
     sys.exit("No runs in results/ yet.")
 
 def cost_label(model, run_costs):
-    """Three different reasons a run can have no cost, and they are not the
-    same fact. 'local / not recorded' used to be printed for all of them,
-    which said that a paid hosted model reached through the agent runner was
-    free — it is not, the harness simply does not report usage."""
+    """What a run cost has three honest answers: a number, zero because the
+    model is local, or unknown. Naming the provider adds nothing — hosted is
+    the ordinary case — and 'local / not recorded' used to be printed for all
+    three, which said a metered model was free. Unknown is not zero."""
     if run_costs:
         return f"${sum(run_costs):.5f}"
     if model.startswith("ollama/") or "/" not in model:
-        return "local, no cost"
+        return "$0 — runs locally"
     if model.startswith("crush/"):
-        return "hosted; the agent runner reports no usage"
-    return "not recorded"
+        return "unknown — the agent runner reports no usage"
+    return "unknown — no usage in the response"
 
 
 rows, models, costs = {}, [], {}
