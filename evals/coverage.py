@@ -29,8 +29,16 @@ def norm(model):
     """'ollama/kontor-4b:latest' and 'kontor-4b:latest' mean the same model;
     older runs wrote the name without a provider prefix. 'crush/' is not a
     provider but the harness (run.py, ask_crush) — underneath it the model is
-    named as profiles.conf names it."""
-    return re.sub(r"^(ollama|crush)/", "", model)
+    named as profiles.conf names it.
+
+    ':latest' is Ollama's implicit default tag: 'kontor-4b' and
+    'kontor-4b:latest' are one model, and profiles.conf writes the tag while
+    run.py records what was typed. Without stripping it, a profile stayed
+    'ESTIMATE -- not a single run' while the run sat in results/, which is
+    the failure this script exists to prevent, committed by the script
+    itself. ':free' and other tags are NOT stripped: on OpenRouter they name
+    a different endpoint with different behaviour."""
+    return re.sub(r":latest$", "", re.sub(r"^(ollama|crush)/", "", model))
 
 
 def load_profiles():
@@ -104,7 +112,14 @@ def main():
                 runs = results.get((norm(model), tid), [])
                 if runs:
                     errored += 1
-                    print(f"  {tid:<32} error, no evidence  ({len(runs)} run(s), last {runs[-1][0]})")
+                    # Three ways to have no verdict, and they mean different
+                    # things: the call failed, or it succeeded and nobody has
+                    # rated it yet. Reporting an unrated manual answer as an
+                    # "error" sends someone looking for a broken harness.
+                    why = ("the call failed" if any(v == "error" for _, v in runs)
+                           else "answered, awaiting a manual rating")
+                    print(f"  {tid:<32} no verdict -- {why}  "
+                          f"({len(runs)} run(s), last {runs[-1][0]})")
                 else:
                     print(f"  {tid:<32} untested")
                 continue
@@ -116,7 +131,7 @@ def main():
         if not tids:
             print("  (no task carries this profile)")
         elif tested == 0 and errored:
-            print(f"  => ESTIMATE -- {errored} of {len(tids)} attempted, only errors, not one verdict\n")
+            print(f"  => ESTIMATE -- {errored} of {len(tids)} attempted, not one verdict\n")
             continue
         elif tested == 0:
             print("  => ESTIMATE -- not a single run with this model on these tasks\n")

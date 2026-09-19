@@ -69,6 +69,115 @@ def ask_crush(name, prompt, timeout):
     return r.stdout.strip(), round(time.time() - t0, 1), {}
 
 
+# --- local runs: the machine is a resource like any other -------------------
+#
+# This laptop has 16 GB. Two runs of a 4B model drove it into swap deep enough
+# that it stopped responding and had to be restarted, both times because the
+# runner asked for a local model without first asking whether there was room
+# for one, and then waited ten minutes for an answer that was never coming.
+#
+# Three separate mistakes, so three separate guards:
+#   free_ram()      refuse to load a model that does not fit
+#   LOCAL_MAX_TOKENS  cap the answer, so one prompt cannot eat a whole context
+#   LOCAL_TIMEOUT   give up in minutes rather than in ten
+#
+# The check is macOS-specific and returns None elsewhere; None means "cannot
+# tell", and cannot-tell is reported rather than treated as a pass. That is
+# the same rule tools/check-public.sh follows.
+
+LOCAL_MAX_TOKENS = int(os.environ.get("KONTOR_LOCAL_MAX_TOKENS", 4096))
+LOCAL_TIMEOUT = int(os.environ.get("KONTOR_LOCAL_TIMEOUT", 180))
+OLLAMA = os.environ.get("KONTOR_OLLAMA", "http://127.0.0.1:11434")
+
+
+def free_ram():
+    """(free_bytes, swap_used_bytes, pressure) on macOS, or None if unknown.
+
+    `pressure` is kern.memorystatus_vm_pressure_level: 1 normal, 2 warning,
+    4 critical. It is the live signal. vm.swapusage is *cumulative* and does
+    not fall when the pressure passes, so gating on it refuses runs the
+    machine has ample room for — which this did, for one commit, at 4.6 GB
+    free and pressure level 1. Swap is still reported, as history."""
+    if sys.platform != "darwin":
+        return None
+    try:
+        vm = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=10).stdout
+        page = int(re.search(r"page size of (\d+) bytes", vm).group(1))
+
+        def pages(label):
+            m = re.search(rf"{label}:\s+(\d+)", vm)
+            return int(m.group(1)) * page if m else 0
+
+        # Free plus inactive: inactive pages are reclaimable without paging
+        # out. Speculative and compressed pages are not counted as available,
+        # because they are the pressure, not the relief.
+        free = pages("Pages free") + pages("Pages inactive")
+        sw = subprocess.run(["sysctl", "-n", "vm.swapusage"],
+                            capture_output=True, text=True, timeout=10).stdout
+        used = float(re.search(r"used\s*=\s*([\d.,]+)M", sw).group(1).replace(",", "."))
+        lvl = subprocess.run(["sysctl", "-n", "kern.memorystatus_vm_pressure_level"],
+                             capture_output=True, text=True, timeout=10).stdout
+        return free, int(used * 1024 * 1024), int(lvl.strip() or 1)
+    except Exception:
+        return None
+
+
+def model_bytes(name):
+    """Size of a local model as ollama reports it, or None if unknown."""
+    try:
+        with urllib.request.urlopen(f"{OLLAMA}/api/tags", timeout=10) as r:
+            for m in json.loads(r.read()).get("models", []):
+                if m["name"] == name or m["name"].split(":")[0] == name.split(":")[0]:
+                    return m.get("size")
+    except Exception:
+        return None
+    return None
+
+
+def preflight_local(name, force=False):
+    """Refuse a local run the machine has no room for. Returns a note to record."""
+    need = model_bytes(name)
+    mem = free_ram()
+    gb = lambda n: f"{n / 1024**3:.1f} GB"
+    if mem is None or need is None:
+        msg = ("Cannot measure free memory or model size, so cannot tell whether "
+               f"{name} fits.")
+        if not force:
+            sys.exit(f"{msg}\nRe-run with --force-local if you are sure. "
+                     "A check that cannot run is not a pass.")
+        return msg
+    free, swap, pressure = mem
+    # 1.3x: weights are not the whole footprint — the KV cache and the runner
+    # itself also want room, and a model that fits exactly does not fit.
+    headroom = need * 1.3
+    state = {1: "normal", 2: "warning", 4: "critical"}.get(pressure, str(pressure))
+    report = (f"{name} needs ~{gb(need)} (~{gb(headroom)} with its cache); "
+              f"{gb(free)} available, pressure {state}, {gb(swap)} swap used so far")
+    if free < headroom or pressure >= 2:
+        if not force:
+            sys.exit(
+                f"Not enough room: {report}.\n\n"
+                "This is the condition that hung the machine twice. Free memory "
+                "first — quitting the browser and the chat apps is usually "
+                "enough — then run this again. --force-local overrides, at your "
+                "own risk.")
+        report += " -- OVERRIDDEN with --force-local"
+    return report
+
+
+def unload_local(name):
+    """Release the weights. Without this the model sits in RAM for five
+    minutes after the run, which matters on a machine this size."""
+    try:
+        req = urllib.request.Request(
+            f"{OLLAMA}/api/generate",
+            data=json.dumps({"model": name, "keep_alive": 0}).encode(),
+            headers={"Content-Type": "application/json"})
+        urllib.request.urlopen(req, timeout=30).read()
+    except Exception:
+        pass
+
+
 def ask(model, prompt, key, temperature=0.0, timeout=600):
     """An 'ollama/' prefix means: local, and local only.
 
@@ -87,7 +196,13 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
         "temperature": temperature,
         "messages": [{"role": "user", "content": prompt}],
     }
-    if not local:
+    if local:
+        # Without a cap the 4B model has been observed to spend an entire
+        # context on one prompt and return nothing, holding its weights in
+        # RAM the whole time. A truncated answer is a result; a wedged
+        # machine is not.
+        payload["max_tokens"] = LOCAL_MAX_TOKENS
+    else:
         # OpenRouter only returns usage.cost when explicitly asked; Ollama
         # has no such concept and ignores an unknown field harmlessly, but
         # local calls are free anyway so there is nothing to request.
@@ -107,13 +222,20 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
 
     req = urllib.request.Request(url, data=body, headers=headers)
     t0 = time.time()
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with urllib.request.urlopen(req, timeout=LOCAL_TIMEOUT if local else timeout) as r:
         d = json.loads(r.read())
-    msg = d["choices"][0]["message"]
+    choice = d["choices"][0]
+    msg = choice["message"]
     # Reasoning models put the output in a field of their own and leave
     # content empty when the token budget runs out before the answer.
     text = msg.get("content") or msg.get("reasoning") or ""
-    return text, round(time.time() - t0, 1), d.get("usage", {})
+    usage = dict(d.get("usage", {}))
+    # A cap that stops an answer mid-word has not measured the model, it has
+    # measured the cap. The first version of this guard scored two truncated
+    # answers as invalid JSON, which is true and beside the point. Carry the
+    # reason out so the caller can tell the two apart.
+    usage["finish_reason"] = choice.get("finish_reason")
+    return text, round(time.time() - t0, 1), usage
 
 
 def check_contains_any(ans, expect):
@@ -186,6 +308,8 @@ def main():
                     help="run each task N times; the verdict is the majority, and a task "
                          "that does not agree with itself is marked unstable")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--force-local", action="store_true",
+                    help="run a local model even when the machine has no room for it")
     a = ap.parse_args()
 
     tasks = load_tasks(a.tasks, a.profile)
@@ -206,6 +330,12 @@ def main():
                  "Kontor keeps it in the OS keychain under 'kontor-openrouter':\n"
                  "  security find-generic-password -s kontor-openrouter -w\n"
                  "Alternatively:  export OPENROUTER_API_KEY=sk-or-...")
+
+    local_name = a.model.split("/", 1)[1] if a.model.startswith("ollama/") else None
+    headroom = None
+    if local_name:
+        headroom = preflight_local(local_name, a.force_local)
+        print(f"Local run: {headroom}\n")
 
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M")
     run = {"model": a.model, "time_utc": stamp, "tasks": []}
@@ -232,7 +362,8 @@ def main():
                 failed = str(e)
                 break
             att = {"seconds": dur, "tokens": usage.get("total_tokens"),
-                   "cost_usd": usage.get("cost"), "answer": ans}
+                   "cost_usd": usage.get("cost"), "answer": ans,
+                   "truncated": usage.get("finish_reason") == "length"}
             if fn:
                 ok, note = fn(ans, t["expect"])
                 att["passed"], att["note"] = ok, note
@@ -264,15 +395,33 @@ def main():
             # reported verdict, or an unstable task prints "PASS" beside the
             # reason one attempt failed.
             note = next(x["note"] for x in attempts if x["passed"] == ok)
+            cut = any(x["truncated"] for x in attempts)
             rec["auto"] = {"passed": ok, "note": note, "stable": stable}
-            mark = "PASS" if ok else "FAIL"
+            if cut and not ok:
+                # Not a verdict on the answer: the answer never finished.
+                rec["auto"]["truncated"] = True
+                note = f"{note} -- but the answer was cut off at the token cap"
+                rec["auto"]["note"] = note
+            mark = "PASS" if ok else ("TRUNC" if cut else "FAIL")
             extra = "" if stable else f"  UNSTABLE {sum(verdicts)}/{len(verdicts)}"
             print(f"{mark}  ({note}){extra}  {rec['seconds']}s{cost}")
         else:
             rec["manual"] = {"rating": None, "rubric": t.get("rubric", []), "note": ""}
+            if any(x["truncated"] for x in attempts):
+                rec["manual"]["note"] = ("cut off at the token cap -- rate the "
+                                         "answer that exists, or raise the cap and re-run")
             open_ratings += 1
-            print(f"to be rated  {rec['seconds']}s{cost}")
+            cut = "  CUT OFF at the token cap" if any(x["truncated"] for x in attempts) else ""
+            print(f"to be rated  {rec['seconds']}s{cost}{cut}")
         run["tasks"].append(rec)
+
+    if local_name:
+        # What the machine had at the time is part of the result: a local run
+        # made under pressure is not comparable with one made with room, and
+        # an answer cut off at the token cap is not the model's best.
+        run["local"] = {"headroom": headroom, "max_tokens": LOCAL_MAX_TOKENS,
+                        "timeout_s": LOCAL_TIMEOUT}
+        unload_local(local_name)
 
     RESULTS.mkdir(exist_ok=True)
     # ':' is legal on this filesystem and not on Windows; model ids carry it

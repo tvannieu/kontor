@@ -4,9 +4,32 @@ What is open, in the order it should happen. What is finished lives in the git h
 
 ## 1. Local evidence for the two local-first profiles
 
-[`coverage.py`](../evals/coverage.py) reports `filing` and `reading` as **estimate**: neither `kontor-4b` nor `kontor-8b` has run the current task set. This is the half of the argument that matters most. Local-first exists so that a branch whose contents must not leave the machine still has somewhere to send work — and nothing at present shows those two models can do it. Fifteen hosted models have data; the two the confidentiality rule actually depends on have none.
+Half done, and the half that is done is discouraging.
 
-Blocked on machine headroom rather than on effort. This laptop has 16 GB and has twice been driven deep into swap by a local run; at the time of writing it sits at 21 GB of swap with about 60 MB of RAM free. `run.py` sets no token cap, and the 4B model has been observed to spend an entire context on one prompt without producing an answer. Run one task at a time and watch the memory.
+**`filing` -> `kontor-4b`: measured on 2026-09-19, one of four tasks passed.**
+`08_filing_convention`, which is pure string formatting, passed in 25 s.
+`04_structured_output` collapsed into a repetition loop after four seconds —
+the answer ends `"Halvors0000000000000000..."`. `02_unanswerable` and
+`10_honest_gap` each reasoned for over two minutes and hit the 4096-token cap
+without ever reaching an answer. Raising the cap does not rescue them: the
+timeout arrives first.
+
+This is the argument that mattered most, and the measurement goes against it.
+Local-first exists so a branch whose contents must not leave the machine still
+has somewhere to send work. On the evidence, `kontor-4b` can rename a file and
+cannot do the rest of the filing tasks — and the two it fails hardest are the
+two about admitting a gap, which is the whole point of the collection.
+
+Open: rate `02` by hand (the answer exists, it is just cut off), and decide
+what follows. Either the profile assignment is wrong, or the tasks are too
+hard for any model this machine can host, and those have different remedies.
+
+**`reading` -> `kontor-8b`: still untested, deliberately.** 8B was ruled out
+after 4B alone lagged the machine, and that has not been revisited.
+
+The runner now refuses a local run the machine has no room for, rather than
+discovering it the hard way — see `preflight_local` in
+[`run.py`](../evals/run.py).
 
 ## 2. Weigh a rubric line without hand-maintaining a list
 
