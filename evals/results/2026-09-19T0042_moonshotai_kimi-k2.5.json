@@ -1,0 +1,143 @@
+{
+  "model": "moonshotai/kimi-k2.5",
+  "time_utc": "2026-09-19T0042",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 91.8,
+      "tokens": 15789,
+      "cost_usd": 0.05212137,
+      "answer": "This is a classic case of **convention differences** or **unit confusion**, with several likely culprits:\n\n## Most Likely Causes\n\n**1. Angle Unit Confusion (Degrees vs. Radians)**\nProgram B may be interpreting \"90\" as **90 radians** instead of 90 degrees. Since 90 rad ≈ 5157° ≡ 116.6° (mod 360°), Program B is actually computing at ~117°. For many particles, the phase function S11 can have similar values at 90° and 117° (due to oscillations in the Mie pattern), but the polarization (S12) differs significantly. This explains why S11 matches \"by accident\" while S12 differs.\n\n**2. Sign Convention for Stokes Q**\nThe two programs likely use **opposite definitions** for the reference direction of the Stokes parameter Q:\n- **Convention A**: Q = I_⊥ − I_∥ (perpendicular to scattering plane minus parallel)\n- **Convention B**: Q = I_∥ − I_⊥ (parallel minus perpendicular)\n\nThis flips the sign of S12: S12 = ½(|S₂|² − |S₁|²) vs. S12 = ½(|S₁|² − |S₂|²). However, this alone doesn't explain the magnitude difference (|S12| differs by ~4.3×), so it's probably combined with another issue.\n\n**3. Reference Frame for Scattered Light**\nS12 depends on whether the reference direction for the scattered Stokes vector is:\n- Perpendicular to the scattering plane (standard in Bohren & Huffman)\n- Lying within the scattering plane (some atmospheric/optics codes)\n\nThis swaps the roles of the Mie amplitudes S₁ and S₂ in the S12 formula.\n\n**4. Normalization or Definition of Matrix Elements**\nProgram B might be outputting:\n- The **degree of polarization** P = −S12/S11 (dimensionless ~0.223) rather than S12 itself\n- A differently normalized element (missing the factor of ½)\n\n## What to Check\n\n1. **Angle units**: Verify that both programs interpret the input as **degrees**, not radians. If Program B uses radians, 90° input becomes 90 rad ≈ 5160° ≡ 116°.\n   \n2. **Stokes convention documentation**: Check the manuals for definitions of S12. Look for phrases like \"parallel to the scattering plane\" vs. \"perpendicular to the scattering plane.\"\n\n3. **Test at θ = 0°**: \n   - At forward scattering (θ=0°), S₁ = S₂, so **S12 must be exactly 0** in both programs.\n   - If Program B gives non-zero S12 at 0°, it confirms a convention bug or angle error.\n\n4. **Test with Rayleigh limit**: For a very small particle (x ≪ 1), at 90°:\n   - S₂ ≈ 0, S₁ ≈ constant\n   - S12 ≈ −S11 (high polarization, ~100%)\n   - Program A's result (S12/S11 ≈ −0.97) is close to this limit.\n   - Program B's result (S12/S11 ≈ +0.22) is physically inconsistent with Rayleigh scattering.\n\n5. **Verify the refractive index convention**: Ensure both use the same sign for the imaginary part (m = n + iκ vs. m = n − iκ), though this usually affects absorption, not S11/S12 at real indices.\n\n**Bottom line**: The exact match in S11 with disagreement in S12 strongly suggests Program B is computing at a **different effective angle** (likely 116.6° due to radians/degrees confusion) where S11 coincidentally equals the 90° value, or is using an **opposite Stokes convention** combined with a different reference frame.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Asserts a likely cause and gives a checklist; never states that the question cannot be settled conclusively from the information given. Invents no conversion factor. Decisive line 1 unmet. Proposes a specific degrees/radians confusion and an effective angle of 116.6 degrees - an invented specific, though not a conversion factor in the rubric's sense."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 50.5,
+      "tokens": 11454,
+      "cost_usd": 0.037866696,
+      "answer": "Looking at this data, we need to model how the execution time scales with the number of cores. This is a classic **strong scaling** problem in parallel computing.\n\n## Analysis of the scaling behavior\n\nFirst, let's look at the \"work\" (core-seconds) for each run:\n- Run 1: 3 × 412 = 1,236 core·s\n- Run 2: 6 × 208 = 1,248 core·s  \n- Run 3: 9 × 141 = 1,269 core·s\n- Run 4: 12 × 118 = 1,416 core·s\n\nThe first two runs show nearly perfect linear scaling (1,236 → 1,248 is only 1% overhead). The efficiency drops slightly at 9 cores and more significantly at 12 cores.\n\n## Applying Amdahl's Law\n\nThe standard model for strong scaling is **Amdahl's Law**:\n$$T(n) = T_{serial} + \\frac{T_{parallel}}{n}$$\n\nUsing the first two runs (which show the cleanest scaling):\n- $T(3) = s + p/3 = 412$\n- $T(6) = s + p/6 = 208$\n\nSolving these:\n- $p/6 = 204$ → $p = 1,224$ core·seconds of parallelizable work\n- $s = 412 - 408 = 4$ seconds of serial work\n\n**Verification:**\n- $T(9) = 4 + 1224/9 = 4 + 136 = 140$ s (actual: 141 s ✓)\n- $T(12) = 4 + 1224/12 = 4 + 102 = 106$ s (actual: 118 s — deviation suggests communication overhead at higher core counts)\n\n## Extrapolation to 256 cores\n\nUsing the Amdahl model:\n$$T(256) = 4 + \\frac{1224}{256} \\approx 4 + 4.8 = \\boxed{8.8 \\text{ seconds}}$$\n\nOr approximately **5–10 seconds**.\n\n## Caveats\n\nIf we account for the communication overhead visible in the 12-core measurement (which was 12 seconds slower than predicted), the actual time might be higher. A least-squares fit to all four points gives $T(n) \\approx 12.5 + 1194/n$, yielding approximately **17 seconds**.\n\nHowever, for many parallel computing problems of this nature, the **Amdahl-derived estimate of approximately 5–10 seconds** (or roughly **9 seconds**) is the expected answer, with the understanding that:\n- The theoretical minimum is ~5 seconds (fully parallel portion)\n- The serial portion adds ~4 seconds\n- Communication overhead might add several more seconds at 256 cores\n\n**Reasonable estimate: 5–15 seconds, with ~9 seconds being the Amdahl prediction.**",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Gives a number as the answer; does not say the question is unanswerable from the data. Answer: 5-15 s, 'with ~9 seconds being the Amdahl prediction'. Offers a range, which the rubric permits only with an explicit caveat about answerability; the caveat is about overhead instead."
+      }
+    },
+    {
+      "id": "03_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 32.4,
+      "tokens": 5030,
+      "cost_usd": 0.01641752,
+      "answer": "The result is **1.0** instead of **1.5** because the variable **`SUM` is being treated as an INTEGER** rather than a REAL.\n\nHere is the step-by-step breakdown of what happens when `SUM` is an integer:\n\n1.  **Initialization**: `SUM = 0.0` assigns 0 to the integer variable `SUM`.\n2.  **First iteration** (`I=1`, `X(1)=1.0`):\n    *   `SUM + X(I)` = $0 + 1.0 = 1.0$\n    *   Assigning this to integer `SUM` truncates it to **1**.\n3.  **Second iteration** (`I=2`, `X(2)=2.0`):\n    *   `SUM + X(I)` = $1 + 2.0 = 3.0$\n    *   Assigning this to integer `SUM` truncates it to **3**.\n4.  **Final calculation**: `RES = SUM / N` becomes `3 / 2`.\n    *   Since both `SUM` and `N` are integers, Fortran performs **integer division**, truncating $1.5$ to **1**.\n    *   The integer 1 is then converted to the real number **1.0** for assignment to `RES`.\n\n### Why is `SUM` an integer?\n\nIn standard Fortran 77, variables starting with **S** fall in the A-H, O-Z range and should implicitly be **REAL**. However, `SUM` becomes an integer if:\n\n*   There is an `IMPLICIT INTEGER (A-Z)` statement (or similar) earlier in the code that changes the default typing rules.\n*   The variable was explicitly declared as `INTEGER SUM` (perhaps in a part of the code not shown).\n\n### The Fix\n\nExplicitly declare `SUM` as `REAL` in the subroutine:\n\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, SUM\n      INTEGER N, I\n      SUM = 0.0\n      DO 10 I = 1, N\n         SUM = SUM + X(I)\n   10 CONTINUE\n      RES = SUM / N\n      RETURN\n      END\n```\n\n**Note:** It is best practice to use `IMPLICIT NONE` (or compile with options that enforce explicit typing) to catch such errors at compile time. `IMPLICIT NONE` was standardized in Fortran 90 but was available as a common extension in many Fortran 77 compilers.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer', 'INTEGER', 'Integer']"
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 166.0,
+      "tokens": 3961,
+      "cost_usd": 0.00871965,
+      "answer": "{\"title\":null,\"year\":null,\"authors\":null,\"uncertain\":[\"title\",\"year\",\"authors\"]}",
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int"
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 6.4,
+      "tokens": 1137,
+      "cost_usd": 0.003585015,
+      "answer": "Independent programs embody different design assumptions, ensuring their errors appear in divergent contexts. Mutual validation between such implementations uncovers discrepancies that elude single program tests because those tests share the same underlying conceptual framework as the code they check.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 1.4,
+      "tokens": 240,
+      "cost_usd": 0.000588525,
+      "answer": "1962",
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Answers 1962, exactly per the given text. No silent substitution. Bonus remark optional."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 6.2,
+      "tokens": 1611,
+      "cost_usd": 0.005099619,
+      "answer": "The function returns a **scalar** instead of a spectrum because `np.mean(weighted)` averages over **all dimensions** (both grain sizes and wavelengths), collapsing the entire 2D array into a single number.\n\n## The Problem\n\nWhen you call `np.mean(weighted)` on an array of shape `(n_sizes, n_wavelengths)`, NumPy computes the mean of *all* elements. You want to average only over grain sizes (axis 0) while preserving the wavelength dimension.\n\n## The Fix\n\nSpecify `axis=0` to average only over grain sizes:\n\n```python\ndef mean_spectrum(qext, weights):\n    weighted = qext * weights[:, None]\n    return np.mean(weighted, axis=0) / np.mean(weights)\n```\n\nOr better yet, use NumPy's built-in weighted average function:\n\n```python\ndef mean_spectrum(qext, weights):\n    return np.average(qext, axis=0, weights=weights)\n```\n\n## Why the math works\n\nWith `axis=0`, the operation computes for each wavelength $\\lambda_j$:\n\n$$\\frac{\\frac{1}{N}\\sum_{i=1}^N Q_{ext}(a_i, \\lambda_j) \\cdot w_i}{\\frac{1}{N}\\sum_{i=1}^N w_i} = \\frac{\\sum_{i=1}^N Q_{ext}(a_i, \\lambda_j) \\cdot w_i}{\\sum_{i=1}^N w_i}$$\n\nThis gives the properly weighted average extinction efficiency per wavelength, returning an array of shape `(n_wavelengths,)` rather than a scalar.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']"
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 57.1,
+      "tokens": 1614,
+      "cost_usd": 0.0033489,
+      "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+      "auto": {
+        "passed": true,
+        "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 22.0,
+      "tokens": 584,
+      "cost_usd": 0.0011142,
+      "answer": "The deadline for withdrawal is **not stated** in the extract; none of the provisions address withdrawal or specify a deadline for it.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 34.3,
+      "tokens": 1599,
+      "cost_usd": 0.00426303,
+      "answer": "{\"title\":null,\"year\":null,\"authors\":[\"Lindqvist\"],\"uncertain\":[\"title\",\"year\",\"authors\"]}",
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied"
+      }
+    }
+  ]
+}

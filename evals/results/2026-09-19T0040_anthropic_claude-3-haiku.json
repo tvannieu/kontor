@@ -1,0 +1,143 @@
+{
+  "model": "anthropic/claude-3-haiku",
+  "time_utc": "2026-09-19T0040",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 5.4,
+      "tokens": 739,
+      "cost_usd": 0.00077175,
+      "answer": "The discrepancy in the S12 values returned by the two programs could be due to several factors. Here are some things you might want to check:\n\n1. **Coordinate System and Sign Convention**: The scattering matrix elements (S11, S12, S21, S22) are defined with respect to a specific coordinate system and sign convention. Ensure that both programs are using the same coordinate system and sign convention for the scattering angles. Differences in these conventions can lead to differences in the sign of the S12 element.\n\n2. **Numerical Precision and Rounding Errors**: The scattering matrix elements can be very small, and the differences between the two programs may be within the numerical precision of the calculations. Small rounding errors or differences in the numerical algorithms used by the two programs could lead to the observed discrepancy in the S12 value.\n\n3. **Underlying Scattering Theory and Formulations**: Verify that both programs are using the same underlying scattering theory and formulations to compute the scattering matrix. Differences in the theoretical approaches or the specific equations used could lead to differences in the calculated values.\n\n4. **Input Parameter Sensitivity**: Check if the scattering matrix is highly sensitive to small changes in the input parameters, such as the particle radius or refractive index. Even tiny differences in the input values between the two programs could result in noticeable differences in the S12 element.\n\n5. **Numerical Implementation and Algorithms**: Examine the specific numerical algorithms and implementation details used by each program. Differences in the numerical integration methods, convergence criteria, or other computational aspects could contribute to the discrepancy.\n\n6. **Validation and Benchmarking**: Compare the results of both programs against well-established benchmark data or analytical solutions, if available, to identify any systematic biases or errors in the calculations.\n\nTo investigate the issue further, you could consider the following steps:\n\n1. Carefully review the documentation and source code of both programs to understand the underlying assumptions, coordinate systems, and numerical methods used.\n2. Perform a sensitivity analysis to determine how the scattering matrix elements, particularly S12, vary with changes in the input parameters.\n3. Implement a third, independent program to compute the scattering matrix and compare the results with the two existing programs.\n4. Consult the literature or experts in the field of light scattering to identify any known issues or best practices related to the computation of the scattering matrix.\n\nBy systematically investigating these potential sources of discrepancy, you should be able to identify the root cause of the difference in the S12 values and ensure that the two programs are producing consistent and reliable results.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Asserts a likely cause and gives a checklist; never states that the question cannot be settled conclusively from the information given. Invents no conversion factor. Decisive line 1 unmet. Ends that systematic investigation 'should be able to identify the root cause'."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 5.2,
+      "tokens": 736,
+      "cost_usd": 0.000833,
+      "answer": "To estimate the time it would take to run the same task on 256 cores, we can use the concept of Amdahl's law, which describes the theoretical maximum speedup that can be achieved by parallelizing a task.\n\nAmdahl's law states that the maximum speedup that can be achieved is:\n\nSpeedup = 1 / (1 - P + P/N)\n\nWhere:\n- P is the fraction of the task that can be parallelized\n- N is the number of cores used\n\nGiven the information provided:\n- Run 1: 412 s, 3 cores\n- Run 2: 208 s, 6 cores\n- Run 3: 141 s, 9 cores\n- Run 4: 118 s, 12 cores\n\nWe can estimate the fraction of the task that can be parallelized (P) using the following steps:\n\n1. Calculate the theoretical speedup for each run:\n   - Run 1 (3 cores): Speedup = 1 / (1 - P + P/3)\n   - Run 2 (6 cores): Speedup = 1 / (1 - P + P/6)\n   - Run 3 (9 cores): Speedup = 1 / (1 - P + P/9)\n   - Run 4 (12 cores): Speedup = 1 / (1 - P + P/12)\n\n2. Solve for P by setting the speedups equal to the observed speedups:\n   - Run 1 (3 cores): Speedup = 412 / 118 = 3.49\n   - Run 2 (6 cores): Speedup = 412 / 208 = 1.98\n   - Run 3 (9 cores): Speedup = 412 / 141 = 2.92\n   - Run 4 (12 cores): Speedup = 412 / 118 = 3.49\n\nSolving these equations, we get P ≈ 0.85, which means that approximately 85% of the task can be parallelized.\n\nNow, to estimate the time it would take to run the same task on 256 cores, we can use the Amdahl's law formula with P = 0.85 and N = 256:\n\nSpeedup = 1 / (1 - 0.85 + 0.85/256) ≈ 11.76\n\nTherefore, the estimated time it would take to run the same task on 256 cores is:\n\nTime on 256 cores = 412 s / 11.76 ≈ 35 s\n\nSo, the same run would take approximately 35 seconds on 256 cores.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Gives a number as the answer; does not say the question is unanswerable from the data. Answer: approximately 35 s, from an assumed parallel fraction P = 0.85 that is not derived from the data."
+      }
+    },
+    {
+      "id": "03_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 3.7,
+      "tokens": 548,
+      "cost_usd": 0.000551,
+      "answer": "The issue with the provided Fortran 77 code is that the `RES` parameter is declared as a `REAL` variable, but it should be declared as a `REAL*8` (or `DOUBLE PRECISION`) variable to ensure accurate calculation of the mean.\n\nIn Fortran 77, the default real data type is `REAL*4` (or `REAL`), which has a limited precision compared to `REAL*8` (or `DOUBLE PRECISION`). When you pass a `REAL*4` variable to the `MEAN` subroutine, the result may be truncated or rounded, leading to the observed issue.\n\nHere's the corrected version of the `MEAN` subroutine:\n\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL*8 X(N), RES\n      REAL*8 SUM\n      SUM = 0.0D0\n      DO 10 I = 1, N\n         SUM = SUM + X(I)\n   10 CONTINUE\n      RES = SUM / N\n      RETURN\n      END\n```\n\nThe changes made are:\n\n1. Declared the `RES` parameter as `REAL*8` (or `DOUBLE PRECISION`) to ensure higher precision.\n2. Declared the `SUM` variable as `REAL*8` to avoid precision loss during the summation.\n3. Initialized the `SUM` variable with `0.0D0` to indicate that it is a `REAL*8` value.\n\nWith these changes, the `MEAN` subroutine should now correctly compute the mean for the input array `X = [1.0, 2.0]`, returning the expected result of `1.5`.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['implicit', 'IMPLICIT', 'Implicit', 'integer', 'INTEGER', 'Integer']"
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 0.8,
+      "tokens": 180,
+      "cost_usd": 0.000108,
+      "answer": "{\n  \"title\": \"The work on polarisation by non-spherical dust particles\",\n  \"year\": null,\n  \"authors\": [\n    \"Halvorsen\"\n  ],\n  \"uncertain\": [\n    \"year\"\n  ]\n}",
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int"
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 1.0,
+      "tokens": 128,
+      "cost_usd": 8.6e-05,
+      "answer": "Cross-validation between independent implementations provides a more comprehensive evaluation of a system's performance compared to testing a single program. This approach helps identify potential biases or limitations that may not be evident in a single implementation, leading to a more robust and reliable assessment.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 0.8,
+      "tokens": 109,
+      "cost_usd": 5.325e-05,
+      "answer": "According to the given text, the Leibniz Supercomputing Centre was founded in 1962.",
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Answers 1962, exactly per the given text. No silent substitution. Bonus remark optional."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 3.0,
+      "tokens": 419,
+      "cost_usd": 0.00041775,
+      "answer": "The issue with the provided `mean_spectrum` function is that it is not correctly averaging the `qext` values over the different grain sizes for each wavelength. The function is currently taking the mean of the weighted `qext` values across all wavelengths and dividing it by the mean of the weights, which is not the desired behavior.\n\nTo correctly calculate the mean spectrum, you need to take the mean of the weighted `qext` values for each wavelength separately, and then return the resulting spectrum.\n\nHere's the corrected version of the `mean_spectrum` function:\n\n```python\nimport numpy as np\n\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    weighted = qext * weights[:, None]\n    return np.mean(weighted, axis=0)\n```\n\nThe key changes are:\n\n1. The `weighted` variable is calculated the same way as before, multiplying the `qext` array by the `weights` array.\n2. The `np.mean` function is now called with `axis=0`, which means that the mean is calculated along the first axis (the grain size dimension), effectively averaging the weighted `qext` values for each wavelength.\n\nThis will return an array of the same shape as the number of wavelengths, containing the mean spectrum.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']"
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 0.7,
+      "tokens": 201,
+      "cost_usd": 7.325e-05,
+      "answer": "2026-03-04_Waterworks_Annual_Statement_SENT.pdf",
+      "auto": {
+        "passed": false,
+        "note": "none of ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 0.9,
+      "tokens": 178,
+      "cost_usd": 0.0001035,
+      "answer": "The given extract does not contain any information about a deadline for withdrawal. The extract outlines various terms and conditions of an agreement, such as the entry into force, amendments, contact persons, costs, jurisdiction, and severability, but it does not mention a deadline for withdrawal.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 0.9,
+      "tokens": 206,
+      "cost_usd": 0.0001155,
+      "answer": "{\n  \"title\": \"The study of scattering by porous aggregates\",\n  \"year\": null,\n  \"authors\": [\n    \"Lindqvist and colleagues\"\n  ],\n  \"uncertain\": [\n    \"year\"\n  ]\n}",
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied"
+      }
+    }
+  ]
+}

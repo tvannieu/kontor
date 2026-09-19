@@ -1,0 +1,46 @@
+{
+  "model": "mistralai/mistral-large",
+  "time_utc": "2026-09-19T0108",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "02_unanswerable",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "03_fortran_legacy",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "04_structured_output",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "05_instruction_following",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "06_context_fidelity",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "07_python_review",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "08_filing_convention",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    },
+    {
+      "id": "10_honest_gap",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/mistral-large is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your r"
+    }
+  ]
+}

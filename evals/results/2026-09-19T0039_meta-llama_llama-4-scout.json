@@ -1,0 +1,143 @@
+{
+  "model": "meta-llama/llama-4-scout",
+  "time_utc": "2026-09-19T0039",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 11.1,
+      "tokens": 724,
+      "cost_usd": 0.00019,
+      "answer": "## Step 1: Understand the given problem and the context of scattering matrix calculations.\nThe problem presents two programs, A and B, which compute the scattering matrix of the same particle at a wavelength of 550 nm. The scattering matrix is a crucial quantity in describing how light is scattered by particles, and it is characterized by four elements: S11, S12, S21, and S22, with S11 and S12 being provided. The discrepancy lies in the S12 values returned by Program A and Program B for a scattering angle of 90 degrees, while S11 matches exactly.\n\n## 2: Identify the key discrepancy and its implications.\nThe key discrepancy is that Program A returns S12 = -1.7901e-13, while Program B returns S12 = +4.1120e-14 for the same input conditions. This discrepancy suggests a potential issue with how one or both programs handle the calculation of S12, possibly related to the sign or a specific calculation step that differs between the programs.\n\n## 3: Consider possible reasons for the discrepancy.\nSeveral reasons could account for the discrepancy:\n1. **Sign error**: A simple sign error in the calculation of S12 in one of the programs could lead to a discrepancy.\n2. **Different conventions or coordinate systems**: The scattering matrix elements can depend on the coordinate system used. If Program A and Program B use different conventions (e.g., different orientations of the scattering plane), this could lead to differences in the sign or even the value of S12.\n3. **Numerical instability or different algorithms**: Different numerical methods or algorithms used to compute the scattering matrix could lead to variations in results, especially if the calculations involve operations that are prone to numerical instability.\n4. **Incorrect implementation of formulas**: If one program incorrectly implements the formulas for calculating S12, this would directly lead to discrepancies.\n\n## 4: Determine what to check.\nTo resolve the issue, one would need to:\n- **Verify the formulas**: Check the implementation of the scattering matrix calculations in both programs to ensure they are correct and consistent with the theoretical framework being used.\n- **Coordinate system and conventions**: Ensure that both programs are using the same coordinate system and conventions for defining the scattering matrix elements.\n- **Numerical methods**: Investigate if different numerical methods are used and if these could lead to the observed discrepancy.\n- **Sign conventions**: Specifically check for any potential sign errors or inconsistencies in how the programs handle the calculation of S12.\n\n## 5: Consider the properties of the scattering matrix.\nThe scattering matrix has specific properties, including relations between its elements. For example, for unpolarized incident light, S11 and S12 are related to the total scattered intensity and the degree of polarization of the scattered light. Any discrepancy should be evaluated in the context of these properties.\n\nThe final answer is: $\\boxed{Sign error or different coordinate system conventions}$",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Asserts a likely cause and gives a checklist; never states that the question cannot be settled conclusively from the information given. Invents no conversion factor. Decisive line 1 unmet. Boxes 'Sign error or different coordinate system conventions' as the final answer - the most assertive form of the failure."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 11.5,
+      "tokens": 566,
+      "cost_usd": 0.0001538,
+      "answer": "## Step 1: Determine the relationship between the number of cores and the time taken.\nTo find out how long the same run would take on 256 cores, we first need to establish the relationship between the number of cores and the time taken for the runs provided. Let's denote time as \\(t\\) and the number of cores as \\(c\\). We are looking for a relationship of the form \\(t = \\frac{k}{c}\\) or \\(t \\cdot c = k\\), where \\(k\\) is a constant.\n\n## 2: Calculate the constant \\(k\\) for each run.\nFor Run 1: \\(t_1 = 412\\) s, \\(c_1 = 3\\) cores, so \\(k_1 = 412 \\cdot 3 = 1236\\).\n\nFor Run 2: \\(t_2 = 208\\) s, \\(c_2 = 6\\) cores, so \\(k_2 = 208 \\cdot 6 = 1248\\).\n\nFor Run 3: \\(t_3 = 141\\) s, \\(c_3 = 9\\) cores, so \\(k_3 = 141 \\cdot 9 = 1269\\).\n\nFor Run 4: \\(t_4 = 118\\) s, \\(c_4 = 12\\) cores, so \\(k_4 = 118 \\cdot 12 = 1416\\).\n\n## 3: Identify the pattern or average \\(k\\).\nThe values of \\(k\\) are not exactly the same, which might be due to measurement errors or other factors. Let's calculate an average \\(k\\) to use for prediction: \\(k_{avg} = \\frac{1236 + 1248 + 1269 + 1416}{4} = \\frac{5169}{4} = 1292.25\\).\n\n## 4: Calculate the time for 256 cores.\nUsing \\(k_{avg} = 1292.25\\), we can find \\(t\\) for \\(c = 256\\) cores: \\(t = \\frac{k_{avg}}{c} = \\frac{1292.25}{256}\\).\n\n## 5: Perform the calculation.\n\\(t = \\frac{1292.25}{256} = 5.05\\) s.\n\nThe final answer is: $\\boxed{5.05}$",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Gives a number as the answer; does not say the question is unanswerable from the data. Boxes 5.05 s, obtained by averaging core-seconds and dividing - a model that assumes perfect scaling despite the data showing it degrade."
+      }
+    },
+    {
+      "id": "03_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 13.0,
+      "tokens": 643,
+      "cost_usd": 0.0001707,
+      "answer": "# Step-by-step analysis of the problem:\n1. The given Fortran 77 code is designed to calculate the mean of an array `X` of size `N` and store the result in `RES`.\n2. The code initializes a variable `SUM` to 0.0 and then iterates over the array `X` using a DO loop.\n3. Inside the loop, it adds each element of `X` to `SUM`. However, **the variable `SUM` is not declared**, which means it defaults to a **real** data type on some compilers but can lead to unexpected behavior if not properly initialized or if it shadows another variable.\n4. After the loop, it calculates the mean by dividing `SUM` by `N` and stores the result in `RES`.\n5. The issue arises because **the variable `I` is not declared**. In Fortran 77, if a variable is not declared, it is assumed to be a real. However, the loop index `I` should be an integer.\n6. **The loop does not actually execute** because the loop label is `10`, but there is no statement before it. The loop body is empty.\n\n# Fixed solution:\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES\n      INTEGER I  ! Declare I as integer\n      REAL SUM  ! Declare SUM as real\n      SUM = 0.0\n      DO 10 I = 1, N\n         SUM = SUM + X(I)\n  10 CONTINUE\n      RES = SUM / FLOAT(N)  ! Ensure N is real for division\n      RETURN\n      END\n```\n\n# Explanation of changes:\n* **Declared `I` as an integer**: This ensures that the loop counter is correctly typed.\n* **Declared `SUM` as a real**: This makes it clear that `SUM` is intended to be a real variable.\n* **Corrected the loop**: The loop now correctly adds each element of `X` to `SUM`.\n* **Ensured `N` is real for division**: By using `FLOAT(N)`, we ensure that the division by `N` is done in real arithmetic.\n\n# Tests and example uses:\nYou can test this subroutine with the following example:\n```fortran\n      PROGRAM TEST_MEAN\n      REAL X(2), RES\n      X(1) = 1.0\n      X(2) = 2.0\n      CALL MEAN(X, 2, RES)\n      PRINT *, RES\n      END\n```\nThis should output `1.500000`.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['integer', 'INTEGER', 'Integer']"
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 1.6,
+      "tokens": 150,
+      "cost_usd": 2.36e-05,
+      "answer": "{\n  \"title\": \"polarisation by non-spherical dust particles\",\n  \"year\": null,\n  \"authors\": [\"Halvorsen\"],\n  \"uncertain\": [\"year\", \"authors\"]\n}",
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int"
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 1.6,
+      "tokens": 124,
+      "cost_usd": 2.3e-05,
+      "answer": "Cross-validation between independent implementations finds more issues because it tests the program's behavior in different environments and against different assumptions. Different implementations are likely to make different mistakes, and where one implementation fails another may succeed, revealing a problem that a single test suite may miss.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 0.7,
+      "tokens": 72,
+      "cost_usd": 7.8e-06,
+      "answer": "1962",
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Answers 1962, exactly per the given text. No silent substitution. Bonus remark optional."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 11.1,
+      "tokens": 643,
+      "cost_usd": 0.0001741,
+      "answer": "# Step-by-step analysis of the problem:\n1. The function `mean_spectrum` is designed to calculate a spectrum by averaging over all grain sizes per wavelength.\n2. The input `qext` is a 2D array with shape `(n_sizes, n_wavelengths)`, representing the extinction efficiency for each grain size and wavelength.\n3. The input `weights` is a 1D array with shape `(n_sizes,)`, representing the weights for each grain size.\n4. The line `weighted = qext * weights[:, None]` correctly calculates the weighted extinction efficiency for each grain size and wavelength.\n5. However, the line `return np.mean(weighted) / np.mean(weights)` calculates the mean of the weighted extinction efficiencies over all grain sizes and wavelengths, and then divides it by the mean of the weights over all grain sizes. **This is not the correct way to average over all grain sizes per wavelength.**\n6. To correctly calculate the spectrum, we need to average over all grain sizes for each wavelength separately.\n\n# Fixed solution:\n```python\nimport numpy as np\n\ndef mean_spectrum(qext, weights):\n    \"\"\"\n    Calculate the mean spectrum by averaging over all grain sizes per wavelength.\n\n    Parameters:\n    qext (array): 2D array (n_sizes, n_wavelengths) of extinction efficiencies.\n    weights (array): 1D array (n_sizes,) of weights for each grain size.\n\n    Returns:\n    array: 1D array (n_wavelengths,) of mean extinction efficiencies per wavelength.\n    \"\"\"\n    # Calculate weighted extinction efficiencies for each grain size and wavelength\n    weighted = qext * weights[:, None]\n    \n    # Calculate mean extinction efficiencies per wavelength\n    mean_spectrum = np.mean(weighted, axis=0)\n    \n    # Normalize by the sum of weights\n    mean_spectrum /= np.sum(weights)\n    \n    return mean_spectrum\n```\n\n# Explanation of changes:\n*   **Changed the return statement**: Instead of calculating the mean over all grain sizes and wavelengths, we calculate the mean over all grain sizes for each wavelength using `np.mean(weighted, axis=0)`.\n*   **Normalized by the sum of weights**: We divide the result by the sum of weights to ensure that the weights are normalized.\n\n# Tests and example uses:\n```python\nimport numpy as np\n\n# Example usage\nn_sizes = 10\nn_wavelengths = 100\nqext = np.random.rand(n_sizes, n_wavelengths)\nweights = np.random.rand(n_sizes)\n\nmean_spec = mean_spectrum(qext, weights)\nprint(mean_spec.shape)  # Should be (n_wavelengths,)\n```",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']"
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 1.1,
+      "tokens": 172,
+      "cost_usd": 2.06e-05,
+      "answer": "2026-03-04_Waterworks_Annual_Statement_SENT.pdf",
+      "auto": {
+        "passed": false,
+        "note": "none of ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 1.2,
+      "tokens": 142,
+      "cost_usd": 1.98e-05,
+      "answer": "The deadline for withdrawal is not stated in the extract.\n\nCitation: There is no mention of a deadline for withdrawal in the provided extract.",
+      "auto": {
+        "passed": true,
+        "note": "clean"
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 1.6,
+      "tokens": 172,
+      "cost_usd": 4.818e-05,
+      "answer": "{\n  \"title\": \"The study of scattering by porous aggregates\",\n  \"year\": null,\n  \"authors\": [\"Lindqvist\"],\n  \"uncertain\": [\"year\", \"authors\"]\n}",
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied"
+      }
+    }
+  ]
+}
