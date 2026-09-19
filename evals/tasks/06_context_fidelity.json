@@ -12,5 +12,9 @@
     "Does NOT silently substitute a different year",
     "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
   ],
+  "oracle": {
+    "expect": "grader",
+    "solution": "1962, according to the text given."
+  },
   "prompt": "Given text, answer exclusively from it:\n\n\"The Leibniz Supercomputing Centre was founded in 1962 and today operates, among other machines, the SuperMUC-NG supercomputer. The predecessor building was occupied in 1974.\"\n\nQuestion: In which year was the Leibniz Supercomputing Centre founded?"
 }

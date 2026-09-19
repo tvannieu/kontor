@@ -17,5 +17,9 @@
     "Recognises that the result is a scalar instead of a spectrum",
     "The code does not crash, it returns something wrong"
   ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "np.mean(weighted) is called without an axis argument, so it averages over the whole two-dimensional array and returns a single scalar rather than one value per wavelength. It needs axis=0 to average over grain sizes, and the normalisation by np.mean(weights) should be a sum over the weights instead."
+  },
   "prompt": "This function is meant to average over all grain sizes per wavelength and return a spectrum. It does not. Why?\n\nimport numpy as np\n\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    weighted = qext * weights[:, None]\n    return np.mean(weighted) / np.mean(weights)"
 }

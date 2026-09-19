@@ -2,14 +2,22 @@
   "id": "08_filing_convention",
   "title": "Filing by a fixed convention",
   "why": "The most common cheap task there is: a document gets a name according to a rule that is stated in full. No judgement required, only exact compliance. A model that cannot do this reliably is of no use for anything cheaper either. Note that this checks a string, not a file — see NOTES.md on Harbor for why that is the wrong shape for what it measures.",
-  "profile": ["filing"],
+  "profile": [
+    "filing"
+  ],
   "check": "contains_any",
-  "expect": ["2026-03-04_Waterworks_AnnualStatement_SENT.pdf"],
+  "expect": [
+    "2026-03-04_Waterworks_AnnualStatement_SENT.pdf"
+  ],
   "rubric": [
     "Exactly the format YYYY-MM-DD_Sender_Subject_STATUS.pdf",
     "Date from the document, not from its arrival",
     "Spaces become underscores",
     "Status in capitals"
   ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf"
+  },
   "prompt": "Name the file according to this convention and output ONLY the filename, with no explanation and no quotation marks.\n\nConvention:\n  YYYY-MM-DD_Sender_Subject_STATUS.pdf\n  - YYYY-MM-DD is the date of the document, not the date it arrived\n  - Sender: one word, as on the letterhead\n  - Subject: one word, spaces become underscores\n  - STATUS is SENT if the document has already gone out, otherwise DRAFT\n\nDocument:\n  Letterhead: Waterworks\n  Subject: AnnualStatement\n  Date of the letter: 4 March 2026\n  Received on: 11 March 2026\n  Margin note: delivered by post on 4.3."
 }

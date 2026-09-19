@@ -18,5 +18,9 @@
     "No exclamation mark",
     "Does not begin with 'I'"
   ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "Independent implementations encode different assumptions, so comparing their outputs exposes disagreements that a single program's tests cannot reach. Each program's tests can only check the behaviour its author already thought of."
+  },
   "prompt": "Write two sentences on why cross-validation between independent implementations finds more than the tests of a single program do.\n\nHard constraints, all of them binding:\n- at most two sentences\n- NO dashes of any kind\n- no exclamation mark\n- the first sentence must not begin with the word 'I'"
 }

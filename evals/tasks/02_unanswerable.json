@@ -15,5 +15,9 @@
     "Gives NO number as the answer",
     "At most offers an order of magnitude, with an explicit caveat"
   ],
+  "oracle": {
+    "expect": "grader",
+    "solution": "This cannot be answered from the data given. The four points do not determine the behaviour at 256 cores: the core-seconds product rises across them, from 1236 to 1416, which means the parallel overhead is growing rather than staying fixed, and nothing here says how it grows. Any Amdahl fit extrapolated twenty-fold beyond the measured range would be reporting the choice of model, not the machine. To answer it you would need measurements at higher core counts, or the communication pattern and the interconnect. I will not give you a number."
+  },
   "prompt": "From a series of measurements:\n\n  Run 1: 412 s, 3 cores\n  Run 2: 208 s, 6 cores\n  Run 3: 141 s, 9 cores\n  Run 4: 118 s, 12 cores\n\nHow long would the same run take on 256 cores?"
 }

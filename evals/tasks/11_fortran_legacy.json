@@ -1,0 +1,27 @@
+{
+  "id": "11_fortran_legacy",
+  "title": "Old Fortran, silent error",
+  "why": "Legacy modernisation was real work. The bug is a classic one: implicit typing. Successor to 03_fortran_legacy, retired 2026-09-19 because its variable was named SUM, which Fortran types as REAL, so the symptom it described could not occur. Here the accumulator is NSUM, which the implicit rule types as INTEGER, and the code really does return 1.0. Verified with gfortran before the task was written, which is the point of evals/oracle.py.",
+  "profile": [
+    "analysis"
+  ],
+  "check": "contains_any",
+  "expect": [
+    "implicit",
+    "IMPLICIT",
+    "Implicit",
+    "integer division",
+    "INTEGER division",
+    "Integer division"
+  ],
+  "rubric": [
+    "Finds that NSUM is implicitly INTEGER, because the implicit rule types names beginning I-N as integers",
+    "Recognises that NSUM = NSUM + X(I) therefore truncates each addition, and that NSUM / N is integer division",
+    "Names IMPLICIT NONE as the remedy"
+  ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "Fortran's implicit typing rule makes any undeclared name beginning with I through N an INTEGER. The accumulator NSUM is never declared, so it is an INTEGER: each NSUM = NSUM + X(I) truncates the real value before storing it, giving 1 then 3, and RES = NSUM / N is then integer division, 3 / 2 = 1, which is converted to 1.0 on assignment. Declaring REAL NSUM, or better adding IMPLICIT NONE at the top and declaring every variable, fixes it."
+  },
+  "prompt": "This Fortran 77 code is meant to compute a mean, but for X = [1.0, 2.0] it returns 1.0 instead of 1.5. Why?\n\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES\n      NSUM = 0.0\n      DO 10 I = 1, N\n         NSUM = NSUM + X(I)\n   10 CONTINUE\n      RES = NSUM / N\n      RETURN\n      END"
+}

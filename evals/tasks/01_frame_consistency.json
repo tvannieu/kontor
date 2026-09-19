@@ -12,5 +12,9 @@
     "Invents NO conversion factor",
     "Says which piece of information is missing"
   ],
+  "oracle": {
+    "expect": "grader",
+    "solution": "The two results cannot be reconciled from what you have given: S11 is a sum of squared amplitudes and is invariant to the sign and basis conventions, while S12 is a difference and is not, so an identical S11 with a differing S12 is exactly what you would see if the programs are not expressing S12 in the same reference frame. Which of them is in which frame is not determinable from these six numbers. Note also that the magnitudes differ, not only the sign, so a straight sign flip does not account for it either. To settle it you would need, from each program, the definition of the scattering plane and the polarisation basis, the sign convention for S12, and the raw complex amplitudes S1 and S2 rather than the assembled matrix. I am not going to guess a factor that would map one onto the other."
+  },
   "prompt": "Two programs compute the scattering matrix of the same particle at 550 nm.\n\nProgram A returns, for a scattering angle of 90 degrees:\n  S11 = 1.8423e-13, S12 = -1.7901e-13\n\nProgram B returns, for the same angle:\n  S11 = 1.8423e-13, S12 = +4.1120e-14\n\nBoth programs were called with identical inputs: same radius, same refractive index, same wavelength. S11 matches exactly, S12 does not.\n\nWhat could account for this? What would you check?"
 }
