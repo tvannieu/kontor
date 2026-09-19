@@ -14,7 +14,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-TASKS, RESULTS = ROOT / "tasks", ROOT / "results"
+# Overridable so the same runner, the same checks and the same result format
+# serve a second task set (classifier/) without a second copy of any of it.
+TASKS = Path(os.environ.get("KONTOR_TASKS_DIR", ROOT / "tasks"))
+RESULTS = Path(os.environ.get("KONTOR_RESULTS_DIR", ROOT / "results"))
 API = "https://openrouter.ai/api/v1/chat/completions"
 
 
@@ -179,6 +182,9 @@ def main():
     ap.add_argument("model", nargs="?", help="e.g. anthropic/claude-sonnet-4.5")
     ap.add_argument("--tasks", nargs="*", help="only these prefixes, e.g. 02 05")
     ap.add_argument("--profile", help="only tasks of this profile, e.g. filing")
+    ap.add_argument("--epochs", type=int, default=1, metavar="N",
+                    help="run each task N times; the verdict is the majority, and a task "
+                         "that does not agree with itself is marked unstable")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
@@ -209,36 +215,70 @@ def main():
                           "Not directly comparable with runs made through the API.")
     open_ratings = 0
 
+    if a.epochs > 1:
+        run["epochs"] = a.epochs
+
     for t in tasks:
         print(f"  {t['id']} ... ", end="", flush=True)
-        try:
-            ans, dur, usage = ask(a.model, t["prompt"], key)
-        except urllib.error.HTTPError as e:
-            print(f"HTTP {e.code}")
-            run["tasks"].append({"id": t["id"], "error": f"HTTP {e.code}: {e.read()[:200].decode(errors='replace')}"})
-            continue
-        except Exception as e:
-            print(f"Error: {e}")
-            run["tasks"].append({"id": t["id"], "error": str(e)})
+        fn = CHECKS.get(t["check"])
+        attempts, failed = [], None
+        for _ in range(a.epochs):
+            try:
+                ans, dur, usage = ask(a.model, t["prompt"], key)
+            except urllib.error.HTTPError as e:
+                failed = f"HTTP {e.code}: {e.read()[:200].decode(errors='replace')}"
+                break
+            except Exception as e:
+                failed = str(e)
+                break
+            att = {"seconds": dur, "tokens": usage.get("total_tokens"),
+                   "cost_usd": usage.get("cost"), "answer": ans}
+            if fn:
+                ok, note = fn(ans, t["expect"])
+                att["passed"], att["note"] = ok, note
+            attempts.append(att)
+
+        if failed is not None:
+            print(f"Error: {failed[:90]}")
+            run["tasks"].append({"id": t["id"], "error": failed})
             continue
 
-        rec = {"id": t["id"], "title": t["title"], "seconds": dur,
-               "tokens": usage.get("total_tokens"), "cost_usd": usage.get("cost"),
-               "answer": ans}
+        costs_here = [x["cost_usd"] for x in attempts if x["cost_usd"] is not None]
+        rec = {"id": t["id"], "title": t["title"],
+               "seconds": round(sum(x["seconds"] for x in attempts), 1),
+               "tokens": sum(x["tokens"] or 0 for x in attempts) or None,
+               "cost_usd": sum(costs_here) if costs_here else None,
+               "answer": attempts[0]["answer"]}
         cost = f"  ${rec['cost_usd']:.5f}" if rec["cost_usd"] is not None else ""
-        fn = CHECKS.get(t["check"])
+        if a.epochs > 1:
+            # Keep every attempt: the point of epochs is the disagreement, and
+            # a reduced verdict that hides which runs disagreed is worth less
+            # than no reduction at all.
+            rec["attempts"] = attempts
+
         if fn:
-            ok, note = fn(ans, t["expect"])
-            rec["auto"] = {"passed": ok, "note": note}
-            print(("PASS" if ok else "FAIL") + f"  ({note})  {dur}s{cost}")
+            verdicts = [x["passed"] for x in attempts]
+            ok = sum(verdicts) * 2 > len(verdicts)          # majority
+            stable = len(set(verdicts)) == 1
+            # The note has to come from an attempt that agrees with the
+            # reported verdict, or an unstable task prints "PASS" beside the
+            # reason one attempt failed.
+            note = next(x["note"] for x in attempts if x["passed"] == ok)
+            rec["auto"] = {"passed": ok, "note": note, "stable": stable}
+            mark = "PASS" if ok else "FAIL"
+            extra = "" if stable else f"  UNSTABLE {sum(verdicts)}/{len(verdicts)}"
+            print(f"{mark}  ({note}){extra}  {rec['seconds']}s{cost}")
         else:
             rec["manual"] = {"rating": None, "rubric": t.get("rubric", []), "note": ""}
             open_ratings += 1
-            print(f"to be rated  {dur}s{cost}")
+            print(f"to be rated  {rec['seconds']}s{cost}")
         run["tasks"].append(rec)
 
     RESULTS.mkdir(exist_ok=True)
-    out = RESULTS / f"{stamp}_{a.model.replace('/', '_')}.json"
+    # ':' is legal on this filesystem and not on Windows; model ids carry it
+    # (":free"), and a repository meant to be cloned should not hand out files
+    # that cannot be checked out.
+    out = RESULTS / f"{stamp}_{a.model.replace('/', '_').replace(':', '-')}.json"
     out.write_text(json.dumps(run, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nWritten: {out.relative_to(ROOT)}")
     costs = [r["cost_usd"] for r in run["tasks"] if r.get("cost_usd") is not None]

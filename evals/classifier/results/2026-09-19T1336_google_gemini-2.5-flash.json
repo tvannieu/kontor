@@ -1,0 +1,123 @@
+{
+  "model": "google/gemini-2.5-flash",
+  "time_utc": "2026-09-19T1336",
+  "tasks": [
+    {
+      "id": "01_rename_invoices",
+      "title": "Routing: filing",
+      "seconds": 0.8,
+      "tokens": 179,
+      "cost_usd": 9.99e-05,
+      "answer": "filing. This task involves renaming files according to a specific convention, which is a straightforward organizational activity.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "02_summarise_contract",
+      "title": "Routing: reading",
+      "seconds": 0.6,
+      "tokens": 164,
+      "cost_usd": 8e-05,
+      "answer": "reading. The task involves extracting and summarizing existing information from a document.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['reading']",
+        "stable": true
+      }
+    },
+    {
+      "id": "03_decline_offer",
+      "title": "Routing: drafting",
+      "seconds": 0.6,
+      "tokens": 173,
+      "cost_usd": 9.81e-05,
+      "answer": "drafting. This task involves composing a new piece of correspondence addressed to a specific person (the supplier).",
+      "auto": {
+        "passed": true,
+        "note": "found: ['drafting']",
+        "stable": true
+      }
+    },
+    {
+      "id": "04_wrong_axis",
+      "title": "Routing: analysis",
+      "seconds": 0.8,
+      "tokens": 161,
+      "cost_usd": 7.91e-05,
+      "answer": "analysis. The task involves diagnosing a problem and reasoning about its cause.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['analysis']",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_register_arrivals",
+      "title": "Routing: filing",
+      "seconds": 0.8,
+      "tokens": 162,
+      "cost_usd": 8.16e-05,
+      "answer": "filing. This task involves recording information without requiring any interpretation or synthesis.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_annual_review",
+      "title": "Routing: underdetermined",
+      "seconds": 1.0,
+      "tokens": 164,
+      "cost_usd": 8.66e-05,
+      "answer": "reading. The task involves reviewing existing correspondence to extract information relevant to the annual review.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "07_deal_with_letter",
+      "title": "Routing: underdetermined",
+      "seconds": 0.7,
+      "tokens": 157,
+      "cost_usd": 8.67e-05,
+      "answer": "unclear. The nature of the letter and what \"deal with\" entails are unknown.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_clean_project_folder",
+      "title": "Routing: underdetermined",
+      "seconds": 1.0,
+      "tokens": 151,
+      "cost_usd": 7.83e-05,
+      "answer": "unclear. The description does not specify what \"clean up\" entails.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_numbers_write_up",
+      "title": "Routing: underdetermined",
+      "seconds": 0.9,
+      "tokens": 186,
+      "cost_usd": 0.0001592,
+      "answer": "unclear. The description does not specify the nature of \"looking at the numbers\" or \"writing something up,\" which could range from simple data entry (filing) to complex interpretation (analysis) or summarizing existing reports (reading).",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    }
+  ]
+}

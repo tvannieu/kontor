@@ -97,6 +97,18 @@ Two instabilities, different in kind.
 
 The opinion: `--epochs` is a good, cheap feature and the reducer choice matters — `mode` is right for letter grades. But the default grade parser is brittle to the single most common thing a chat model does to a label (bold it), and the failure is silent at the run level. That belongs next to the retry-error finding above: the framework handles the hard cases and drops the easy one.
 
+### The fix for that: stop asking the model to conclude
+
+Implemented 2026-09-19 as the default for `kontor_manual`. Each rubric line is put to the grader as one plain yes/no question about the submission — one call per line — and the letter is then derived in Python: any decisive line unmet gives I, all decisive plus all secondary gives C, otherwise P. A rule evaluated in code cannot be inverted. Harbor's rewardkit offers the same shape as `mode = "individual"`; the single-call version is kept as `kontor_manual_single_call` so the two can be compared on identical inputs rather than argued about.
+
+Two measurements, and neither is the clean win it would be convenient to report.
+
+**On the current set, the two designs are indistinguishable.** [`calibrate.py`](calibrate.py) now grades every human-rated answer both ways: 36 distinct answers, `deepseek-v4-flash` as grader, **100% agreement with the human rating for both**. That is not validation. The set is skewed — 32 of 36 are failures — and, more to the point, every rating in it is a clear-cut 0 or 1. Nothing currently sits on the C/P boundary, which is exactly where the original error happened. A design change that cannot be distinguished from what it replaced has not been shown to help.
+
+**Replaying the case it was built for shows something else.** The answer that split the graders on 2026-09-18 was written against the retired German task 01, so it no longer occurs in any live run; [`regression_two_pass.py`](regression_two_pass.py) replays it from `regression_case.json` — same stored text, same grader, same rubric, both designs. Two-pass reaches **I**, from per-line verdicts of NO / NO / NO / YES. Single-call also reached **I** this time, having reached **P** on the identical input the day before.
+
+So the single-call scorer is not reliably wrong on this case. It is *unstable* on it, which is a worse property to have in a grader and a harder one to notice: the disagreement that exposed it only appeared because two graders were run side by side. The argument for two-pass is therefore not that it is more accurate here, but that its concluding step is arithmetic and cannot vary between runs. On present evidence that is a claim about variance, not about accuracy, and it is written down that way.
+
 ### Task 04 rewards a sentinel over an honest null — and it's not the port's doing
 
 Both hosted models hit the same shape of trouble on task 04, differently. The schema requires `jahr: int`. Neither model could determine the year with confidence, and both correctly flagged `"jahr"` in `unsicher`:
@@ -178,7 +190,7 @@ Not a design flaw exactly — retrying a 429 and not retrying a 403 is the right
 
 ## What is not done
 
-- Six of the seven models in `evals/results/` now have data through the port (gemma via its paid listing, the free one being rate-limited on a shared pool). `thinkingmachines/inkling:free` remains the one that needs an actual agentic-harness wrapper to call at all — a real integration, not a retry.
+- ~~`thinkingmachines/inkling:free` needs an agentic-harness wrapper~~ **Solved, 2026-09-19, and the fix was already in the repository.** Its 403 says "only available on agentic harnesses" — and `crush`, which `run.py` already shells out to for the Hyper models, is one. `run.py crush/openrouter/thinkingmachines/inkling:free` runs the whole suite. The model that had no data in this repository's entire history had been reachable since the day the `crush/` route was added, for an unrelated reason. Worth remembering before writing "needs an integration" about anything else.
 - `ollama/kontor-8b:latest` deliberately not run through the port — `kontor-4b` alone already surfaced a real, unresolved failure mode, and the machine had already been under real memory pressure from this suite once today. Adding the larger model's footprint on top wasn't worth repeating that.
 - The fixed scorer has now been calibrated (see "Judge calibration"): two graders agree with all six human labels and with each other on 13 of 14 items. The remaining known weakness is the one the split exposed — a grader concluding P after finding a decisive line unmet. A two-pass scorer (decide each decisive line, then derive the letter mechanically) would remove that failure mode; not built.
 - `task 09` (`stelle_nicht_im_text`) and `task 05` (`instruktionstreue`) both produced **empty** answers from `gpt-oss-120b` in the very first (pre-fix) run, and were marked passed (`clean`) by `regex_absent` anyway — because a check for the *absence* of a forbidden pattern is vacuously satisfied by no output at all. That is a real gap in the check itself, present in `run.py` too (identical logic), not introduced by the port. Worth a rubric note if these two tasks get a token-budget-starved run again — a pass on `regex_absent` is not evidence the model actually answered.

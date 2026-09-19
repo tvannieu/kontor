@@ -1,0 +1,151 @@
+{
+  "model": "crush/openrouter/thinkingmachines/inkling:free",
+  "time_utc": "2026-09-19T1335",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 25.3,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Given the inputs are identical and `S11` matches exactly, the core Mie coefficients (`a_n`, `b_n`) are almost certainly the same in both programs. The discrepancy is isolated to how `S12` is assembled or interpreted.\n\nWhat to check:\n\n- **S12 assembly formula**: Verify whether one program swaps `a_n`/`b_n` or uses wrong angular functions (`π_n`, `τ_n`) in the `S12` sum. A bug in the `S12` expression alone would leave `S11` untouched.\n- **Polarization / reference-frame convention**: `S12` is the cross-polarized term; its sign depends on the handedness of the coordinate system and whether the scattering plane is defined from the incident or scattered side.\n- **Angular function definitions**: Check `τ_n` sign/parity conventions. If one code uses an opposite-derivative definition, `S11` can remain unchanged while `S12` flips.\n- **Normalization / phase factor**: Look for an extra normalization or complex-conjugate step applied only to the off-diagonal element.\n- **Special handling at 90°**: Some implementations treat exactly 90° separately; confirm both handle it the same way.\n\nFirst diagnostic: print the intermediate `a_n`, `b_n`, `π_n`, `τ_n` for the first few terms, and compare the `S12` summation line-by-line.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Asserts the discrepancy is isolated to how S12 is assembled and gives a diagnostic plan. Never states the question cannot be settled from what was given. Invents no conversion factor."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 22.3,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Fit Amdahl’s law `T(N) = S + P/N` to the 4 points (least squares):\n- Serial part `S ≈ 12.5 s`\n- Parallel part `P ≈ 1194 s`\n\nThen on 256 cores:\n`T ≈ 12.5 + 1194/256 ≈ 17.2 s`\n\nIf you instead use only the first two runs (`S ≈ 4 s`, `P ≈ 1224 s`), you get ≈ 9 s. Given the slowdown at higher core counts, a realistic estimate is **around 15–20 s**; best-fit says **~17 s**.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Gives ~17 s, and notably shows the estimate is model-dependent by deriving ~9 s from a different pair of points — then still lands on 'around 15-20 s, best-fit ~17 s'. Demonstrating that the answer depends on the fit is the argument for declining to give one; it gave one anyway."
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 16.7,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "{\"title\":\"Polarisation by non-spherical dust particles\",\"year\":null,\"authors\":[\"Halvorsen\"],\"uncertain\":[\"title\",\"year\"]}",
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 2.7,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Cross-validation between independent implementations exposes errors that one program's internal tests miss because the implementations share no common biases or hidden assumptions. When two distinct approaches agree, confidence grows, but disagreement reveals bugs that a single test suite cannot detect.",
+      "auto": {
+        "passed": true,
+        "note": "clean",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 1.9,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "1962",
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Answers 1962, per the given text. No silent substitution."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 6.5,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "`np.mean(weighted)` collapses everything to one scalar; you need the mean along the size axis (`axis=0`).\n\nFix: `np.average(qext, axis=0, weights=weights)` (or `np.sum(qext * weights[:, None], axis=0) / np.sum(weights)`).",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 4.1,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+      "auto": {
+        "passed": true,
+        "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 59.2,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "It is not stated in the extract. The text covers entry into force, amendments, contact persons, costs, jurisdiction, and severability, but contains no provision on withdrawal or any related deadline. (Citation: the provided extract in full; no line mentions withdrawal.)",
+      "auto": {
+        "passed": true,
+        "note": "clean",
+        "stable": true
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 18.7,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "{\"title\":\"The study of scattering by porous aggregates\",\"year\":null,\"authors\":[\"Lindqvist\"],\"uncertain\":[\"title\",\"year\",\"authors\"]}",
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied",
+        "stable": true
+      }
+    },
+    {
+      "id": "11_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 13.0,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "`NSUM` is undeclared, so Fortran 77 implicit typing makes it `INTEGER` (I-N rule). The sum and division `NSUM / N` are then integer arithmetic: `(1+2)/2 = 1`, assigned to `REAL RES` as `1.0`. Fix: declare `REAL NSUM`.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['implicit', 'IMPLICIT', 'Implicit']",
+        "stable": true
+      }
+    }
+  ],
+  "harness": "crush run: temperature not controllable (provider default, not 0), agent system prompt in front of the task, no token or cost figures. Not directly comparable with runs made through the API."
+}

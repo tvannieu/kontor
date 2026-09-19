@@ -1,0 +1,123 @@
+{
+  "model": "openai/gpt-5-nano",
+  "time_utc": "2026-09-19T1334",
+  "tasks": [
+    {
+      "id": "01_rename_invoices",
+      "title": "Routing: filing",
+      "seconds": 8.9,
+      "tokens": 677,
+      "cost_usd": 0.00021865,
+      "answer": "filing — It involves renaming and organizing scanned invoices into a standard file naming convention.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "02_summarise_contract",
+      "title": "Routing: reading",
+      "seconds": 7.2,
+      "tokens": 882,
+      "cost_usd": 0.00030205,
+      "answer": "reading — It involves reading a sixty-page supplier contract and summarising the obligations it imposes into five bullet points.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['reading']",
+        "stable": true
+      }
+    },
+    {
+      "id": "03_decline_offer",
+      "title": "Routing: drafting",
+      "seconds": 14.7,
+      "tokens": 1763,
+      "cost_usd": 0.00065305,
+      "answer": "drafting: It involves writing a polite, three-paragraph reply to a supplier declining their offer.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['drafting']",
+        "stable": true
+      }
+    },
+    {
+      "id": "04_wrong_axis",
+      "title": "Routing: analysis",
+      "seconds": 10.3,
+      "tokens": 1034,
+      "cost_usd": 0.00036355,
+      "answer": "analysis: It requires diagnosing and debugging why a numerical routine returns a single number instead of a spectrum.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['analysis']",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_register_arrivals",
+      "title": "Routing: filing",
+      "seconds": 9.6,
+      "tokens": 1465,
+      "cost_usd": 0.00053595,
+      "answer": "filing This task involves recording the arrival dates of incoming letters into the register (data entry).",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_annual_review",
+      "title": "Routing: underdetermined",
+      "seconds": 9.1,
+      "tokens": 1223,
+      "cost_usd": 0.00043985,
+      "answer": "filing — It involves going through last year's correspondence to organize and assemble the documents and materials needed for the annual review.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "07_deal_with_letter",
+      "title": "Routing: underdetermined",
+      "seconds": 6.3,
+      "tokens": 828,
+      "cost_usd": 0.00028395,
+      "answer": "unclear — The description could refer to drafting (writing a reply), reading (understanding or summarizing the letter), or filing (recording or organizing it), so more specificity is needed to determine a single profile.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_clean_project_folder",
+      "title": "Routing: underdetermined",
+      "seconds": 5.3,
+      "tokens": 718,
+      "cost_usd": 0.000241,
+      "answer": "filing. It involves organizing and renaming files in a project folder.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_numbers_write_up",
+      "title": "Routing: underdetermined",
+      "seconds": 9.3,
+      "tokens": 1168,
+      "cost_usd": 0.00041995,
+      "answer": "unclear — the instruction could be about drafting a document to communicate findings, or about analyzing numbers and producing a write-up, and it does not specify an audience or the nature of the write-up.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    }
+  ]
+}

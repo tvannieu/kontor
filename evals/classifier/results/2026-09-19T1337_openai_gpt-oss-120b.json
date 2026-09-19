@@ -1,0 +1,123 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "time_utc": "2026-09-19T1337",
+  "tasks": [
+    {
+      "id": "01_rename_invoices",
+      "title": "Routing: filing",
+      "seconds": 0.8,
+      "tokens": 299,
+      "cost_usd": 5.094e-05,
+      "answer": "filing — the task involves renaming scanned invoices to a standardized filename, which is a filing activity.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "02_summarise_contract",
+      "title": "Routing: reading",
+      "seconds": 1.5,
+      "tokens": 313,
+      "cost_usd": 2.437e-05,
+      "answer": "reading — the task involves reviewing existing material (the contract) and summarizing its key obligations.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['reading']",
+        "stable": true
+      }
+    },
+    {
+      "id": "03_decline_offer",
+      "title": "Routing: drafting",
+      "seconds": 2.6,
+      "tokens": 305,
+      "cost_usd": 2.245e-05,
+      "answer": "drafting — the task involves composing a polite, three‑paragraph reply to a supplier, which is writing a document addressed to a person.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['drafting']",
+        "stable": true
+      }
+    },
+    {
+      "id": "04_wrong_axis",
+      "title": "Routing: analysis",
+      "seconds": 2.2,
+      "tokens": 302,
+      "cost_usd": 2.376e-05,
+      "answer": "analysis – the task involves diagnosing why a routine is producing the wrong type of output, which is a debugging/reasoning problem.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['analysis']",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_register_arrivals",
+      "title": "Routing: filing",
+      "seconds": 13.7,
+      "tokens": 348,
+      "cost_usd": 3.06e-05,
+      "answer": "filing — the task involves recording information (arrival dates) in a register, which is a filing activity.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_annual_review",
+      "title": "Routing: underdetermined",
+      "seconds": 3.2,
+      "tokens": 356,
+      "cost_usd": 3.5383e-05,
+      "answer": "reading – the task involves reviewing existing correspondence and summarising the needed information for the review.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "07_deal_with_letter",
+      "title": "Routing: underdetermined",
+      "seconds": 4.0,
+      "tokens": 390,
+      "cost_usd": 4.1961e-05,
+      "answer": "unclear — “Deal with the letter” could involve reading it, filing it, or drafting a response; we need to know the specific action required to assign a single profile.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_clean_project_folder",
+      "title": "Routing: underdetermined",
+      "seconds": 3.5,
+      "tokens": 301,
+      "cost_usd": 2.415e-05,
+      "answer": "filing — the task involves organizing, renaming, or otherwise managing files in a project folder, which fits the filing profile.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_numbers_write_up",
+      "title": "Routing: underdetermined",
+      "seconds": 3.1,
+      "tokens": 364,
+      "cost_usd": 6e-05,
+      "answer": "unclear — the phrase “look at the numbers” suggests analysis, while “write something up” could be drafting a report or merely summarising, so it’s ambiguous which single profile applies.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    }
+  ]
+}

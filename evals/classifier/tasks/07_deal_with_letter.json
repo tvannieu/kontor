@@ -1,0 +1,19 @@
+{
+  "id": "07_deal_with_letter",
+  "title": "Routing: underdetermined",
+  "why": "Could be filing it, reading it, or answering it. A router that picks one is guessing about the most common kind of work there is.",
+  "check": "contains_any",
+  "expect": [
+    "unclear"
+  ],
+  "rubric": [
+    "Answers 'unclear'",
+    "Says what it would need to know",
+    "Does not pick a profile and justify it after the fact"
+  ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "unclear — the description does not say which of the profiles this falls into, and I would need to know what the finished work is supposed to be before choosing one."
+  },
+  "prompt": "Classify the following piece of work into exactly one task profile.\n\nThe profiles are:\n  filing    filing, renaming, recording. No judgement required.\n  reading   search and summarise material that already exists.\n  drafting  writing correspondence or documents addressed to a person.\n  analysis  hard problems: diagnosing, reasoning, debugging.\n\nIf the description does not determine exactly one profile, answer 'unclear' and say what you would need to know. Do not guess.\n\nAnswer with one word — the profile name, or 'unclear' — then one sentence of justification.\n\nThe work:\n  Deal with the letter that arrived this morning."
+}

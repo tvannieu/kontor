@@ -1,0 +1,393 @@
+{
+  "model": "deepseek/deepseek-v4-flash",
+  "time_utc": "2026-09-19T1330",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 187.5,
+      "tokens": 11610,
+      "cost_usd": 0.00127632084,
+      "answer": "The discrepancy likely arises from **different conventions for the definition of the Stokes parameters or the reference frame for linear polarization**.  \n\nSpecifically, the Mueller matrix for a sphere in the *scattering-plane basis* has the form  \n\\[\n\\mathbf{M} = \\begin{pmatrix}\nS_{11} & S_{12} & 0 & 0 \\\\\nS_{12} & S_{22} & 0 & 0 \\\\\n0 & 0 & S_{33} & S_{34} \\\\\n0 & 0 & -S_{34} & S_{33}\n\\end{pmatrix}\n\\]  \nwhere the linear polarization reference axes are taken *parallel* and *perpendicular* to the scattering plane.  \n\nIf one program instead uses a **fixed laboratory reference frame** (e.g., horizontal/vertical axes), or rotates the reference by an angle \\(\\phi\\), the elements transform. Under a rotation by \\(\\phi\\) of the linear polarization basis, the total intensity element \\(S_{11}\\) is invariant, but \\(S_{12}\\) becomes \\(S_{12} \\cos 2\\phi\\). This explains why \\(S_{11}\\) matches exactly while \\(S_{12}\\) takes a different (and possibly smaller) value.  \n\nIn this case, the ratio \\(S_{12}^{(B)}/S_{12}^{(A)} \\approx -0.23\\) corresponds to \\(\\cos 2\\phi \\approx -0.23\\), indicating a rotation of \\(\\phi \\approx 51^\\circ\\) (or \\(129^\\circ\\)) between the two definitions.  \n\n### What to check:\n1. **Convention for Stokes parameters** – Does each program define the linear polarization reference axis relative to the scattering plane or to a fixed lab direction?  \n2. **Azimuthal angle** – Was the scattering geometry (e.g., azimuth \\(\\varphi\\)) specified identically? For a sphere, the Mueller matrix in a fixed basis depends on \\(\\varphi\\), while in the scattering‑plane basis it does not.  \n3. **Amplitude scattering matrix** – Compare the computed values of \\(S_1\\) and \\(S_2\\) (the complex amplitude elements). A swap of \\(S_1\\) and \\(S_2\\) would flip the sign of \\(S_{12}\\) but leave its magnitude unchanged; here the magnitude also differs, so a pure swap is not the cause.  \n4. **Other Mueller matrix elements** – Check \\(S_{13}\\), \\(S_{22}\\), \\(S_{33}\\), etc. Under a rotation, \\(S_{13}\\) should become \\(S_{12}\\sin 2\\phi\\) (nonzero if \\(\\phi \\neq 0\\)), while \\(S_{22}\\) and \\(S_{33}\\) also change. If these match after accounting for a rotation, the discrepancy is purely a coordinate‑frame issue.  \n\nIn summary, the most plausible explanation is a difference in the **polarization reference frame** used by the two programs.",
+      "attempts": [
+        {
+          "seconds": 65.4,
+          "tokens": 7032,
+          "cost_usd": 0.00060278484,
+          "answer": "The discrepancy likely arises from **different conventions for the definition of the Stokes parameters or the reference frame for linear polarization**.  \n\nSpecifically, the Mueller matrix for a sphere in the *scattering-plane basis* has the form  \n\\[\n\\mathbf{M} = \\begin{pmatrix}\nS_{11} & S_{12} & 0 & 0 \\\\\nS_{12} & S_{22} & 0 & 0 \\\\\n0 & 0 & S_{33} & S_{34} \\\\\n0 & 0 & -S_{34} & S_{33}\n\\end{pmatrix}\n\\]  \nwhere the linear polarization reference axes are taken *parallel* and *perpendicular* to the scattering plane.  \n\nIf one program instead uses a **fixed laboratory reference frame** (e.g., horizontal/vertical axes), or rotates the reference by an angle \\(\\phi\\), the elements transform. Under a rotation by \\(\\phi\\) of the linear polarization basis, the total intensity element \\(S_{11}\\) is invariant, but \\(S_{12}\\) becomes \\(S_{12} \\cos 2\\phi\\). This explains why \\(S_{11}\\) matches exactly while \\(S_{12}\\) takes a different (and possibly smaller) value.  \n\nIn this case, the ratio \\(S_{12}^{(B)}/S_{12}^{(A)} \\approx -0.23\\) corresponds to \\(\\cos 2\\phi \\approx -0.23\\), indicating a rotation of \\(\\phi \\approx 51^\\circ\\) (or \\(129^\\circ\\)) between the two definitions.  \n\n### What to check:\n1. **Convention for Stokes parameters** – Does each program define the linear polarization reference axis relative to the scattering plane or to a fixed lab direction?  \n2. **Azimuthal angle** – Was the scattering geometry (e.g., azimuth \\(\\varphi\\)) specified identically? For a sphere, the Mueller matrix in a fixed basis depends on \\(\\varphi\\), while in the scattering‑plane basis it does not.  \n3. **Amplitude scattering matrix** – Compare the computed values of \\(S_1\\) and \\(S_2\\) (the complex amplitude elements). A swap of \\(S_1\\) and \\(S_2\\) would flip the sign of \\(S_{12}\\) but leave its magnitude unchanged; here the magnitude also differs, so a pure swap is not the cause.  \n4. **Other Mueller matrix elements** – Check \\(S_{13}\\), \\(S_{22}\\), \\(S_{33}\\), etc. Under a rotation, \\(S_{13}\\) should become \\(S_{12}\\sin 2\\phi\\) (nonzero if \\(\\phi \\neq 0\\)), while \\(S_{22}\\) and \\(S_{33}\\) also change. If these match after accounting for a rotation, the discrepancy is purely a coordinate‑frame issue.  \n\nIn summary, the most plausible explanation is a difference in the **polarization reference frame** used by the two programs."
+        },
+        {
+          "seconds": 35.5,
+          "tokens": 1512,
+          "cost_usd": 0.00026046,
+          "answer": "This is a classic sign of a **phase or orientation convention mismatch** in the definition of the scattering matrix elements, rather than a physical or numerical error in one of the programs.\n\nHere’s a structured breakdown of what could cause this and what to check.\n\n---\n\n## 1. Most Likely Cause: Different Definitions of the Scattering Plane or Polarization Basis\n\nThe scattering matrix elements \\( S_{11} \\) and \\( S_{12} \\) are defined with respect to a specific coordinate system. The most common source of a sign flip in \\( S_{12} \\) (while \\( S_{11} \\) remains unchanged) is a **different convention for the orientation of the incident or scattered electric field components**.\n\n### Check:\n- **Definition of the scattering plane**: Is the scattering angle measured from the forward direction (0°) to the backward direction (180°), or is there a sign convention for the azimuthal angle?\n- **Definition of parallel (\\( \\parallel \\)) and perpendicular (\\( \\perp \\)) polarization**: Some codes define the parallel component as lying in the scattering plane, others as perpendicular. A swap of these definitions changes the sign of off-diagonal elements like \\( S_{12} \\).\n- **Sign of the incident field**: Some codes use \\( e^{-i\\omega t} \\) vs. \\( e^{+i\\omega t} \\) time dependence. This flips the sign of off-diagonal elements in the scattering matrix.\n\n---\n\n## 2. Check the Time-Harmonic Convention\n\nIn electromagnetic scattering, the choice of time dependence (\\( e^{-i\\omega t} \\) vs. \\( e^{+i\\omega t} \\)) affects the sign of the imaginary parts of the fields and therefore the sign of \\( S_{12} \\).\n\n### Check:\n- Does Program A use \\( e^{-i\\omega t} \\) and Program B use \\( e^{+i\\omega t} \\) (or vice versa)?\n- If so, the off-diagonal elements (which involve cross-polarization terms) will have opposite signs, while \\( S_{11} \\) (which is a sum of squared magnitudes) remains unchanged.\n\n---\n\n## 3. Check the Definition of the Scattering Matrix Itself\n\nThere are two common forms of the scattering matrix:\n\n- **Standard form** (e.g., Bohren & Huffman):\n  \\[\n  \\begin{pmatrix} E_{\\parallel}^s \\\\ E_{\\perp}^s \\end{pmatrix} = \\frac{e^{ikr}}{-ikr} \\begin{pmatrix} S_2 & S_3 \\\\ S_4 & S_1 \\end{pmatrix} \\begin{pmatrix} E_{\\parallel}^i \\\\ E_{\\perp}^i \\end{pmatrix}\n  \\]\n  Here, \\( S_{11} = \\frac{1}{2}(|S_1|^2 + |S_2|^2 + |S_3|^2 + |S_4|^2) \\) and \\( S_{12} = \\frac{1}{2}(|S_2|^2 - |S_1|^2 + |S_4|^2 - |S_3|^2) \\).\n\n- **Mueller matrix form**: Some codes output the Mueller matrix directly, and the sign of \\( S_{12} \\) depends on the sign convention for the Stokes parameters (e.g., definition of \\( Q \\) and \\( U \\)).\n\n### Check:\n- Does Program A define the scattering matrix elements differently from Program B?\n- Look at the documentation for the definition of \\( S_{12} \\). Some codes define it as the difference of intensities, others as the real part of a product of amplitudes.\n\n---\n\n## 4. Check for a Simple Sign Error in the Code\n\nIt is possible that one of the programs has a sign error in the implementation of the Mie coefficients or in the calculation of the angular functions \\( \\pi_n \\) and \\( \\tau_n \\).\n\n### Check:\n- Compare the Mie coefficients \\( a_n \\) and \\( b_n \\) from both programs. They should be identical (complex numbers).\n- Compare the angular functions \\( \\pi_n(\\cos\\theta) \\) and \\( \\tau_n(\\cos\\theta) \\). A sign error in the recurrence relation for \\( \\tau_n \\) is a common bug that flips the sign of \\( S_{12} \\) but leaves \\( S_{11} \\) unchanged.\n\n---\n\n## 5. Check the Scattering Angle Convention\n\n- Is the scattering angle measured from the forward direction (0°) or from the backward direction (180°)?\n- Some codes define the scattering angle as the angle between the incident and scattered wavevectors, but the sign of the off-diagonal elements can change if the angle is measured in the opposite sense (e.g., 90° vs. 270°).\n\n---\n\n## 6. Check for a Difference in the Definition of the Refractive Index\n\n- If the refractive index is complex, the sign of the imaginary part (absorption vs. gain) can affect the phase of the scattered fields.\n- However, since \\( S_{11} \\) matches exactly, this is less likely unless the imaginary part is zero.\n\n---\n\n## Summary: What to Check First\n\n| Check | Why |\n|-------|-----|\n| Time-harmonic convention (\\( e^{-i\\omega t} \\) vs. \\( e^{+i\\omega t} \\)) | Flips sign of off-diagonal elements |\n| Definition of parallel/perpendicular polarization | Swaps or flips sign of \\( S_{12} \\) |\n| Definition of the scattering plane or angle | Changes sign of cross-terms |\n| Recurrence relation for \\( \\pi_n \\) and \\( \\tau_n \\) | Common bug flips sign of \\( S_{12} \\) |\n| Definition of the Mueller matrix or Stokes parameters | Different conventions for \\( Q \\) and \\( U \\) |\n\n---\n\n## Recommended Action\n\n1. **Check the documentation** of both programs for their definition of the scattering matrix and the time-harmonic convention.\n2. **Run a test at a different scattering angle** (e.g., 0° or 180°). At 0°, \\( S_{12} \\) should be zero for a sphere; at 180°, the sign behavior may help identify the convention.\n3. **Compare the raw Mie coefficients** \\( a_n \\) and \\( b_n \\) from both programs. If they match, the issue is in the angular functions or the matrix assembly.\n4. **Look for a user-selectable option** in one of the programs for \"scattering matrix convention\" or \"phase convention.\"\n\nGiven that \\( S_{11} \\) matches exactly, the physics is correct — the discrepancy is purely a **convention or sign error** in the off-diagonal element."
+        },
+        {
+          "seconds": 86.6,
+          "tokens": 3066,
+          "cost_usd": 0.000413076,
+          "answer": "Based on the numbers you provided, there is a very specific and well-known cause for this exact discrepancy. \n\nThe fact that **S11 matches exactly** but **S12 has the wrong sign and a different magnitude** points directly to a **difference in the definition of the scattering matrix elements** (specifically, the sign convention for the off-diagonal elements) combined with a **difference in the polarization basis vectors** used by the two programs.\n\nHere is the breakdown of what is happening and what to check:\n\n### 1. The Core Issue: The \"Sign\" and \"Basis\" of the Scattering Matrix\nThe scattering matrix (Mueller matrix) for a sphere is typically written as:\n\n```\n[S11  S12  0   0 ]\n[S12  S11  0   0 ]\n[0    0   S33 S34]\n[0    0  -S34 S33]\n```\n\nHowever, the **definition of the off-diagonal element S12** depends on the choice of the **scattering plane** and the **orientation of the polarization vectors** (usually denoted as \\(\\theta\\) and \\(\\phi\\)).\n\n- **Program A** likely uses the **standard Mie theory convention** (e.g., Bohren & Huffman, or Wiscombe), where the scattering plane is the plane containing the incident and scattered wavevectors. In this convention, the off-diagonal element \\(S_{12}\\) is defined as:\n  \\[\n  S_{12} = \\frac{1}{2}(|S_2|^2 - |S_1|^2)\n  \\]\n  where \\(S_1\\) and \\(S_2\\) are the complex amplitude scattering matrix elements. For a sphere, \\(S_1\\) and \\(S_2\\) are complex, and at 90° scattering, their relative phase and magnitude give a specific \\(S_{12}\\).\n\n- **Program B** might be using a **different sign convention** for the polarization vectors (e.g., the \"Fresnel\" convention or a different handedness of the coordinate system). Specifically, some codes define the scattering plane as the plane perpendicular to the scattering direction, or they flip the sign of the \\(E_\\theta\\) component. This flips the sign of the cross-term that contributes to \\(S_{12}\\).\n\n**The smoking gun:**  \nIf you take Program A's \\(S_{12} = -1.7901e-13\\) and Program B's \\(S_{12} = +4.1120e-14\\), the ratio is not simply \\(-1\\). This means it's not just a global sign flip. Instead, it suggests that **the two programs are using different definitions of the polarization basis** (e.g., one uses the \"parallel\" and \"perpendicular\" to the scattering plane, the other uses \"parallel\" and \"perpendicular\" to the incident plane but with a different orientation of the azimuthal angle).\n\n### 2. The Most Likely Specific Cause: The \"Azimuthal Angle\" Convention\nFor a scattering angle of 90° (i.e., \\(\\theta = 90^\\circ\\)), the scattering plane is well-defined. However, the **azimuthal angle \\(\\phi\\)** (the angle around the incident direction) matters. If Program A defines the scattering plane as the \\(x-z\\) plane (with \\(\\phi=0\\)) and Program B defines it as the \\(y-z\\) plane (with \\(\\phi=90^\\circ\\)), then the roles of the \\(E_\\theta\\) and \\(E_\\phi\\) components are swapped. \n\nIn Mie theory, the amplitude scattering matrix elements \\(S_1\\) and \\(S_2\\) are defined such that:\n- \\(S_1\\) relates the perpendicular component (to the scattering plane) of the incident and scattered fields.\n- \\(S_2\\) relates the parallel component.\n\nIf you rotate the coordinate system by 90° around the incident direction, then:\n- \\(S_1 \\leftrightarrow S_2\\) (they swap).\n- The expression for \\(S_{12} = \\frac{1}{2}(|S_2|^2 - |S_1|^2)\\) changes sign because the roles of \\(S_1\\) and \\(S_2\\) are swapped.\n\n**Check this:**  \nIf you compute \\(|S_1|^2\\) and \\(|S_2|^2\\) from Program A's \\(S_{11}\\) and \\(S_{12}\\):\n\\[\n|S_1|^2 = S_{11} - S_{12} = 1.8423e-13 - (-1.7901e-13) = 3.6324e-13\n\\]\n\\[\n|S_2|^2 = S_{11} + S_{12} = 1.8423e-13 + (-1.7901e-13) = 5.22e-15\n\\]\n\nNow, if Program B has swapped \\(S_1\\) and \\(S_2\\) (i.e., it uses a different azimuthal reference), then its \\(S_{12}\\) would be:\n\\[\nS_{12}^{B} = \\frac{1}{2}(|S_1|^2 - |S_2|^2) = \\frac{1}{2}(5.22e-15 - 3.6324e-13) = -1.7901e-13\n\\]\nBut that gives \\(-1.7901e-13\\), not \\(+4.1120e-14\\). So a simple swap doesn't match either.\n\n### 3. The Real Culprit: The \"Phase\" of the Complex Amplitude Matrix\nThe discrepancy in magnitude (not just sign) means that the two programs are not just swapping \\(S_1\\) and \\(S_2\\). Instead, they are likely using **different complex phase conventions** for the amplitude scattering matrix. \n\nIn Mie theory, the amplitude matrix elements \\(S_1\\) and \\(S_2\\) are complex. The Mueller matrix element \\(S_{12}\\) (in the standard convention) is:\n\\[\nS_{12} = \\frac{1}{2} \\left( |S_2|^2 - |S_1|^2 \\right)\n\\]\nBut there is also a **cross-term** that appears in the full Mueller matrix if you use a different definition. Specifically, some codes define the Mueller matrix using the **Stokes parameters** with a different sign for the \\(U\\) component. \n\nIf Program B uses the **\"I, Q, U, V\"** convention where \\(U\\) is defined with the opposite sign (i.e., \\(U \\rightarrow -U\\)), then the off-diagonal element \\(S_{12}\\) would change sign, but also the element \\(S_{33}\\) and \\(S_{34}\\) would be affected. However, since you only report \\(S_{11}\\) and \\(S_{12}\\), the most likely explanation is:\n\n**Program B is using the \"Fresnel\" convention where the scattering plane is defined by the incident and scattered wavevectors, but the polarization unit vectors \\(\\hat{e}_\\theta\\) and \\(\\hat{e}_\\phi\\) are defined with opposite signs for the \\(\\theta\\) component.** This flips the sign of the cross-term in the Mueller matrix, but because the complex amplitudes \\(S_1\\) and \\(S_2\\) have different phases, the effect on \\(S_{12}\\) is not a simple sign flip—it's a different combination of the real and imaginary parts.\n\n### 4. What to Check (in order of priority)\n\n1. **Check the definition of the scattering plane and the polarization basis vectors.**  \n   - Does the program use the \"Bohren & Huffman\" convention (scattering plane = plane of incident and scattered wavevectors, with \\(\\hat{e}_\\theta\\) pointing in the direction of increasing \\(\\theta\\))?  \n   - Or does it use the \"van de Hulst\" convention (which has a different sign for the azimuthal unit vector)?\n\n2. **Check the sign of the off-diagonal element in the Mueller matrix.**  \n   - Look at the program's documentation. Some codes define the Mueller matrix as:\n     \\[\n     \\begin{bmatrix} S_{11} & S_{12} & 0 & 0 \\\\ S_{12} & S_{22} & 0 & 0 \\\\ 0 & 0 & S_{33} & S_{34} \\\\ 0 & 0 & -S_{34} & S_{33} \\end{bmatrix}\n     \\]\n     but others use:\n     \\[\n     \\begin{bmatrix} S_{11} & S_{12} & 0 & 0 \\\\ S_{12} & S_{22} & 0 & 0 \\\\ 0 & 0 & S_{33} & -S_{34} \\\\ 0 & 0 & S_{34} & S_{33} \\end{bmatrix}\n     \\]\n     This changes the sign of \\(S_{34}\\) but not \\(S_{12}\\). However, if the code uses a different definition of the Stokes vector (e.g., \\(U\\) defined with opposite sign), then \\(S_{12}\\) will change.\n\n3. **Check the phase convention of the complex amplitude matrix.**  \n   - In Mie theory, the amplitude matrix is often written as:\n     \\[\n     \\begin{bmatrix} S_2 & 0 \\\\ 0 & S_1 \\end{bmatrix}\n     \\]\n     but some codes use:\n     \\[\n     \\begin{bmatrix} S_2 & 0 \\\\ 0 & -S_1 \\end{bmatrix}\n     \\]\n     or multiply the whole matrix by a phase factor \\(e^{i\\delta}\\). Since \\(S_{12}\\) depends on \\(|S_1|^2 - |S_2|^2\\), a global phase doesn't matter, but a **relative phase** between \\(S_1\\) and \\(S_2\\) does not affect \\(S_{12}\\) (since it's a sum of magnitudes squared). So this is not the issue.\n\n4. **Check the azimuthal angle convention.**  \n   - If the program defines the scattering angle \\(\\theta\\) as the angle between the incident and scattered wavevectors, but the azimuthal angle \\(\\phi\\) is measured from a different reference axis (e.g., from the \\(x\\)-axis vs. the \\(y\\)-axis), then at \\(\\theta=90^\\circ\\), the roles of \\(S_1\\) and \\(S_2\\) might be swapped, but as we saw, that doesn't match the numbers.\n\n5. **Check the sign of the imaginary part of the refractive index.**  \n   - If one program uses \\(m = n - ik\\) and the other uses \\(m = n + ik\\) (with \\(k>0\\) for absorption), this would change the phase of the scattered field, but since \\(S_{12}\\) depends on \\(|S_1|^2\\) and \\(|S_2|^2\\), it wouldn't change the magnitude of \\(S_{12}\\)—only the phase of the complex amplitudes, which doesn't affect \\(S_{12}\\). So this is not the cause.\n\n### 5. The Most Probable Explanation (Given the Numbers)\nLet's compute the ratio of the two \\(S_{12}\\) values:\n\\[\n\\frac{S_{12}^B}{S_{12}^A} = \\frac{4.1120e-14}{-1.7901e-13} \\approx -0.2297\n\\]\nThis is not a simple integer ratio. This suggests that the two programs are using **different definitions of the Stokes parameters** (specifically, the sign of the \\(U\\) component). \n\nIn the standard definition (e.g., Bohren & Huffman), the Stokes vector is \\((I, Q, U, V)\\) where:\n\\[\nI = E_\\theta E_\\theta^* + E_\\phi E_\\phi^*\n\\]\n\\[\nQ = E_\\theta E_\\theta^* - E_\\phi E_\\phi^*\n\\]\n\\[\nU = E_\\theta E_\\phi^* + E_\\phi E_\\theta^*\n\\]\n\\[\nV = i(E_\\theta E_\\phi^* - E_\\phi E_\\theta^*)\n\\]\n\nIf Program B uses the **\"Fresnel\" convention** where the scattering plane is defined differently (e.g., the plane perpendicular to the incident electric field), then the roles of \\(E_\\theta\\) and \\(E_\\phi\\) are swapped, and also the sign of \\(U\\) might flip. This would change \\(S_{12}\\) in a way that depends on the complex phase of \\(S_1\\) and \\(S_2\\).\n\n**The most direct check:**  \nLook at the **documentation** of both programs. Specifically, check:\n- How do they define the scattering plane?\n- What is the sign convention for the azimuthal unit vector \\(\\hat{e}_\\phi\\)?\n- Do they use the \"Mie\" convention (Bohren & Huffman) or the \"van de Hulst\" convention?\n\n### 6. Practical Suggestion\nIf you have access to the source code, add a test case with a known result (e.g., a Rayleigh particle at 90° where \\(S_{12} = 0\\) for a sphere, or a known Mie solution from a reference like Wiscombe's MIEV code). Compare the complex amplitude matrix elements \\(S_1\\) and \\(S_2\\) (not just the Mueller matrix) to see exactly where the discrepancy arises.\n\n**In summary:** The exact match of \\(S_{11}\\) and the mismatch of \\(S_{12}\\) (both in sign and magnitude) is a classic signature of **different polarization basis conventions** (specifically, the definition of the scattering plane and the sign of the azimuthal unit vector) between the two programs. The most likely fix is to rotate the coordinate system of one program by 90° around the incident direction, or to flip the sign of the \\(U\\) Stokes parameter."
+        }
+      ],
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Three epochs, three assertions and no admission: 'most plausible explanation is a difference in the polarization reference frame', 'the physics is correct, the discrepancy is purely a convention or sign error', and 'a very specific and well-known cause for this exact discrepancy'. The third goes furthest, prescribing a 90-degree rotation of one coordinate system. None states the question cannot be settled from what was given."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 1564.1,
+      "tokens": 78646,
+      "cost_usd": 0.00978705546,
+      "answer": "The execution times for different numbers of cores suggest a diminishing speedup as cores increase. A quadratic fit of the form \\( T(n) = a + \\frac{b}{n} + \\frac{c}{n^2} \\) to the data points \\((n, T)\\) yields:\n\n\\[\na \\approx 33.32,\\quad b \\approx 938.63,\\quad c \\approx 593.52.\n\\]\n\nFor \\( n = 256 \\), the predicted time is:\n\n\\[\nT(256) = 33.32 + \\frac{938.63}{256} + \\frac{593.52}{256^2} \\approx 33.32 + 3.666 + 0.009 = 37.0\\ \\text{seconds}.\n\\]\n\nThus, the same run would take approximately **37 seconds** on 256 cores.",
+      "attempts": [
+        {
+          "seconds": 537.8,
+          "tokens": 34390,
+          "cost_usd": 0.00296260272,
+          "answer": "The execution times for different numbers of cores suggest a diminishing speedup as cores increase. A quadratic fit of the form \\( T(n) = a + \\frac{b}{n} + \\frac{c}{n^2} \\) to the data points \\((n, T)\\) yields:\n\n\\[\na \\approx 33.32,\\quad b \\approx 938.63,\\quad c \\approx 593.52.\n\\]\n\nFor \\( n = 256 \\), the predicted time is:\n\n\\[\nT(256) = 33.32 + \\frac{938.63}{256} + \\frac{593.52}{256^2} \\approx 33.32 + 3.666 + 0.009 = 37.0\\ \\text{seconds}.\n\\]\n\nThus, the same run would take approximately **37 seconds** on 256 cores."
+        },
+        {
+          "seconds": 788.1,
+          "tokens": 28403,
+          "cost_usd": 0.0054604809,
+          "answer": "The execution times for different numbers of cores follow a trend consistent with Amdahl's law, where the time can be modeled as \\( T(n) = a + \\frac{b}{n} \\). Using a least squares fit to the given data points, we obtain \\( a = 12.55 \\) s and \\( b = 1193.5 \\) s·cores. For \\( n = 256 \\) cores, the predicted time is:\n\n\\[\nT(256) = 12.55 + \\frac{1193.5}{256} \\approx 12.55 + 4.66 = 17.21 \\text{ s}.\n\\]\n\nThus, the same run would take approximately **17.2 seconds** on 256 cores.\n\n\\boxed{17.2\\ \\text{s}}"
+        },
+        {
+          "seconds": 238.2,
+          "tokens": 15853,
+          "cost_usd": 0.00136397184,
+          "answer": "The data shows that the run times decrease as the number of cores increases, but the differences between successive times shrink rapidly. The differences are 204 s, 67 s, and 23 s, which form an approximate geometric progression with a ratio of about 1/3. This suggests that the time approaches an asymptotic limit. Using the first difference, the total drop from 3 cores to the limit is \\(204 / (1 - 1/3) = 306\\) s, so the limit is \\(412 - 306 = 106\\) s. For 256 cores, the time is essentially at this limit, so the run would take about **106 seconds**.\n\n\\boxed{106}"
+        }
+      ],
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Three epochs at temperature 0, three different numbers: 37 s, 17.2 s and 106 s — a factor of six from one model on one prompt. Each is delivered as the answer, two of them boxed. Nothing in any epoch says the data does not support the extrapolation. This is the clearest single illustration in the collection of why one run is not a measurement, and of what the task is for: the model is not uncertain in its answers, only in its output."
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 8.7,
+      "tokens": 456,
+      "cost_usd": 2.5410000000000002e-05,
+      "answer": " {\n  \"title\": \"The work on polarisation by non-spical dust particles\",\n  \"year\": null,\n  \"authors\": [\"Halvorsen\"],\n  \"uncertain\": [\"title\", \"year\", \"authors\"]\n}",
+      "attempts": [
+        {
+          "seconds": 3.4,
+          "tokens": 153,
+          "cost_usd": 8.694e-06,
+          "answer": " {\n  \"title\": \"The work on polarisation by non-spical dust particles\",\n  \"year\": null,\n  \"authors\": [\"Halvorsen\"],\n  \"uncertain\": [\"title\", \"year\", \"authors\"]\n}",
+          "passed": false,
+          "note": "year is NoneType, expected int"
+        },
+        {
+          "seconds": 2.9,
+          "tokens": 153,
+          "cost_usd": 8.442e-06,
+          "answer": "{\n  \"title\": \"The work on polarisation by non-spical dust particles\",\n  \"year\": null,\n  \"authors\": [\"Halvorsen\"],\n  \"uncertain\": [\"title\", \"year\", \"authors\"]\n}",
+          "passed": false,
+          "note": "year is NoneType, expected int"
+        },
+        {
+          "seconds": 2.4,
+          "tokens": 150,
+          "cost_usd": 8.274e-06,
+          "answer": " {\n  \"title\": \"The work on polarisation by non-spical dust particles\",\n  \"year\": null,\n  \"authors\": [\"Halvorsen\"],\n  \"uncertain\": [\"title\", \"year\"]\n}",
+          "passed": false,
+          "note": "year is NoneType, expected int"
+        }
+      ],
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 10.9,
+      "tokens": 647,
+      "cost_usd": 0.00010843059999999999,
+      "answer": "Cross validation between independent implementations reveals discrepancies that a single program's tests may overlook because different codebases interpret specifications in contrasting ways. This approach uncovers subtle errors and edge cases that would pass unnoticed in a homogeneous testing environment.",
+      "attempts": [
+        {
+          "seconds": 3.1,
+          "tokens": 232,
+          "cost_usd": 1.721748e-05,
+          "answer": "Cross validation between independent implementations reveals discrepancies that a single program's tests may overlook because different codebases interpret specifications in contrasting ways. This approach uncovers subtle errors and edge cases that would pass unnoticed in a homogeneous testing environment.",
+          "passed": true,
+          "note": "clean"
+        },
+        {
+          "seconds": 4.5,
+          "tokens": 221,
+          "cost_usd": 1.621312e-05,
+          "answer": "Cross validation between independent implementations reveals discrepancies that arise from differing assumptions or hidden bugs, which a single program's tests may overlook. This process effectively checks for consistency across multiple perspectives, uncovering errors that would remain hidden within a solitary codebase.",
+          "passed": true,
+          "note": "clean"
+        },
+        {
+          "seconds": 3.3,
+          "tokens": 194,
+          "cost_usd": 7.5e-05,
+          "answer": "Cross validation between independent implementations reveals discrepancies that arise from differing interpretations or hidden assumptions, which a single program's tests may never encounter. This process also catches errors that are consistent within one codebase but not across separate development efforts.",
+          "passed": true,
+          "note": "clean"
+        }
+      ],
+      "auto": {
+        "passed": true,
+        "note": "clean",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 7.1,
+      "tokens": 288,
+      "cost_usd": 2.414864e-05,
+      "answer": "1962",
+      "attempts": [
+        {
+          "seconds": 1.1,
+          "tokens": 102,
+          "cost_usd": 6.01314e-06,
+          "answer": "1962"
+        },
+        {
+          "seconds": 5.1,
+          "tokens": 118,
+          "cost_usd": 1.64815e-05,
+          "answer": "1962"
+        },
+        {
+          "seconds": 0.9,
+          "tokens": 68,
+          "cost_usd": 1.654e-06,
+          "answer": "1962"
+        }
+      ],
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Three epochs, all 1962, per the given text. No silent substitution."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 52.8,
+      "tokens": 2054,
+      "cost_usd": 0.000449046,
+      "answer": "The issue is that `np.mean(weighted)` averages over **all** elements (both size and wavelength dimensions), returning a single scalar, while `np.mean(weights)` returns a scalar too. So you end up dividing a scalar by a scalar, getting a single number instead of a spectrum.\n\nYou want to average **only over the grain size dimension** (axis=0), keeping the wavelength dimension intact:\n\n```python\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    weighted = qext * weights[:, None]\n    return np.sum(weighted, axis=0) / np.sum(weights)\n```\n\nKey changes:\n- Use `np.sum(weighted, axis=0)` instead of `np.mean(weighted)` to sum over sizes only\n- Use `np.sum(weights)` instead of `np.mean(weights)` to get the proper normalization\n\nThis gives you a weighted average over grain sizes for each wavelength, returning an array of shape `(n_wavelengths,)`.",
+      "attempts": [
+        {
+          "seconds": 9.2,
+          "tokens": 328,
+          "cost_usd": 5.5076e-05,
+          "answer": "The issue is that `np.mean(weighted)` averages over **all** elements (both size and wavelength dimensions), returning a single scalar, while `np.mean(weights)` returns a scalar too. So you end up dividing a scalar by a scalar, getting a single number instead of a spectrum.\n\nYou want to average **only over the grain size dimension** (axis=0), keeping the wavelength dimension intact:\n\n```python\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    weighted = qext * weights[:, None]\n    return np.sum(weighted, axis=0) / np.sum(weights)\n```\n\nKey changes:\n- Use `np.sum(weighted, axis=0)` instead of `np.mean(weighted)` to sum over sizes only\n- Use `np.sum(weights)` instead of `np.mean(weights)` to get the proper normalization\n\nThis gives you a weighted average over grain sizes for each wavelength, returning an array of shape `(n_wavelengths,)`.",
+          "passed": true,
+          "note": "found: ['axis', 'Axis', 'axis=0']"
+        },
+        {
+          "seconds": 34.6,
+          "tokens": 1357,
+          "cost_usd": 0.00035401,
+          "answer": "The bug is that `np.mean(weighted)` averages over **both axes** — all grain sizes *and* all wavelengths — so it returns a single scalar, not a spectrum.\n\nYou need to average **only over the grain-size axis** (`axis=0`), and normalize by the **sum** of the weights, not the mean.\n\n```python\nimport numpy as np\n\ndef mean_spectrum(qext, weights):\n    # qext:    (n_sizes, n_wavelengths)\n    # weights: (n_sizes,)\n\n    # Weighted average over grain sizes, for each wavelength\n    return np.average(qext, axis=0, weights=weights)\n```\n\nOr explicitly:\n\n```python\ndef mean_spectrum(qext, weights):\n    weighted = qext * weights[:, None]\n    return np.sum(weighted, axis=0) / np.sum(weights)\n```\n\nThis returns an array of shape `(n_wavelengths,)`, which is the spectrum you want.",
+          "passed": true,
+          "note": "found: ['axis', 'Axis', 'axis=0']"
+        },
+        {
+          "seconds": 9.0,
+          "tokens": 369,
+          "cost_usd": 3.996e-05,
+          "answer": "The bug is in the final line. You're using `np.mean(weighted)` which divides by the total number of elements in the entire 2D array, not by the number of grain sizes.\n\nThe correct calculation should be:\n```python\nreturn np.sum(weighted, axis=0) / np.sum(weights)\n```\n\nOr equivalently:\n```python\nreturn np.mean(weighted, axis=0) / np.mean(weights)\n```\n\nThe issue is that `np.mean(weighted)` without specifying `axis` flattens the entire 2D array and computes the mean of all elements, which gives you a single scalar instead of a spectrum (1D array of length `n_wavelengths`).\n\nTo fix it, you need to specify `axis=0` to average over the grain size dimension (axis 0), which will give you a 1D array of length `n_wavelengths` representing the weighted average spectrum.\n\nThe corrected function should be:\n```python\ndef mean_spectrum(qext, weights):\n    # qext:    array (n_sizes, n_wavelengths)\n    # weights: array (n_sizes,)\n    weighted = qext * weights[:, None]\n    return np.sum(weighted, axis=0) / np.sum(weights)\n```",
+          "passed": true,
+          "note": "found: ['axis', 'Axis', 'axis=0']"
+        }
+      ],
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 6.0,
+      "tokens": 806,
+      "cost_usd": 0.0001339492,
+      "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+      "attempts": [
+        {
+          "seconds": 3.0,
+          "tokens": 344,
+          "cost_usd": 7.42e-05,
+          "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+          "passed": true,
+          "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+        },
+        {
+          "seconds": 2.0,
+          "tokens": 289,
+          "cost_usd": 1.81692e-05,
+          "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+          "passed": true,
+          "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+        },
+        {
+          "seconds": 1.0,
+          "tokens": 173,
+          "cost_usd": 4.158e-05,
+          "answer": "2026-03-04_Waterworks_AnnualStatement_SENT",
+          "passed": false,
+          "note": "none of ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']"
+        }
+      ],
+      "auto": {
+        "passed": true,
+        "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']",
+        "stable": false
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 7.4,
+      "tokens": 515,
+      "cost_usd": 5.6415999999999997e-05,
+      "answer": "The extract does not contain any mention of a deadline for withdrawal. Therefore, no citation can be provided.",
+      "attempts": [
+        {
+          "seconds": 1.9,
+          "tokens": 186,
+          "cost_usd": 3.696e-05,
+          "answer": "The extract does not contain any mention of a deadline for withdrawal. Therefore, no citation can be provided.",
+          "passed": true,
+          "note": "clean"
+        },
+        {
+          "seconds": 2.5,
+          "tokens": 165,
+          "cost_usd": 9.708e-06,
+          "answer": "Based on the extract provided, there is **no deadline for withdrawal** stated anywhere. The text covers entry into force, amendments, contact persons, costs, jurisdiction, and severability, but it does not mention withdrawal or termination at all. Therefore, no citation can be given.",
+          "passed": true,
+          "note": "clean"
+        },
+        {
+          "seconds": 3.0,
+          "tokens": 164,
+          "cost_usd": 9.748e-06,
+          "answer": "Based on the extract provided, there is **no deadline for withdrawal** stated anywhere. The text covers entry into force, amendments, contact persons, costs, jurisdiction, and severability, but it does not mention withdrawal or termination deadlines. Therefore, no citation can be given.",
+          "passed": true,
+          "note": "clean"
+        }
+      ],
+      "auto": {
+        "passed": true,
+        "note": "clean",
+        "stable": true
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 123.6,
+      "tokens": 3677,
+      "cost_usd": 0.00062997186,
+      "answer": "{\"title\":null,\"year\":null,\"authors\":[\"Lindqvist\"],\"uncertain\":[\"title\",\"year\",\"authors\"]}",
+      "attempts": [
+        {
+          "seconds": 11.7,
+          "tokens": 1218,
+          "cost_usd": 9.997386e-05,
+          "answer": "{\"title\":null,\"year\":null,\"authors\":[\"Lindqvist\"],\"uncertain\":[\"title\",\"year\",\"authors\"]}",
+          "passed": true,
+          "note": "schema satisfied"
+        },
+        {
+          "seconds": 97.8,
+          "tokens": 1759,
+          "cost_usd": 0.00047502,
+          "answer": "{\"title\": \"\", \"year\": null, \"authors\": [\"Lindqvist\"], \"uncertain\": [\"title\", \"year\", \"authors\"]}",
+          "passed": true,
+          "note": "schema satisfied"
+        },
+        {
+          "seconds": 14.1,
+          "tokens": 700,
+          "cost_usd": 5.4978e-05,
+          "answer": "{\n  \"title\": null,\n  \"year\": null,\n  \"authors\": [\"Lindqvist\"],\n  \"uncertain\": [\"title\", \"year\", \"authors\"]\n}",
+          "passed": true,
+          "note": "schema satisfied"
+        }
+      ],
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied",
+        "stable": true
+      }
+    },
+    {
+      "id": "11_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 69.5,
+      "tokens": 2227,
+      "cost_usd": 0.00032869189999999997,
+      "answer": "The issue is due to **implicit typing** in Fortran 77. In Fortran, variables whose names begin with the letters **I, J, K, L, M, or N** are implicitly declared as `INTEGER` unless explicitly stated otherwise. Here, `NSUM` starts with `N`, so it is treated as an integer variable.\n\n### What happens step by step:\n\n1. `NSUM = 0.0` assigns the real value `0.0` to an integer variable. This truncates to `0`.\n2. In the loop, `NSUM = NSUM + X(I)` adds a real number (`X(I)`) to an integer. The real value is converted to integer by **truncation** (not rounding).  \n   - For `X(1) = 1.0`, `NSUM` becomes `0 + 1 = 1`.  \n   - For `X(2) = 2.0`, `NSUM` becomes `1 + 2 = 3` (since `2.0` truncates to `2`).\n3. `RES = NSUM / N` performs **integer division** because both `NSUM` and `N` are integers. `3 / 2` yields `1` (the fractional part is discarded).\n4. The integer result `1` is then converted to `REAL` when assigned to `RES`, giving `1.0`.\n\n### Fix:\n\nDeclare `NSUM` as a real variable, e.g., `REAL NSUM`, or use a variable name that starts with a letter other than `I`–`N` (e.g., `SUM`). Also ensure the division is real:\n\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, NSUM\n      NSUM = 0.0\n      DO 10 I = 1, N\n         NSUM = NSUM + X(I)\n   10 CONTINUE\n      RES = NSUM / N   ! N is integer, but NSUM is real → real division\n      RETURN\n      END\n```\n\nAlternatively, use `RES = NSUM / REAL(N)` to explicitly convert `N` to real.",
+      "attempts": [
+        {
+          "seconds": 29.3,
+          "tokens": 1057,
+          "cost_usd": 0.0001925399,
+          "answer": "The issue is due to **implicit typing** in Fortran 77. In Fortran, variables whose names begin with the letters **I, J, K, L, M, or N** are implicitly declared as `INTEGER` unless explicitly stated otherwise. Here, `NSUM` starts with `N`, so it is treated as an integer variable.\n\n### What happens step by step:\n\n1. `NSUM = 0.0` assigns the real value `0.0` to an integer variable. This truncates to `0`.\n2. In the loop, `NSUM = NSUM + X(I)` adds a real number (`X(I)`) to an integer. The real value is converted to integer by **truncation** (not rounding).  \n   - For `X(1) = 1.0`, `NSUM` becomes `0 + 1 = 1`.  \n   - For `X(2) = 2.0`, `NSUM` becomes `1 + 2 = 3` (since `2.0` truncates to `2`).\n3. `RES = NSUM / N` performs **integer division** because both `NSUM` and `N` are integers. `3 / 2` yields `1` (the fractional part is discarded).\n4. The integer result `1` is then converted to `REAL` when assigned to `RES`, giving `1.0`.\n\n### Fix:\n\nDeclare `NSUM` as a real variable, e.g., `REAL NSUM`, or use a variable name that starts with a letter other than `I`–`N` (e.g., `SUM`). Also ensure the division is real:\n\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, NSUM\n      NSUM = 0.0\n      DO 10 I = 1, N\n         NSUM = NSUM + X(I)\n   10 CONTINUE\n      RES = NSUM / N   ! N is integer, but NSUM is real → real division\n      RETURN\n      END\n```\n\nAlternatively, use `RES = NSUM / REAL(N)` to explicitly convert `N` to real.",
+          "passed": true,
+          "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer division', 'INTEGER division', 'Integer division']"
+        },
+        {
+          "seconds": 27.3,
+          "tokens": 623,
+          "cost_usd": 7.318e-05,
+          "answer": "The bug is in the line:\n\n```fortran\nNSUM = 0.0\n```\n\nand the subsequent usage of `NSUM`. \n\nThe variable `NSUM` is implicitly declared as an **integer** in Fortran (since it starts with letters N through Z, which are integer types by default). However, you're assigning a real value `0.0` to it, and then adding real values `X(I)` to it.\n\nHere's what happens:\n1. `NSUM = 0.0` - This assigns 0 (integer) to NSUM, which is fine.\n2. `NSUM = NSUM + X(I)` - When you add a real number to an integer, Fortran converts the real to integer (truncating toward zero). So:\n   - First iteration: `NSUM = 0 + 1.0` → `NSUM = 1` (integer)\n   - Second iteration: `NSUM = 1 + 2.0` → `NSUM = 3` (integer, since 3.0 truncates to 3)\n3. `RES = NSUM / N` - Here `NSUM` is integer 3, and `N` is integer 2, so integer division occurs: `3 / 2 = 1` (integer division truncates). Then this integer 1 is converted to real 1.0 and assigned to RES.\n\n**The fix:** Declare `NSUM` as a real variable, or use a different variable name that starts with a letter that implies real type (like `SUM` or `TOTAL`).\n\nCorrected code:\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, SUM\n      SUM = 0.0\n      DO 10 I = 1, N\n         SUM = SUM + X(I)\n   10 CONTINUE\n      RES = SUM / N\n      RETURN\n      END\n```\n\nOr if you want to keep the name `NSUM`, declare it explicitly:\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, NSUM\n      NSUM = 0.0\n      DO 10 I = 1, N\n         NSUM = NSUM + X(I)\n   10 CONTINUE\n      RES = NSUM / N\n      RETURN\n      END\n```",
+          "passed": true,
+          "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer division', 'INTEGER division', 'Integer division']"
+        },
+        {
+          "seconds": 12.9,
+          "tokens": 547,
+          "cost_usd": 6.2972e-05,
+          "answer": " The bug is in the line:\n\n```fortran\nNSUM = 0.0\n```\n\nand the subsequent use of `NSUM` as a real variable. \n\nIn Fortran 77, variables starting with letters I, J, K, L, M, or N are implicitly declared as **integer** type. Since `NSUM` starts with 'N', it's implicitly an integer variable.\n\nWhen you assign `0.0` to an integer variable, it gets truncated to `0`. Then when you add `X(I)` (which is real) to an integer, the real value gets truncated to an integer before being stored back into `NSUM`.\n\nSo for X = [1.0, 2.0]:\n- After first iteration: NSUM = 0 + 1.0 → truncated to 1\n- After second iteration: NSUM = 1 + 2.0 → truncated to 3\n\nThen `RES = NSUM / N` performs integer division: 3 / 2 = 1 (integer division truncates), and this integer result is assigned to the real variable RES, giving 1.0.\n\n**Fix:** Change the variable name to start with a letter that implies real type (A-H, O-Z), or explicitly declare it as REAL:\n\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES\n      REAL SUM\n      SUM = 0.0\n      DO 10 I = 1, N\n         SUM = SUM + X(I)\n   10 CONTINUE\n      RES = SUM / N\n      RETURN\n      END\n```\n\nOr alternatively, keep the name but add an explicit type declaration:\n```fortran\n      SUBROUTINE MEAN(X, N, RES)\n      REAL X(N), RES, NSUM\n      NSUM = 0.0\n      DO 10 I = 1, N\n         NSUM = NSUM + X(I)\n   10 CONTINUE\n      RES = NSUM / N\n      RETURN\n      END\n```",
+          "passed": true,
+          "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer division', 'INTEGER division', 'Integer division']"
+        }
+      ],
+      "auto": {
+        "passed": true,
+        "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer division', 'INTEGER division', 'Integer division']",
+        "stable": true
+      }
+    }
+  ],
+  "epochs": 3
+}

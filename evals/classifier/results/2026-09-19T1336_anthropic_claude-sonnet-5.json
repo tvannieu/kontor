@@ -1,0 +1,123 @@
+{
+  "model": "anthropic/claude-sonnet-5",
+  "time_utc": "2026-09-19T1336",
+  "tasks": [
+    {
+      "id": "01_rename_invoices",
+      "title": "Routing: filing",
+      "seconds": 2.4,
+      "tokens": 287,
+      "cost_usd": 0.000982,
+      "answer": "filing — this is purely mechanical renaming based on extracting a date/sender/subject from each document, with no judgement, analysis, or correspondence involved.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "02_summarise_contract",
+      "title": "Routing: reading",
+      "seconds": 2.4,
+      "tokens": 261,
+      "cost_usd": 0.000826,
+      "answer": "reading — you're searching through existing material and summarising/extracting the key obligations, not judging or resolving a problem.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['reading']",
+        "stable": true
+      }
+    },
+    {
+      "id": "03_decline_offer",
+      "title": "Routing: drafting",
+      "seconds": 2.0,
+      "tokens": 256,
+      "cost_usd": 0.000768,
+      "answer": "drafting — it is correspondence addressed to a person (the supplier), written to go out over your name.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['drafting']",
+        "stable": true
+      }
+    },
+    {
+      "id": "04_wrong_axis",
+      "title": "Routing: analysis",
+      "seconds": 1.9,
+      "tokens": 252,
+      "cost_usd": 0.000792,
+      "answer": "analysis — this requires diagnosing/debugging why the routine's output is malformed, a reasoning task.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['analysis']",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_register_arrivals",
+      "title": "Routing: filing",
+      "seconds": 2.6,
+      "tokens": 238,
+      "cost_usd": 0.000668,
+      "answer": "filing — this is a simple recording task involving no judgement or analysis.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_annual_review",
+      "title": "Routing: underdetermined",
+      "seconds": 3.4,
+      "tokens": 299,
+      "cost_usd": 0.001286,
+      "answer": "unclear — \"prepare what we need\" could mean summarizing past correspondence (reading) or drafting new review documents, so the specific task isn't determined.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "07_deal_with_letter",
+      "title": "Routing: underdetermined",
+      "seconds": 2.0,
+      "tokens": 257,
+      "cost_usd": 0.00093,
+      "answer": "unclear — I would need to know what action the letter requires (e.g., filing it away, summarising its contents, writing a reply, or resolving a problem it raises).",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_clean_project_folder",
+      "title": "Routing: underdetermined",
+      "seconds": 2.9,
+      "tokens": 273,
+      "cost_usd": 0.001138,
+      "answer": "unclear — \"clean up\" could mean simple filing/renaming/organizing (filing) or could involve deciding what to keep, merge, or delete based on judgement (analysis), so the required scope of decision-making needs clarification.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_numbers_write_up",
+      "title": "Routing: underdetermined",
+      "seconds": 2.3,
+      "tokens": 281,
+      "cost_usd": 0.001194,
+      "answer": "unclear — I'd need to know what \"look at the numbers\" entails (retrieving/summarizing existing data vs. diagnosing patterns/trends) and who the write-up is addressed to, since this could be reading, analysis, or drafting.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    }
+  ]
+}

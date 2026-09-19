@@ -1,0 +1,18 @@
+{
+  "id": "02_summarise_contract",
+  "title": "Routing: reading",
+  "why": "Material exists, nothing is written to anyone, no diagnosis. The plainest reading task.",
+  "check": "contains_any",
+  "expect": [
+    "reading"
+  ],
+  "rubric": [
+    "Answers 'reading'",
+    "Does not hedge across several profiles"
+  ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "reading — the description states the work fully and it falls squarely in that profile."
+  },
+  "prompt": "Classify the following piece of work into exactly one task profile.\n\nThe profiles are:\n  filing    filing, renaming, recording. No judgement required.\n  reading   search and summarise material that already exists.\n  drafting  writing correspondence or documents addressed to a person.\n  analysis  hard problems: diagnosing, reasoning, debugging.\n\nIf the description does not determine exactly one profile, answer 'unclear' and say what you would need to know. Do not guess.\n\nAnswer with one word — the profile name, or 'unclear' — then one sentence of justification.\n\nThe work:\n  Read a sixty-page supplier contract and produce five bullet points covering the obligations it puts on us."
+}

@@ -27,9 +27,18 @@ That is the failure shape that matters: these systems do not fail with an error 
 ./run.py openai/gpt-5 --tasks 02 05               # only some
 ./run.py ollama/kontor-4b --profile filing        # only tasks concerning filing work
 ./run.py crush/hyper/glm-5.3 --profile analysis   # through the agent runner, for providers only it reaches
+./run.py openai/gpt-5 --epochs 3                  # three runs per task; the verdict is the majority
 ./run.py --dry-run                                # shows what would be sent, no key needed
 ./report.py                                       # every run side by side
 ./coverage.py                                     # which profile-model assignment is evidenced, which is a guess
+./oracle.py                                       # does every check accept an answer known to be right?
+```
+
+A second, smaller task set lives in [`classifier/`](classifier/) and answers a different question — whether a model knows when it *cannot* decide which profile a piece of work belongs to. Same runner, same checks, same format:
+
+```bash
+KONTOR_TASKS_DIR=$PWD/classifier/tasks KONTOR_RESULTS_DIR=$PWD/classifier/results ./run.py openai/gpt-5-nano
+./report.py classifier/results
 ```
 
 **The key is in no file.** `run.py` takes it from the operating system's keychain and only then falls back to an environment variable:
@@ -42,7 +51,7 @@ That keeps the key out of the repository and out of shell configuration, and an 
 
 Via **OpenRouter**, new models are usually available within hours of release, billed per token rather than per subscription. A full run costs a few cents, depending on the model.
 
-`temperature=0`, so that runs stay comparable. Three runs of one model at temperature 0 nevertheless produced three different answers to task 01, which is why `--epochs` exists in the Inspect port and why a single run is not a measurement.
+`temperature=0`, so that runs stay comparable. It does not make them identical: three runs of `deepseek-v4-flash` at temperature 0 answered task 02 with 37 s, 17.2 s and 106 s. That is why `--epochs` exists, and why a single run is not a measurement. A task whose epochs disagree is reported as `~` rather than as its majority.
 
 ## Rating
 
@@ -61,8 +70,12 @@ retired/    tasks that no longer run, with their results and the reason
 run.py      the runner
 report.py   comparison of all runs
 coverage.py profile-to-model assignment against results/: evidenced or estimated
+oracle.py   submits each task's own known-good answer to its own check
+classifier/ a second task set: can a model tell when it cannot route a job?
 inspect_port/  the same tasks ported to Inspect AI, with an opinion in NOTES.md
 ```
+
+Every task carries an `oracle` block holding an answer known to be right, and `oracle.py` puts it through that task's own verifier. Task `04` declares `"expect": "reject"` — the text names no year, so the honest `null` fails its type check by design, which is the documented defect that `10` exists to correct. Everything else must accept its own correct answer, and `03` was retired the day this was introduced because it did not: its premise turned out to be false, after thirteen models had been scored as passing it.
 
 ## Rules that keep it worth something
 

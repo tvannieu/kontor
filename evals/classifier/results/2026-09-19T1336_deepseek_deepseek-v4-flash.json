@@ -1,0 +1,123 @@
+{
+  "model": "deepseek/deepseek-v4-flash",
+  "time_utc": "2026-09-19T1336",
+  "tasks": [
+    {
+      "id": "01_rename_invoices",
+      "title": "Routing: filing",
+      "seconds": 9.5,
+      "tokens": 1044,
+      "cost_usd": 8.379462e-05,
+      "answer": "unclear  \nThe task involves both renaming (filing) and extracting dates from documents (reading), so the profile is not determined solely by the description.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "02_summarise_contract",
+      "title": "Routing: reading",
+      "seconds": 1.7,
+      "tokens": 173,
+      "cost_usd": 6.562e-06,
+      "answer": " reading — the task is to search and summarise existing material (the contract) into key points, with no judgement or drafting for a person.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['reading']",
+        "stable": true
+      }
+    },
+    {
+      "id": "03_decline_offer",
+      "title": "Routing: drafting",
+      "seconds": 2.2,
+      "tokens": 167,
+      "cost_usd": 5.272e-06,
+      "answer": " drafting  \nThe task involves writing correspondence addressed to a person, which fits the drafting profile.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['drafting']",
+        "stable": true
+      }
+    },
+    {
+      "id": "04_wrong_axis",
+      "title": "Routing: analysis",
+      "seconds": 2.9,
+      "tokens": 221,
+      "cost_usd": 2.7391e-05,
+      "answer": "analysis\n\nThe task involves diagnosing a bug in a numerical routine, which requires reasoning and debugging.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['analysis']",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_register_arrivals",
+      "title": "Routing: filing",
+      "seconds": 1.3,
+      "tokens": 160,
+      "cost_usd": 5.678e-06,
+      "answer": "filing  \nThe task is purely recording information without judgment, which matches the filing profile.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['filing']",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_annual_review",
+      "title": "Routing: underdetermined",
+      "seconds": 2.4,
+      "tokens": 318,
+      "cost_usd": 6.6464e-05,
+      "answer": "reading",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "07_deal_with_letter",
+      "title": "Routing: underdetermined",
+      "seconds": 2.0,
+      "tokens": 166,
+      "cost_usd": 6.554e-06,
+      "answer": "unclear  \nThe description is too vague to determine whether it involves filing, reading, drafting, or analysis without knowing the letter's content and the required action.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_clean_project_folder",
+      "title": "Routing: underdetermined",
+      "seconds": 2.4,
+      "tokens": 244,
+      "cost_usd": 5.012e-05,
+      "answer": "filing\n\n\"Clean up the project folder\" involves organizing, renaming, or recording files, which matches the filing profile with no judgement required.",
+      "auto": {
+        "passed": false,
+        "note": "none of ['unclear']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_numbers_write_up",
+      "title": "Routing: underdetermined",
+      "seconds": 4.4,
+      "tokens": 320,
+      "cost_usd": 4.6137e-05,
+      "answer": "unclear  \nThe task could involve reading and summarizing data (reading), analyzing numbers (analysis), or drafting a report (drafting); more context is needed to determine exactly one profile.",
+      "auto": {
+        "passed": true,
+        "note": "found: ['unclear']",
+        "stable": true
+      }
+    }
+  ]
+}

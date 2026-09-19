@@ -34,7 +34,9 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from run import CHECKS  # noqa: E402 -- the runner's own checks, not a copy
 
-TASKS = ROOT / "tasks"
+#     ./oracle.py                   the task set in tasks/
+#     ./oracle.py classifier/tasks  any other set in the same format
+TASKS = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "tasks"
 
 
 def main():

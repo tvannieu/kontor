@@ -1,0 +1,18 @@
+{
+  "id": "05_register_arrivals",
+  "title": "Routing: filing",
+  "why": "Recording, stated in full. A second filing case so the profile is not carried by one example.",
+  "check": "contains_any",
+  "expect": [
+    "filing"
+  ],
+  "rubric": [
+    "Answers 'filing'",
+    "Does not hedge across several profiles"
+  ],
+  "oracle": {
+    "expect": "pass",
+    "solution": "filing — the description states the work fully and it falls squarely in that profile."
+  },
+  "prompt": "Classify the following piece of work into exactly one task profile.\n\nThe profiles are:\n  filing    filing, renaming, recording. No judgement required.\n  reading   search and summarise material that already exists.\n  drafting  writing correspondence or documents addressed to a person.\n  analysis  hard problems: diagnosing, reasoning, debugging.\n\nIf the description does not determine exactly one profile, answer 'unclear' and say what you would need to know. Do not guess.\n\nAnswer with one word — the profile name, or 'unclear' — then one sentence of justification.\n\nThe work:\n  Record the arrival date of each incoming letter in the register, one line per letter."
+}

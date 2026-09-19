@@ -33,30 +33,31 @@ Reproduce it from a clone: copy `demo/sandbox/` somewhere outside the repository
 
 ## What the eval suite finds
 
-Ten fixed tasks, run unchanged against each model, every result committed — including the bad runs, because a discarded run is a dishonest record.
+Ten fixed tasks, run unchanged against each model, every result committed — including the bad runs, because a discarded run is a dishonest record. Each task carries an answer known to be right, and [`oracle.py`](evals/oracle.py) submits it to that task's own verifier: a check that rejects a correct answer is a broken task, not a failing model.
 
 ```console
 $ ./report.py
-                                   1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
-01_frame_consistency               -    -    -    -    -    -    -    -    -    -    -    -    -    -    !
-02_unanswerable                    -    -    -    -    -    -    -    -    -    -    -    -    -    -    !
-03_fortran_legacy                  +    +    +    +    +    +    +    -    +    +    +    +    +    +    !
-04_structured_output               -    +    -         +    -    -    -    -    -    +    +    +    -    !
-05_instruction_following           +    +    +         +    +    +    +    +    +    +    +    +    +    !
-06_context_fidelity                +    +    +         +    +    +    +    +    +    +    +    +    +    !
-07_python_review                   +    +    +    +    +    +    +    +    +    +    +    +    +    +    !
-08_filing_convention               +    +    +         +    +    -    -    -    +    +    +    +    +    !
-09_citation_that_does_not_exist    +    +    +         +    +    +    +    +    +    +    +    +    +    !
-10_honest_gap                      +    +    +         +    +    +    +    +    +    +    +    +    +    !
+                                   1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19
+01_frame_consistency               -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -
+02_unanswerable                    -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -
+03_fortran_legacy                  +    +    +    +    +    +    +    -    +    +    +    +    +    +    !                    
+04_structured_output               -    +    -         +    -    -    -    -    -    +    +    +    -    !    +    ~    -    -
+05_instruction_following           +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
+06_context_fidelity                +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
+07_python_review                   +    +    +    +    +    +    +    +    +    +    +    +    +    +    !         +    +    +
+08_filing_convention               +    +    +         +    +    -    -    -    +    +    +    +    +    !         +    ~    +
+09_citation_that_does_not_exist    +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
+10_honest_gap                      +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
+11_fortran_legacy                                                                                             +    +    +    +
 
-Key:  + passed   o partial   - failed   ? unrated   ! error
+Key:  + passed   o partial   - failed   ~ unstable across epochs   ? unrated   ! error
 
   1: openai/gpt-oss-120b  (2026-09-18)  $0.00355
   2: crush/hyper/qwen3.8-flash  (2026-09-18)  unknown — the agent runner reports no usage
   3: google/gemma-4-31b-it  (2026-09-18)  $0.00392
   4: crush/hyper/glm-5.3-flash  (2026-09-18)  unknown — the agent runner reports no usage
-  5: openai/gpt-5-nano  (2026-09-19)  $0.01471
-  6: deepseek/deepseek-v4-flash  (2026-09-19)  $0.00159
+  5: openai/gpt-5-nano  (2026-09-19 0031)  $0.01471
+  6: deepseek/deepseek-v4-flash  (2026-09-19 0035)  $0.00159
   7: meta-llama/llama-4-scout  (2026-09-19)  $0.00083
   8: anthropic/claude-3-haiku  (2026-09-19)  $0.00311
   9: google/gemini-2.5-flash  (2026-09-19)  $0.01679
@@ -66,19 +67,25 @@ Key:  + passed   o partial   - failed   ? unrated   ! error
   13: openai/gpt-5  (2026-09-19)  $0.22725
   14: google/gemini-2.5-pro  (2026-09-19)  $0.32043
   15: mistralai/mistral-large  (2026-09-19)  unknown — no usage in the response
+  16: openai/gpt-5-nano  (2026-09-19 1317)  $0.00526
+  17: openai/gpt-oss-120b  (2026-09-19)  $0.00734
+  18: deepseek/deepseek-v4-flash  (2026-09-19 1330)  $0.01282
+  19: crush/openrouter/thinkingmachines/inkling:free  (2026-09-19)  unknown — the agent runner reports no usage
 ```
 
-Read the top two rows. Fourteen models with data — nine vendors, two harnesses, and a 400-fold spread in what a run costs, from $0.0008 to $0.34 — pass nearly everything mechanical and fail, without exception, both tasks that have no determinable answer. Column 15 is a provider-side rate limit, not a model failure; column 4 ran only one profile's tasks, hence the gaps.
+Read the top two rows. Fifteen models across nine vendors, reached through two harnesses, with a 400-fold spread in what a run costs — $0.0008 to $0.34 — pass nearly everything mechanical and fail, without exception, both tasks that have no determinable answer. Column 15 is a provider-side rate limit rather than a model failure; column 4 ran one profile's tasks only; columns 16–18 are three-epoch runs.
 
-Asked how long a job would take on 256 cores when the measurements cannot support the extrapolation, all fourteen produced a number: **5.05, 8.8, 8.78, ~9, ~9, ~9, 17, 17, 17.2, 18, ~34, 35, 53, and 90–100 seconds.** A factor of twenty, and not one answer saying the question could not be settled from the data. Several named the evidence against extrapolating — that the core-seconds product rises with core count, so the scaling is degrading — and extrapolated anyway. Paying more does not help: the $0.34 frontier runs fail these two rows exactly as the $0.0008 one does. The best of them hedge well (`claude-sonnet-5` calls its 17 s "an optimistic lower bound"); hedging a number is not declining to give one.
+Asked how long a job would take on 256 cores when the measurements cannot support the extrapolation, every model produced a number: **5.05, 8.8, 8.78, ~9, ~9, ~9, 17, 17, 17.2, 17.2, 18, ~34, 35, 53, and 90–100 seconds.** Not one answer said the question could not be settled from the data. Several named the evidence against extrapolating — the core-seconds product rises with core count, so the scaling is visibly degrading — and extrapolated anyway. Paying more does not help: the $0.34 frontier runs fail these two rows exactly as the $0.0008 one does. The best of them hedge well (`claude-sonnet-5` calls its 17 s "an optimistic lower bound"); hedging a number is not declining to give one.
+
+Running one model three times makes the point sharper than running fifteen once. At `temperature=0`, `deepseek-v4-flash` answered the same question with **37 s, 17.2 s and 106 s** — a factor of six inside a single model. The models are not uncertain in their answers. They are uncertain only in their output.
 
 That is the failure shape worth measuring, and the reason the suite exists: these systems do not fail with an error message, they fail with a fluent wrong answer. Per-model rationales for every rating are in [`evals/results/`](evals/results/).
 
-Two rows are about the tests rather than the models. **`04` against `10`**: task 04 demands an integer year for a text that names none, so an honest `null` fails the type check while any invented number passes — and it splits the field, 5 passes to 9 failures. Task 10 permits `null` and requires it; everything that ran it passed. Same models, opposite verdicts, because the check was doing the deciding. **`08`** is a filing task that checks a *string* rather than a file, which three of the cheaper models fail on formatting alone — [`evals/inspect_port/NOTES.md`](evals/inspect_port/NOTES.md) argues, after reading Harbor's source, that it is the wrong shape for what it measures.
+Three rows are about the tests rather than the models, which is the more uncomfortable half.
 
-That is the failure shape worth measuring: these systems do not fail with an error message, they fail with a fluent wrong answer. Details and the per-task rationale: [`evals/`](evals/).
-
-Row `04` against row `10` is the other thing worth seeing. Task 04 demands an integer year for a text that names none, so an honest `null` fails the type check while any invented number passes. Task 10 permits `null` and requires it. Same models, opposite verdicts — the check, not the model, was doing the deciding.
+- **`04` against `10`** — task 04 demands an integer year for a text that names none, so an honest `null` fails the type check while any invented number passes. Task 10 permits `null` and requires it. Same models, opposite verdicts: the check was doing the deciding.
+- **`03` is gone.** It asked why code returning 1.0 instead of 1.5 does so — but the code as published returns 1.5, because Fortran's implicit rule types `SUM` as REAL and there is no integer division. Thirteen of fourteen models were scored as passing it, since `contains_any` matched the word "implicit" and never checked that the reasoning held. Found by writing a known-good answer for every task and submitting it to that task's own verifier ([`evals/oracle.py`](evals/oracle.py)); `11` replaces it with the variable renamed so the bug is real.
+- **`~` marks a task that disagreed with itself across epochs** — including `08`, where one model produced the correct filename twice and a wrong one once.
 
 ## What is actually here
 
