@@ -20,7 +20,8 @@ import json, os, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-TASKS, RESULTS = ROOT / "tasks", ROOT / "results"
+TASKS = Path(os.environ.get("KONTOR_TASKS_DIR", ROOT / "tasks"))
+RESULTS = Path(os.environ.get("KONTOR_RESULTS_DIR", ROOT / "results"))
 PROFILES = Path(os.environ.get("KONTOR_PROFILES", os.path.expanduser("~/.config/kontor/profiles.conf")))
 
 

@@ -27,6 +27,7 @@ Every task carries an `oracle` block:
 Takes no model call and costs nothing. Run it whenever a check changes.
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -34,9 +35,17 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from run import CHECKS  # noqa: E402 -- the runner's own checks, not a copy
 
-#     ./oracle.py                   the task set in tasks/
-#     ./oracle.py classifier/tasks  any other set in the same format
-TASKS = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "tasks"
+#     ./oracle.py                       the task set in tasks/
+#     ./oracle.py classifier/tasks      any other set in the same format
+#     KONTOR_TASKS_DIR=... ./oracle.py  the same, for a whole shell
+#
+# Argument first, environment second, default third — the same order in run.py,
+# report.py and coverage.py. They disagreed once: oracle.py read only the
+# argument, so KONTOR_TASKS_DIR set for a classifier run silently checked the
+# main task set instead and reported it as a pass. A tool that ignores an
+# instruction is worse than one that refuses it.
+TASKS = Path(sys.argv[1] if len(sys.argv) > 1
+             else os.environ.get("KONTOR_TASKS_DIR", ROOT / "tasks"))
 
 
 def main():

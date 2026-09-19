@@ -39,7 +39,13 @@ A second, smaller task set lives in [`classifier/`](classifier/) and answers a d
 ```bash
 KONTOR_TASKS_DIR=$PWD/classifier/tasks KONTOR_RESULTS_DIR=$PWD/classifier/results ./run.py openai/gpt-5-nano
 ./report.py classifier/results
+./oracle.py classifier/tasks
 ```
+
+All four tools resolve their directories the same way — command-line argument
+first, then `KONTOR_TASKS_DIR` / `KONTOR_RESULTS_DIR`, then the default. They
+did not always: `oracle.py` read only the argument, so an environment variable
+set for a classifier run checked the main task set and reported a pass for it.
 
 **The key is in no file.** `run.py` takes it from the operating system's keychain and only then falls back to an environment variable:
 

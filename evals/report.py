@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """Puts every run side by side.
 
-    ./report.py                     the task set in results/
-    ./report.py classifier/results  any other set of runs in the same format
+    ./report.py                       the runs in results/
+    ./report.py classifier/results    any other set of runs in the same format
+    KONTOR_RESULTS_DIR=... ./report.py    the same, for a whole shell
+
+Argument first, environment second, default third, as in run.py and oracle.py.
 """
-import json, sys
+import json, os, sys
 from pathlib import Path
 
-R = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "results"
+R = Path(sys.argv[1] if len(sys.argv) > 1
+         else os.environ.get("KONTOR_RESULTS_DIR",
+                             Path(__file__).resolve().parent / "results"))
 runs = sorted(R.glob("*.json"))
 if not runs:
     sys.exit(f"No runs in {R}/ yet.")
