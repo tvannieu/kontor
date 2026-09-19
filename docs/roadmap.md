@@ -1,36 +1,46 @@
 # Roadmap
 
-What's next, in the order it should happen and why — not a wishlist, a dependency order. Written 2026-09-17.
+What is open, in the order it should happen. What is finished lives in the git history and in [`../evals/inspect_port/NOTES.md`](../evals/inspect_port/NOTES.md) — a roadmap that accumulates its own changelog stops being read as a roadmap.
 
-> **2026-09-19.** The task set was translated into English and the German one retired whole, with its results ([`../evals/retired/`](../evals/retired/)). Task IDs below that carry German names refer to that retired suite. The result schema was translated with it, which is why the comparison starts again from four runs rather than sixteen.
+## 1. Local evidence for the two local-first profiles
 
-## 1. Close the evals gap
+[`coverage.py`](../evals/coverage.py) reports `filing` and `reading` as **estimate**: neither `kontor-4b` nor `kontor-8b` has run the current task set. This is the half of the argument that matters most. Local-first exists so that a branch whose contents must not leave the machine still has somewhere to send work — and nothing at present shows those two models can do it. Fourteen hosted models have data; the two the confidentiality rule actually depends on have none.
 
-Everything below depends on this being solid, not the other way around. `choosing-a-model.md` is already honest that model choice per branch is currently **an estimate, marked as one**: not enough runs to say anything about a tier, no task sets for branch classes beyond the scientific and code ones, and no mapping from task class to confidentiality class.
+Blocked on machine headroom rather than on effort. This laptop has 16 GB and has twice been driven deep into swap by a local run. `run.py` sets no token cap, and the 4B model has been observed to spend an entire context on a single prompt without producing an answer. Run one task at a time and watch the memory.
 
-What's open, concretely — updated 2026-09-18, a day into it:
+## 2. Check the checks against answers known to be right
 
-- ~~The Inspect AI port is unvalidated against local Ollama models~~ **Done.** Validated carefully (single-sample first, machine health checked between runs) and it surfaced a real failure: `kontor-4b` burns its full token budget with an empty answer on two prompts regardless of budget size, a genuinely stuck generation rather than a "needs more room" problem — see `evals/inspect_port/NOTES.md`.
-- **The scorer had its own bug, found and fixed.** The manual-task grader treated every rubric line as equal weight and gave a known-fail answer partial credit. Fixed (decisive vs. secondary vs. optional rubric lines, sourced from each task's own stated hard-fail conditions) and the fix was verified against the *exact* completion text the old scorer got wrong, not just a fresh run that happened to grade correctly.
-- **Multi-model comparison started, not finished.** Two hosted models (`gpt-oss-120b`, `nemotron`) plus one local, through the fixed scorer. Later the same day: gemma ran cleanly on OpenRouter's paid listing (the free one is rate-limited on a shared pool) and matched every other hosted model's profile; `thinkingmachines/inkling:free` confirmed 403 (agentic-harness-only) and stays the one model without data. `kontor-8b` untested locally, by agreement.
-- ~~No cost tracking~~ **Done.** `run.py` now requests OpenRouter's exact per-call `$cost` (confirmed against a live call before wiring it in, not assumed) and records it alongside tokens; `report.py` sums it per model into the legend. Local Ollama runs correctly show "local / not recorded" rather than a misleading `$0`.
-- ~~No task-class-to-confidentiality mapping~~ **Done as a tool, not a table.** `evals/coverage.py` cross-references `profiles.conf` against `tasks/` and committed `results/`: per profile, is the assigned model evidenced on that profile's tasks, and for hosted-model profiles, is any *local* model evidenced there (what a local-first branch would need). A hand-written mapping would have drifted the way the manifest's inbox table and the README's task count did; this one counts itself. What it shows after the same day's runs: drafting evidenced on all three tasks (one failure), reading and filing on one of three each (filing with a failure on record), and analysis's assigned model unreachable — four attempts through crush, all `Invalid input`, while its cheaper sibling answers. Both hosted profiles have a local model evidenced on some of their tasks. Getting there needed `run.py` to speak to the provider only `crush` reaches; those runs are marked as a different harness (no temperature control, agent system prompt) in the result. What's left is instance-side: the analysis profile points at a model the provider currently rejects — model ID, `max_tokens` and reasoning flag all ruled out from here; the rejection is upstream. `glm-5.3-flash`, same family at roughly a tenth of the price, answers — and run on the analysis tasks as a stand-in scores 2 of 4: both machine-checked tasks pass, both epistemic ones fail (asserts a cause on 01, names a number on 02). Repointed to `glm-5.3-flash` on 2026-09-18 — reason recorded beside the line in `profiles.conf`, return to `glm-5.3` when it answers. And the task-04 finding has a draft answer: `tasks/10_ehrliche_luecke.json.draft`, a task where `null` is allowed and required, so an honest gap passes and any invented number — the `0` sentinel included — fails. Drafts don't run; renaming to `.json` is the approval.
-- **The "weekend" the original proposal imagined, started 2026-09-18 — judge calibration first**, because the posting names it: `evals/inspect_port/calibrate.py` re-scores every stored manual completion with two graders from different families against the human labels on record. 100% agreement with the six human labels (three of them independent, three this session's own — stated as such), 93% between graders. The one split is the finding: the cheaper grader found the decisive rubric line unmet and graded P anyway, inverting the rule — correct analysis, wrong application. Epochs, same day: three runs per task on `gpt-oss-120b`. Five of six auto tasks and two of three manual ones are stable; task 04 is a genuine coin flip (`null` twice, an integer once — the honest-null tension is non-deterministic, so a single-run 04 result is noise), and once the *grader* returned `nan` on a correct verdict because it bolded `**GRADE:**` and Inspect's default parser only tolerates whitespace there — fixed with a tolerant pattern. Harbor, read from its code (v0.23.0, cloned; not run — no Docker here): its task schema carries the resource limits whose absence hung this laptop, its `oracle` agent checks a task's own reference solution against its verifier (an idea worth stealing), and its **rewardkit** grades with LLM/agent judges in TOML — including a one-call-per-criterion mode that is the two-pass design the calibration split pointed at. That refutes the 14.09 proposal's reason for preferring Inspect. Neither framework can express a *decisive* criterion; both would need the custom aggregation this port added. Fit verdict unchanged for single-turn tasks, with one exception found only by reading: task 08 is a filesystem task checked as a string. **The weekend the proposal imagined is done.** One loose end, on purpose: a container runtime (colima + docker CLI) is installed so Harbor *can* be run, but the VM was not started on a machine sitting at 20 GB of swap; a single `hello-alpine` trial waits for headroom.
-- **New, not anticipated when this was written:** task 04's automatic check can't distinguish an honestly-flagged "I don't know" from a confidently wrong guess — both pass the schema check identically. Worth a new task variant if that distinction matters enough to measure directly (not a change to task 04 itself, per the suite's own rule against silently editing a task).
+Task 10 exists because task 04's verifier rejects an honest `null`. Task 10's own first verifier then rejected a correct answer too, and was retired a day later. Both were found by accident, which is the problem.
 
-## 2. An eval'd classifier, not an assumed one — later, not now
+Harbor does this on purpose: its `oracle` agent submits a task's own reference solution to that task's verifier, so a verifier that fails a correct answer is caught as a broken *task* rather than misread as a failing model. Nothing here does that. Two checks are already suspect — `08` tests a string where it means a file, and `09`'s forbidden-pattern regex has fired on an answer that was right but happened to cite an unrelated clause.
 
-`choosing-a-model.md`'s argument against automatic model routing is that classifying a task costs more (in a paid model call) than the cheap task saves. A **free, local** classifier breaks that specific argument — but trades it for a different, more dangerous cost: **misclassification**, not compute. A classifier that confidently routes the wrong task to the wrong model fails silently, one layer before the task itself is ever seen — exactly the failure shape the whole eval suite exists to catch, just moved earlier.
+The cheap version: one known-good answer stored beside each task, re-checked whenever a check changes.
 
-So: worth building, but as a natural extension of the measurement discipline already here, not a bet placed ahead of it —
+## 3. More than one run per model
 
-- A small task set: "here's a task, which profile is this," with known-correct answers.
-- Scored the same honesty-over-confidence way as the rest of the suite: does it escalate on an ambiguous case instead of guessing.
-- Only attempted once (1) has given the tier system enough runs to trust in the first place. Building a classifier on top of an unvalidated tier system just moves the estimate one level up.
+The same model at `temperature=0` answered task 04 with `null` twice and an integer once. A single run is therefore not a measurement, at least for that task — and every column in the comparison table is a single run.
 
-## 3. Documentation — real gap, but narrow and lower-stakes
+The Inspect port has `--epochs` with a `mode` reducer; `run.py` has nothing. Either lift it across, or mark in the table which columns are one sample. The second is honest and costs nothing.
 
-~~There is no single walkthrough of how someone else would actually adopt kontor~~ **Done, 2026-09-18** — [`docs/adopting.md`](adopting.md) walks the five steps, cross-referencing rather than repeating `architecture.md` / `pouch.md` / `conventions.md` / `fallback.md`. Writing it surfaced a second, smaller gap along the way: `templates/` had a skeleton for `AGENTS.md` but none for the `CLAUDE.md` it points to — someone following the walkthrough literally would have hit a dead link on their first branch. Added `templates/CLAUDE.md`.
+## 4. A grader that cannot invert its own rule
+
+[`calibrate.py`](../evals/inspect_port/calibrate.py) found one disagreement in fourteen items: a grader identified the decisive rubric line as unmet and then awarded partial credit anyway. Correct analysis, inverted rule. The structure is sound — both graders found the same fact — and the aggregation is what leaked.
+
+The fix is a two-pass scorer: decide each decisive line yes or no, then derive the letter mechanically instead of asking the model to conclude. Harbor's rewardkit offers exactly this as `mode = "individual"`. Not built here.
+
+## 5. An eval'd classifier — still not yet
+
+[`choosing-a-model.md`](choosing-a-model.md) argues against automatic model routing on cost: classifying a task requires understanding it, which means a model call, which costs more than the cheap task saves. A **free, local** classifier defeats that particular argument — but trades it for a worse one. Misclassification is not a compute cost. A classifier that confidently routes the wrong task to the wrong model fails silently, one layer before the task is ever seen: the exact failure shape this suite exists to catch, moved somewhere nothing is watching.
+
+Worth building, as an extension of the measurement discipline rather than a bet placed ahead of it: a small task set of "here is a task, which profile is this" with known-correct answers, scored the same honesty-over-confidence way — does it escalate on an ambiguous case, or guess?
+
+Gated on (1). Building a classifier on top of profiles that are half estimate moves the guess up a level instead of removing it.
+
+## 6. Waiting on infrastructure
+
+**Harbor, run rather than read.** `colima` and the docker CLI are installed; the VM has never been started, because the machine sat at 20 GB of swap when they went in. One `hello-alpine` trial would turn that section of `NOTES.md` from a careful code reading into experience.
+
+**`thinkingmachines/inkling`** answers a plain API call with 403: available only through an agentic harness. That is an integration, not a retry, and it remains the one model in this repository's history with no data at all.
 
 ---
 ← [README](../README.md) · [Choosing a model](choosing-a-model.md)
