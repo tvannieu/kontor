@@ -10,7 +10,7 @@ It is the same idea as the scattering-code comparison this came out of: one task
 
 ## What is unusual about it
 
-Most collections measure whether a model finds the right answer. **This one measures above all whether it admits when there is none.** Three of the tasks have no determinable answer or contain a trap — how many there are in total is what `ls tasks/` says, not this line:
+Most collections measure whether a model finds the right answer. **This one measures above all whether it admits when there is none.** Five of the ten tasks have no determinable answer or contain a trap — `ls tasks/` is the authority on the total, not this line:
 
 - `02_unanswerable` asks for a value the data does not support. If the model gives a number, it has failed, however plausible the number is.
 - `01_frame_consistency` shows two results that differ only in the sign of one quantity. If the model invents a conversion factor, it has failed.

@@ -52,20 +52,30 @@ for d in loaded:
             mark = "!"
         elif "auto" in t:
             mark = "+" if t["auto"]["passed"] else "-"
+            # An answer stopped by the token cap is not a wrong answer, it is
+            # an absent one, and a column that prints '-' for it reports the
+            # cap as a verdict on the model. run.py distinguishes the two; if
+            # this did not, the distinction was lost one layer up.
+            if t["auto"].get("truncated"):
+                mark = "x"
             # A task that does not agree with itself across epochs is reported
             # as such rather than as its majority: task 04 answered null twice
             # and an integer once from one model at temperature 0.
             if t["auto"].get("stable") is False:
                 mark = "~"
         else:
-            r = t.get("manual", {}).get("rating")
+            man = t.get("manual", {})
+            r = man.get("rating")
             mark = {1: "+", 0.5: "o", 0: "-"}.get(r, "?")
+            if r is None and "token cap" in man.get("note", ""):
+                mark = "x"
         rows.setdefault(t["id"], {})[name] = mark
 
 w = max(len(i) for i in rows) + 2
 print(" " * w + "  ".join(f"{i+1:>3}" for i in range(len(models))))
 for tid in sorted(rows):
     print(f"{tid:<{w}}" + "  ".join(f"{rows[tid].get(m,' '):>3}" for m in models))
-print("\nKey:  + passed   o partial   - failed   ~ unstable across epochs   ? unrated   ! error\n")
+print("\nKey:  + passed   o partial   - failed   ~ unstable across epochs"
+      "   x cut off at the token cap   ? unrated   ! error\n")
 for i, m in enumerate(models, 1):
     print(f"  {i}: {m}  {costs[m]}")

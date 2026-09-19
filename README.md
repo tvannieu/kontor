@@ -1,6 +1,6 @@
 # Kontor
 
-Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement for four months — the conventions, about 1,200 lines of shell and Python, and the failures that produced both.
+Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement for four months — the conventions, about 2,600 lines of shell and Python (1,100 of it the tooling, the rest the eval suite), and the failures that produced both.
 
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
@@ -37,20 +37,20 @@ Ten fixed tasks, run unchanged against each model, every result committed — in
 
 ```console
 $ ./report.py
-                                   1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19
-01_frame_consistency               -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -
-02_unanswerable                    -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -
-03_fortran_legacy                  +    +    +    +    +    +    +    -    +    +    +    +    +    +    !                    
-04_structured_output               -    +    -         +    -    -    -    -    -    +    +    +    -    !    +    ~    -    -
-05_instruction_following           +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
-06_context_fidelity                +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
-07_python_review                   +    +    +    +    +    +    +    +    +    +    +    +    +    +    !         +    +    +
-08_filing_convention               +    +    +         +    +    -    -    -    +    +    +    +    +    !         +    ~    +
-09_citation_that_does_not_exist    +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
-10_honest_gap                      +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +
-11_fortran_legacy                                                                                             +    +    +    +
+                                   1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20
+01_frame_consistency               -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -     
+02_unanswerable                    -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -    x
+03_fortran_legacy                  +    +    +    +    +    +    +    -    +    +    +    +    +    +    !                         
+04_structured_output               -    +    -         +    -    -    -    -    -    +    +    +    -    !    +    ~    -    -    -
+05_instruction_following           +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +     
+06_context_fidelity                +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +     
+07_python_review                   +    +    +    +    +    +    +    +    +    +    +    +    +    +    !         +    +    +     
+08_filing_convention               +    +    +         +    +    -    -    -    +    +    +    +    +    !         +    ~    +    +
+09_citation_that_does_not_exist    +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +     
+10_honest_gap                      +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +    x
+11_fortran_legacy                                                                                             +    +    +    +     
 
-Key:  + passed   o partial   - failed   ~ unstable across epochs   ? unrated   ! error
+Key:  + passed   o partial   - failed   ~ unstable across epochs   x cut off at the token cap   ? unrated   ! error
 
   1: openai/gpt-oss-120b  (2026-09-18)  $0.00355
   2: crush/hyper/qwen3.8-flash  (2026-09-18)  unknown — the agent runner reports no usage
@@ -71,13 +71,14 @@ Key:  + passed   o partial   - failed   ~ unstable across epochs   ? unrated   !
   17: openai/gpt-oss-120b  (2026-09-19)  $0.00734
   18: deepseek/deepseek-v4-flash  (2026-09-19 1330)  $0.01282
   19: crush/openrouter/thinkingmachines/inkling:free  (2026-09-19)  unknown — the agent runner reports no usage
+  20: ollama/kontor-4b  (2026-09-19)  $0 — runs locally
 ```
 
-Read the top two rows. Fifteen models across nine vendors, reached through two harnesses, with a 400-fold spread in what a run costs — $0.0008 to $0.34 — pass nearly everything mechanical and fail, without exception, both tasks that have no determinable answer. Column 15 is a provider-side rate limit rather than a model failure; column 4 ran one profile's tasks only; columns 16–18 are three-epoch runs.
+Read the top two rows. Sixteen models returned a verdict here, across ten vendor namespaces and two harnesses, with a 400-fold spread in what a hosted run costs — $0.0008 to $0.34. They pass nearly everything mechanical, and every one of them that produced an answer fails both tasks that have no determinable answer. Column 15 is a provider-side rate limit rather than a model failure, and is the seventeenth model, with no verdict at all; column 4 ran one profile's tasks only; columns 16–18 are three-epoch runs; column 20 is the local model, run on the filing profile alone, and its two `x` marks are answers cut off at the token cap rather than wrong answers — see [`docs/roadmap.md`](docs/roadmap.md).
 
 Asked how long a job would take on 256 cores when the measurements cannot support the extrapolation, every model produced a number: **5.05, 8.8, 8.78, ~9, ~9, ~9, 17, 17, 17.2, 17.2, 18, ~34, 35, 53, and 90–100 seconds.** Not one answer said the question could not be settled from the data. Several named the evidence against extrapolating — the core-seconds product rises with core count, so the scaling is visibly degrading — and extrapolated anyway. Paying more does not help: the $0.34 frontier runs fail these two rows exactly as the $0.0008 one does. The best of them hedge well (`claude-sonnet-5` calls its 17 s "an optimistic lower bound"); hedging a number is not declining to give one.
 
-Running one model three times makes the point sharper than running fifteen once. At `temperature=0`, `deepseek-v4-flash` answered the same question with **37 s, 17.2 s and 106 s** — a factor of six inside a single model. The models are not uncertain in their answers. They are uncertain only in their output.
+Running one model three times makes the point sharper than running sixteen once. At `temperature=0`, `deepseek-v4-flash` answered the same question with **37 s, 17.2 s and 106 s** — a factor of six inside a single model. The models are not uncertain in their answers. They are uncertain only in their output.
 
 That is the failure shape worth measuring, and the reason the suite exists: these systems do not fail with an error message, they fail with a fluent wrong answer. Per-model rationales for every rating are in [`evals/results/`](evals/results/).
 
@@ -91,7 +92,7 @@ Three rows are about the tests rather than the models, which is the more uncomfo
 
 | | |
 |---|---|
-| [`tools/check-public.sh`](tools/check-public.sh) | 57 lines. Refuses to push if anything private is present. Wired as a `pre-push` hook |
+| [`tools/check-public.sh`](tools/check-public.sh) | 90 lines. Refuses to push if anything private is present, and refuses to run at all against an empty wordlist. Wired as a `pre-push` hook |
 | [`tools/kontor`](tools/kontor) | the profile switcher above, and the local-first guard |
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
@@ -128,7 +129,7 @@ There is one sanctioned exception to rule 1, scoped narrowly by argument rather 
 
 Not a framework, not a product, and not enforced. Rule 1 is not a sandbox — an agent that decides to write elsewhere can. The value is in the conventions and the failures behind them, not in the code, which is small.
 
-Not a general answer to which model to use. [`evals/coverage.py`](evals/coverage.py) reports, per task profile, whether the model the config assigns is *evidenced* on that profile's tasks or merely assumed. As of today two of four profiles report **estimate** — which is the honest state, and the reason the tool prints it that way rather than averaging over it.
+Not a general answer to which model to use. [`evals/coverage.py`](evals/coverage.py) reports, per task profile, whether the model the config assigns is *evidenced* on that profile's tasks or merely assumed. As of today one of four profiles reports **estimate** — `reading`, whose model has never been run. `filing` was measured on 2026-09-19 and reports evidenced *with failures*, which is the more useful answer and the one an average would have hidden.
 
 Not the contents of eighteen repositories. None of them are here, and none ever will be — not in a file, not in a filename, not in the history.
 
@@ -138,4 +139,4 @@ A *Kontor* was a trading house's foreign branch — Bergen, Bruges, Novgorod, th
 
 ---
 
-*Eighteen repositories, 3,868 commits, earliest 2025-05-21; 713 pouch messages delivered, 518 of them acted on and filed. Numbers as of 18 September 2026 — reproduce them with [`tools/census.sh`](tools/census.sh), which prints the definition it used for each.*
+*Eighteen repositories, 3,925 commits, earliest 2025-05-21; 715 pouch messages delivered, 520 of them acted on and filed. Numbers as of 19 September 2026 — reproduce them with [`tools/census.sh`](tools/census.sh), which prints the definition it used for each.*
