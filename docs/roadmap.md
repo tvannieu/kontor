@@ -4,32 +4,51 @@ What is open, in the order it should happen. What is finished lives in the git h
 
 ## 1. Local evidence for the two local-first profiles
 
-Half done, and the half that is done is discouraging.
+Half done. The first reading of the result was too harsh, and the correction
+is the more useful finding.
 
-**`filing` -> `kontor-4b`: measured on 2026-09-19, one of four tasks passed.**
-`08_filing_convention`, which is pure string formatting, passed in 25 s.
-`04_structured_output` collapsed into a repetition loop after four seconds —
-the answer ends `"Halvors0000000000000000..."`. `02_unanswerable` and
-`10_honest_gap` each reasoned for over two minutes and hit the 4096-token cap
-without ever reaching an answer. Raising the cap does not rescue them: the
-timeout arrives first.
+**`filing` -> `kontor-4b`, measured 2026-09-19: one of four.**
+`08_filing_convention` passed in 25 s. `04_structured_output` collapsed into a
+repetition loop after four seconds — the answer ends `"Halvors0000000..."`.
+`02_unanswerable` and `10_honest_gap` each reasoned past the 4096-token cap
+without reaching an answer, at 135 s and 129 s. Raising the cap does not
+rescue them; the timeout arrives first.
 
-This is the argument that mattered most, and the measurement goes against it.
-Local-first exists so a branch whose contents must not leave the machine still
-has somewhere to send work. On the evidence, `kontor-4b` can rename a file and
-cannot do the rest of the filing tasks — and the two it fails hardest are the
-two about admitting a gap, which is the whole point of the collection.
+One of four reads like a rout until the same four tasks are read across the
+whole fleet, which is what a fixed task set is for:
 
-Open: rate `02` by hand (the answer exists, it is just cut off), and decide
-what follows. Either the profile assignment is wrong, or the tasks are too
-hard for any model this machine can host, and those have different remedies.
+| on these four tasks | passed |
+|---|---|
+| `claude-sonnet-5`, `gpt-5`, `gpt-5-nano`, `gpt-oss-120b`, `grok-4.3`, `qwen3.8-flash` | 3 of 4 |
+| `gemini-2.5-pro`, `deepseek-v4-flash`, `gemma-4-31b`, `kimi-k2.5`, `inkling` | 2 of 4 |
+| `claude-3-haiku`, `gemini-2.5-flash`, `llama-4-scout`, **`kontor-4b`** | 1 of 4 |
+
+Nobody scores four. `02_unanswerable` is failed by all fifteen models that
+have a verdict, across a 400x price range — it is the collection's flagship
+result, not a defect. So `kontor-4b` sits at the bottom of the fleet, in the
+company of three hosted models, rather than off the scale.
+
+**Its distinctive problem is not accuracy, it is completion.** The hosted
+models that fail these tasks fail them quickly and legibly. `kontor-4b` fails
+`10_honest_gap` — which **fourteen of fourteen** other models pass — by
+reasoning for two minutes and stopping mid-sentence. A wrong answer can be
+scored; an answer that never arrives cannot, and on a 16 GB laptop the budget
+it wants is not available. That, not the score, is what makes the profile
+assignment doubtful.
+
+Open:
+- Rate `02` by hand — the answer exists, it is merely cut off.
+- `10_honest_gap` is passed by every hosted model that has attempted it. A task
+  nothing fails no longer discriminates; it was built to repair `04`'s defect
+  and it did, but it should be looked at as a measuring instrument.
+- Decide whether `filing` should point at `kontor-4b` at all, given that the
+  question is completion rather than capability.
 
 **`reading` -> `kontor-8b`: still untested, deliberately.** 8B was ruled out
 after 4B alone lagged the machine, and that has not been revisited.
 
-The runner now refuses a local run the machine has no room for, rather than
-discovering it the hard way — see `preflight_local` in
-[`run.py`](../evals/run.py).
+The runner now refuses a local run the machine has no room for rather than
+discovering it the hard way — `preflight_local` in [`run.py`](../evals/run.py).
 
 ## 2. Weigh a rubric line without hand-maintaining a list
 
