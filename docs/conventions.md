@@ -103,7 +103,7 @@ Three files at the root of every branch. Agent harnesses resolve them **by name,
 | `AGENTS.md` | A short pointer to `CLAUDE.md` plus a few rules that prevent irreversible damage. |
 | `REPO_MANIFEST.md` | The map. Distributed, not linked — an identical copy in each branch. |
 
-🔑 **Why `AGENTS.md` is a pointer and not a copy.** It began as a full duplicate of `CLAUDE.md`. Neither file mentioned the other existed, so the first edit to either would have diverged them silently. What settled it was a measurement rather than taste: some agent tools load **both** by name, so a branch was spending roughly 7,000 tokens saying the same thing twice before a question was asked — a fifth of a local model's context window. The pointer keeps a damage-prevention block rather than being bare, because some harnesses inject one file without reliably opening a second.
+**Why `AGENTS.md` is a pointer and not a copy.** It began as a full duplicate of `CLAUDE.md`. Neither file mentioned the other existed, so the first edit to either would have diverged them silently. What settled it was a measurement rather than taste: some agent tools load **both** by name, so a branch was spending roughly 7,000 tokens saying the same thing twice before a question was asked — a fifth of a local model's context window. The pointer keeps a damage-prevention block rather than being bare, because some harnesses inject one file without reliably opening a second.
 
 ---
 ← [README](../README.md) · [Architecture](architecture.md) · [Lessons](lessons.md)

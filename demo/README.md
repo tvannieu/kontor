@@ -15,6 +15,6 @@ The tape shows the part worth showing: `use filing` succeeds, `use analysis` is 
 because a local-first branch may reach a hosted model per session but may not have one as its
 default.
 
-⚠️ **Unrecorded so far.** VHS runs the tape and reports success without producing a file on this
+**Unrecorded so far.** VHS runs the tape and reports success without producing a file on this
 machine. Not yet diagnosed; the machine was under heavy memory pressure at the time. The GIF is
 gitignored, so committing the tape does not imply one exists.

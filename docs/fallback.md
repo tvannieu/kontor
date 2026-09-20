@@ -11,9 +11,9 @@ What happens when the subscription runs out. A second agent runner, configured p
 
 The classification lives in the instance config, not here.
 
-🔑 **The default is the protection, not a wall.** In the local-first branches the runner starts on the local model, so nothing leaves the machine on a prompt typed without thinking. Going online is one keystroke and the banner says which mode you are in.
+**The default is the protection, not a wall.** In the local-first branches the runner starts on the local model, so nothing leaves the machine on a prompt typed without thinking. Going online is one keystroke and the banner says which mode you are in.
 
-⚠️ **This was once a kernel-level seal** — a sandbox profile permitting exactly one network destination, so a hosted call returned *operation not permitted*. It was removed deliberately, and the argument is worth keeping because it is easy to get backwards:
+**This was once a kernel-level seal** — a sandbox profile permitting exactly one network destination, so a hosted call returned *operation not permitted*. It was removed deliberately, and the argument is worth keeping because it is easy to get backwards:
 
 > The same material already went to one hosted vendor every day. A seal that blocked a second while
 > the first read everything was not protecting the material; it was protecting a vendor's share of
@@ -27,7 +27,7 @@ The sandbox profile is kept, unused, in case the decision is revisited.
 
 A script writes the runner's config into every branch from the classification lists, and appends the config filename to each branch's `.gitignore` as it goes.
 
-📌 **That last part came from a sibling branch noticing a question it should not have to answer.** The config arrived untracked in its repository, leaving it to decide whether to commit or ignore it — a decision eleven branches would answer eleven ways. Its reasoning generalises:
+**That last part came from a sibling branch noticing a question it should not have to answer.** The config arrived untracked in its repository, leaving it to decide whether to commit or ignore it — a decision eleven branches would answer eleven ways. Its reasoning generalises:
 
 > **A distributed file is cheapest when it is clearly documentation (commit it) or clearly
 > machinery (ignore it), and expensive when it sits between.**

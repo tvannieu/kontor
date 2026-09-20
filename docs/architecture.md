@@ -23,7 +23,7 @@ The exception is narrow and was made narrower by argument rather than convenienc
 > The operator directs the distribution; a session may execute it. The exception covers **generated
 > files with exactly one correct location** and nothing else.
 
-📌 **How that wording was arrived at is the useful part.** The original rule said the *act* of distribution belonged to the operator and a session must never run it. In practice the operator asked and a session ran it, three times in one day, and the rule became a small negotiation each time instead of protecting anything. **A rule set aside by agreement whenever it comes up is not a boundary; it is friction.** So the boundary was moved to where it actually was.
+**How that wording was arrived at is the useful part.** The original rule said the *act* of distribution belonged to the operator and a session must never run it. In practice the operator asked and a session ran it, three times in one day, and the rule became a small negotiation each time instead of protecting anything. **A rule set aside by agreement whenever it comes up is not a boundary; it is friction.** So the boundary was moved to where it actually was.
 
 The test for whether something qualifies came from the branch with the strictest local rule:
 
@@ -42,7 +42,7 @@ There is one rule, it applies to every branch equally, and the branch where it w
 
 This repository is the system. The lists it operates on — which branches exist, which are local-first, which are read-only — are **instance data** and live in `~/.config/kontor/`, outside every repository. See [`../tools/kontor.conf.example`](../tools/kontor.conf.example).
 
-🔑 That separation is load-bearing rather than cosmetic. A public repository that is a *sanitised copy* of a private one holds two copies of every decision and drifts forever. A public repository that **is** the system, configured by a private file, has nothing to sync.
+That separation is load-bearing rather than cosmetic. A public repository that is a *sanitised copy* of a private one holds two copies of every decision and drifts forever. A public repository that **is** the system, configured by a private file, has nothing to sync.
 
 The same system has been bitten three times by exactly the copy-and-drift failure it now avoids — see [`lessons.md`](lessons.md).
 

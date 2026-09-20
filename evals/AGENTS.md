@@ -8,7 +8,7 @@ A **fixed set of tasks**, run unchanged against every new language model. Create
 
 ## The one rule everything rests on
 
-🔴 **Prompts are not patched when a model fails them.**
+**Prompts are not patched when a model fails them.**
 
 Whoever changes a task creates a **new** one and leaves the old one standing. Otherwise the collection eventually measures only itself, and every earlier run becomes worthless.
 
@@ -16,7 +16,7 @@ That applies to you as an agent too: **never touch `tasks/*.json` quietly.**
 
 ## What is measured here
 
-Not in the first instance whether a model finds the right answer, but **whether it admits when there is none.** Three of the tasks (`01`, `02`, `06`) have no determinable answer or contain a trap — how many there are in total is what `ls tasks/` says, not this line. A plausible invented number is a failure, not partial credit.
+Not in the first instance whether a model finds the right answer, but **whether it admits when there is none.** Five of the tasks (`01`, `02`, `06`, `09`, `10`) have no determinable answer or contain a trap. `ls tasks/` is the authority on both counts, not this line — it has been wrong about this one twice. A plausible invented number is a failure, not partial credit.
 
 That is the failure shape at issue: these systems do not fail with an error message, they fail with a fluent wrong answer.
 

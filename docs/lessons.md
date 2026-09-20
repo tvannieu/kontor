@@ -141,9 +141,12 @@ specifically to stop the number going stale:
 
 > *"how many there are in total is what `ls tasks/` says, not this line"*
 
-It went stale anyway, three feet above the five bullets contradicting it. The
-same drift had to be fixed twice on the same day, in two files, because the
-first fix corrected the number without removing the reason a number was there.
+It went stale anyway, three feet above the five bullets contradicting it.
+
+The same wrong number then turned up in **three** files — `evals/README.md`,
+`docs/choosing-a-model.md`, `evals/AGENTS.md` — and **two of the three carried
+that same hedge**. Each was fixed separately, on the same day, because each fix
+corrected the figure without removing the reason a figure was sitting there.
 
 > **A warning about drift is not a defence against it.** Either the document
 > derives the figure, or the figure will be wrong. A sentence that apologises
