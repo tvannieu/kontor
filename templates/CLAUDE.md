@@ -25,4 +25,4 @@ This file only adds what is specific to *this* branch.
 <Whatever this branch has learned about itself. `conventions.md`'s collected rules are a starting point to check against, not a checklist to copy — several branches arrived at the same class of rule independently, which is worth knowing before reinventing it, but the point was that each one stated it in its own words, close to the failure that produced it.>
 
 ---
-← [AGENTS.md](AGENTS.md) · [Manifest](REPO_MANIFEST.md)
+← [AGENTS.md](AGENTS.md) · `REPO_MANIFEST.md` (distributed, not in git)

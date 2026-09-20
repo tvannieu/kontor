@@ -73,7 +73,47 @@ This happened **one hour** after the rule about checks and their populations was
 
 > A scan that cannot run must fail, not pass.
 
-It is now verified with a planted canary: the gate must block a file containing the things it claims to catch, and pass once that file is removed. **A boundary you have never seen open is an outage, not a boundary.**
+It is now verified by [`tools/check-public-selftest.sh`](../tools/check-public-selftest.sh), which plants a file containing a real deny-listed term, asserts the gate blocks, removes it, and asserts the gate passes again. **A boundary you have never seen open is an outage, not a boundary.**
+
+---
+
+## The gate that scanned everywhere except where the danger came from
+
+`check-public.sh` had one line selecting the files it would examine, and that
+line ended `| grep -vE '^inbox/'`. The reasoning, at the time, was that the
+pouch is a delivery mechanism rather than content.
+
+The reasoning was exactly backwards. Messages in `inbox/` are the only files in
+this repository **written by other branches**. They name their own repository,
+their own correspondents and their own subject matter, because that is what
+makes them useful to the branch receiving them. Of everything here, they were
+the likeliest place for another branch's private material to appear — and they
+were the one place never scanned.
+
+Found 2026-09-20, by opening the files for an unrelated reason: eight committed
+and pushed messages, carrying between one and seventeen distinct deny-listed
+terms each. organisation names, two private surnames, and
+paths naming private matters. Every `clean` the gate had
+printed was silent about all of it. The repository was still private, which is
+the only reason this is a lesson and not an incident.
+
+This is the second time the same shape has produced a false `clean`. The first
+was an empty deny-list: the gate scanned the right files against nothing. This
+time it scanned the wrong files against the right list. Both printed `clean`;
+in neither case was the content the problem.
+
+> **An exclusion is a claim that a population cannot contain what you are
+> looking for.** It needs the same evidence as any other claim, and it is
+> invisible in the output — the gate does not print what it declined to read.
+
+The exclusion is gone, the eight messages are gone from the working tree and
+from history, and `inbox/processed/` now ships empty with a README saying why.
+The canary described in the previous lesson turned out never to have been
+written down as anything runnable — it was a procedure someone had carried out
+once. It is now [`tools/check-public-selftest.sh`](../tools/check-public-selftest.sh),
+and it plants its file twice: at the repository root, and inside `inbox/`. Run
+against the old exclusion it fails on the second one, which is the whole point
+of having it.
 
 ---
 

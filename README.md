@@ -1,6 +1,6 @@
 # Kontor
 
-Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement for four months — the conventions, about 2,600 lines of shell and Python (1,100 of it the tooling, the rest the eval suite), and the failures that produced both.
+Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement: the conventions, about 2,600 lines of shell and Python (1,100 of it the tooling, the rest the eval suite), and the failures that produced both. It grew — one repository in May 2025, six by that September, eighteen by September 2026 — and the pouch, which is what makes it an arrangement rather than a pile of folders, has only been in use since March 2026.
 
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
@@ -19,17 +19,29 @@ drafting   hyper/qwen3.8-flash        Drafts and correspondence. Cheap hosted ti
 analysis   hyper/glm-5.3              Hard work. Expensive, chosen deliberately.
 
 $ kontor use filing
-kontor: demorun is now filing — ollama/kontor-4b:latest
+kontor: sandbox is now filing — ollama/kontor-4b:latest
+Note: the next distribution resets this. For good: profiles.conf.
 
 $ kontor use analysis
-refused: demorun is local-first; 'analysis' would make a hosted model its default.
+refused: sandbox is local-first; 'analysis' would make a hosted model its default.
   A hosted model here is a per-session decision, not a setting.
   Use:  kontor run analysis "..."   (one-shot)  or  ctrl+m inside crush.
 ```
 
 That distinction is the whole of local-first. With a hosted default, the first question is sent before the thought *which model am I on* arrives; noticing happens on the second prompt, not the first.
 
-Reproduce it from a clone: copy `demo/sandbox/` somewhere outside the repository, then point `KONTOR_CONF` and `KONTOR_PROFILES` at `demo/conf/`.
+The block above is real output, not a dramatisation. Reproduce it from a clone:
+
+```bash
+cp -R demo/sandbox /tmp/sandbox          # the name matters: the branch is
+cd /tmp/sandbox                          # identified by its directory name
+export KONTOR_CONF=/path/to/kontor/demo/conf/branches.conf
+export KONTOR_PROFILES=/path/to/kontor/demo/conf/profiles.conf
+/path/to/kontor/tools/kontor use analysis
+```
+
+Both variables name a **file**, not the directory. Pointed at a directory they fall back to
+`~/.config/kontor/`, and the demo then quietly reports on your real configuration instead.
 
 ## What the eval suite finds
 
@@ -93,6 +105,7 @@ Three rows are about the tests rather than the models, which is the more uncomfo
 | | |
 |---|---|
 | [`tools/check-public.sh`](tools/check-public.sh) | 90 lines. Refuses to push if anything private is present, and refuses to run at all against an empty wordlist. Wired as a `pre-push` hook |
+| [`tools/check-public-selftest.sh`](tools/check-public-selftest.sh) | plants a deny-listed term at the repository root and inside `inbox/`, and fails if the gate lets either through |
 | [`tools/kontor`](tools/kontor) | the profile switcher above, and the local-first guard |
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
@@ -139,4 +152,4 @@ A *Kontor* was a trading house's foreign branch — Bergen, Bruges, Novgorod, th
 
 ---
 
-*Eighteen repositories, 3,925 commits, earliest 2025-05-21; 715 pouch messages delivered, 520 of them acted on and filed. Numbers as of 19 September 2026 — reproduce them with [`tools/census.sh`](tools/census.sh), which prints the definition it used for each.*
+*Eighteen repositories, 3,925 commits. Earliest repository 2025-05-21, newest 2026-09-09; conventions since 2025-07-14, the pouch since 2026-03-02. 715 pouch messages delivered, 520 of them acted on and filed. Numbers as of 20 September 2026 — reproduce them with [`tools/census.sh`](tools/census.sh), which prints the definition it used for each.*

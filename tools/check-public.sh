@@ -30,7 +30,25 @@ VOCAB="${KONTOR_VOCAB:-$HOME/.config/kontor/vocab.txt}"
 BCONF="${KONTOR_CONF:-$HOME/.config/kontor/branches.conf}"
 self=$(basename "$(git rev-parse --show-toplevel)")
 
-files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$' | grep -vE '^inbox/'; }
+# Two exclusions, and only one of them is defensible.
+#
+# check-public.sh excludes itself because it would otherwise match on the
+# patterns it is searching for.
+#
+# inbox/ used to be excluded too, on the reasoning that the pouch is a
+# delivery mechanism rather than content. That reasoning was wrong, and it
+# was wrong in the most expensive possible way: the messages that arrive in
+# inbox/ come FROM the other branches, so they are the likeliest place in
+# this repository for another branch's names and matters to appear -- and
+# they were the one place never scanned. Found 2026-09-20: eight committed
+# and pushed files, carrying between one and seventeen distinct deny-listed
+# terms each. Every "clean" this script had printed was silent about them.
+#
+# The rule this cost, twice now: an exclusion is a claim that a population
+# cannot contain what you are looking for. The deny-list was empty; the
+# inbox was unscanned. Both times the gate reported clean, and both times
+# the reason was the scope, not the content.
+files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$'; }
 
 # 1. the private wordlist — plus every branch name in the instance config.
 # Found 18.09.2026: the deny-list had been empty since it was created, and
