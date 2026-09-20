@@ -117,6 +117,56 @@ of having it.
 
 ---
 
+## Eleven true sentences that had stopped being true
+
+Before publication, every factual claim in `README.md` and `evals/README.md`
+was checked against the command that produces it. Nine held. **Eleven had
+drifted** — every one of them true on the day it was written, none of them
+re-run since:
+
+| claimed | actual |
+|---|---|
+| `check-public.sh` is 57 lines | 90, since the empty-wordlist fix |
+| about 1,200 lines of shell and Python | 2,600; 1,200 was one directory |
+| two of four profiles report *estimate* | one, after a local run the day before |
+| fifteen models across nine vendors | sixteen with a verdict, across ten namespaces |
+| 3,868 commits, 713 pouch messages | 3,925 and 715 |
+| a `./report.py` transcript | missing a column the live command prints |
+| twenty repositories (`architecture.md`) | eighteen |
+| "four months" | matched none of the three dates in the repository |
+| three tasks have no determinable answer | five, listed directly beneath the sentence |
+
+The last one is the one to keep. That sentence carried a hedge, written
+specifically to stop the number going stale:
+
+> *"how many there are in total is what `ls tasks/` says, not this line"*
+
+It went stale anyway, three feet above the five bullets contradicting it. The
+same drift had to be fixed twice on the same day, in two files, because the
+first fix corrected the number without removing the reason a number was there.
+
+> **A warning about drift is not a defence against it.** Either the document
+> derives the figure, or the figure will be wrong. A sentence that apologises
+> in advance for being unreliable is still unreliable.
+
+Two further things this pass established, both of them about method:
+
+**None of these would have failed any check.** The gate scans for private
+material, the oracle checks that verifiers accept correct answers, the
+self-test proves the gate can block. Not one of them has an opinion about
+whether a sentence is still true. Drift of this kind is found by reading, or
+it is not found.
+
+**The checking scaffolding drifts too.** Three times during that pass a
+throwaway verification command gave a confidently wrong answer: a deny-list
+read from the wrong path, reporting hits that were branch names alone; and
+twice a shell `if git … | head` that tested the exit status of `head` rather
+than of `git`, once reporting that data still existed on a server that had in
+fact refused to serve it. Each number looked plausible. The habit that caught
+them was re-running a surprising result a second way before repeating it.
+
+---
+
 ## A retirement, and why the record of it is kept
 
 An early tool was deleted rather than fixed. Its documentation was kept as a tombstone: what it was, the six defects an audit found, why fixing them was still the wrong call, and what survived it.

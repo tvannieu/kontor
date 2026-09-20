@@ -96,9 +96,19 @@ Key:  + passed   o partial   - failed   ~ unstable across epochs   x cut off at 
   20: ollama/kontor-4b  (2026-09-19)  $0 — runs locally
 ```
 
-Read the top two rows. Sixteen models returned a verdict here, across ten vendor namespaces and two harnesses, with a 400-fold spread in what a hosted run costs — $0.0008 to $0.34. They pass nearly everything mechanical, and every one of them that produced an answer fails both tasks that have no determinable answer. Column 15 is a provider-side rate limit rather than a model failure, and is the seventeenth model, with no verdict at all; column 4 ran one profile's tasks only; columns 16–18 are three-epoch runs; column 20 is the local model, run on the filing profile alone, and its two `x` marks are answers cut off at the token cap rather than wrong answers — see [`docs/roadmap.md`](docs/roadmap.md).
+Read the top two rows.
 
-Asked how long a job would take on 256 cores when the measurements cannot support the extrapolation, every model produced a number: **5.05, 8.8, 8.78, ~9, ~9, ~9, 17, 17, 17.2, 17.2, 18, ~34, 35, 53, and 90–100 seconds.** Not one answer said the question could not be settled from the data. Several named the evidence against extrapolating — the core-seconds product rises with core count, so the scaling is visibly degrading — and extrapolated anyway. Paying more does not help: the $0.34 frontier runs fail these two rows exactly as the $0.0008 one does. The best of them hedge well (`claude-sonnet-5` calls its 17 s "an optimistic lower bound"); hedging a number is not declining to give one.
+Sixteen models returned a verdict, across ten vendor namespaces and two harnesses, over a 400-fold spread in what a hosted run costs — $0.0008 to $0.34. They pass nearly everything mechanical. **Every one of them that produced an answer fails both tasks that have no determinable answer.**
+
+Reading the columns: 15 is a provider-side rate limit, not a model failure — a seventeenth model with no verdict at all. 4 ran one profile's tasks only. 16–18 are three-epoch runs. 20 is the local model on the filing profile alone, and its two `x` marks are answers cut off at the token cap rather than wrong answers ([`docs/roadmap.md`](docs/roadmap.md) has that story).
+
+Asked how long a job would take on 256 cores, when the measurements cannot support the extrapolation, every model produced a number:
+
+> **5.05, 8.8, 8.78, ~9, ~9, ~9, 17, 17, 17.2, 17.2, 18, ~34, 35, 53, and 90–100 seconds.**
+
+Not one said the question could not be settled from the data. Several named the evidence against extrapolating — the core-seconds product rises with core count, so the scaling is visibly degrading — and extrapolated anyway.
+
+Paying more does not help. The $0.34 frontier runs fail these two rows exactly as the $0.0008 one does. The best of them hedge well: `claude-sonnet-5` calls its 17 s "an optimistic lower bound". **Hedging a number is not declining to give one.**
 
 Running one model three times makes the point sharper than running sixteen once. At `temperature=0`, `deepseek-v4-flash` answered the same question with **37 s, 17.2 s and 106 s** — a factor of six inside a single model. The models are not uncertain in their answers. They are uncertain only in their output.
 
@@ -113,11 +123,17 @@ Three rows are about the tests rather than the models, which is the more uncomfo
 ## What already exists
 
 Automatic model routing is a solved problem and this is not an attempt at one.
-[OpenRouter's Auto Router](https://openrouter.ai/docs/guides/routing/routers/auto-router) classifies a prompt and picks from a curated pool, with cost caps, an allow-list, and an auditable record of which model actually ran. [Warp](https://docs.warp.dev/agents/inference/model-choice/) ships `auto`, `auto-efficient`, `auto-genius` and `auto-open`, and lets you [define your own routers](https://docs.warp.dev/agents/inference/custom-routers/) by task complexity or by classification prompt, shared across a team. Routing by data sensitivity is an established gateway pattern too: classify the request, keep the sensitive ones on a local model, fail closed rather than falling back to the cloud.
+- [**OpenRouter's Auto Router**](https://openrouter.ai/docs/guides/routing/routers/auto-router) classifies a prompt and picks from a curated pool, with cost caps, an allow-list, and an auditable record of which model actually ran.
+- [**Warp**](https://docs.warp.dev/agents/inference/model-choice/) ships `auto`, `auto-efficient`, `auto-genius` and `auto-open`, and lets you [define your own routers](https://docs.warp.dev/agents/inference/custom-routers/) by task complexity or by classification prompt, shared across a team.
+- **Routing by data sensitivity** is an established gateway pattern: classify the request, keep the sensitive ones on a local model, fail closed rather than falling back to the cloud.
 
 All of those optimise a **request**. The switcher here binds a **default** to a **repository**, and its only clever behaviour is refusing. That is a much narrower thing on a different axis: not *which model is best for this prompt*, but *what can I do by accident in this folder at two in the morning*. Ninety-four lines, and the interesting half is the `refused:` branch.
 
-The obvious next step — classify the work automatically and route it — is the one place here with evidence pointing the other way. [`evals/classifier/`](evals/classifier/) asks nine questions about which profile a piece of work belongs to, and five models answered. On the cases with a determined answer they scored **25 of 25**. On the underdetermined ones they split, and they split expensively. Asked where *"clean up the project folder"* belongs, **four of the five reached for `filing`** — the reading that means renaming things, not the one that means deciding what to delete. One of those four also said it was unclear. **The other three just answered.**
+The obvious next step is to classify the work automatically and route it. That is the one place here with evidence pointing the other way.
+
+[`evals/classifier/`](evals/classifier/) asks nine questions about which profile a piece of work belongs to; five models answered. On the cases with a determined answer they scored **25 of 25** — routing well-specified work is not the hard part.
+
+On the underdetermined ones they split, and they split expensively. Asked where *"clean up the project folder"* belongs, **four of the five reached for `filing`** — the reading that means renaming things, not the one that means deciding what to delete. One of the four also said it was unclear. **The other three just answered.**
 
 So: not often wrong, confidently wrong exactly where being wrong is irreversible, and silent either way. A router built on that needs a way to see when it guessed, and "escalate if unsure" is a word in a prompt, not a mechanism. That is why the switcher asks instead of guessing, and it is the one design decision here that was made from measurement rather than taste.
 
@@ -138,7 +154,9 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 
 Configuration — which branches exist, which are local-first, which model each profile implies — lives in `~/.config/kontor/`, outside every repository. The scripts are generic; the lists they act on are yours.
 
-Each branch carries a `CLAUDE.md` and an `AGENTS.md`. The first holds the guidelines and the second is a short pointer to it — the filename is an accident of tooling rather than a dependency. This was built with Claude Code, which loads a file of that name automatically; `AGENTS.md` is the vendor-neutral name other harnesses look for. Both exist so a session finds the same text whichever harness it arrives in, and that text names no model. Swapping one model for another should not mean rewriting the documentation around it, which is the same reason the profile switcher and [`evals/`](evals/) exist at all.
+Each branch carries a `CLAUDE.md` holding its guidelines, and an `AGENTS.md` that is a short pointer to it. The filename is an accident of tooling, not a dependency: this was built with Claude Code, which loads a file of that name automatically, while `AGENTS.md` is the vendor-neutral name other harnesses look for.
+
+Both exist so a session finds the same text whichever harness it arrives in — and that text names no model. Swapping one model for another should not mean rewriting the documentation around it, which is the same reason the switcher and [`evals/`](evals/) exist at all.
 
 ## Three things that cost something to learn
 
