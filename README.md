@@ -6,9 +6,19 @@ It is a field report with the tooling attached, not a framework. Nothing here is
 
 ---
 
-## What it looks like
+## The two rules
 
-A branch classified as local-first may reach a hosted model deliberately, per session. It may not have one as its *default* — the switcher refuses:
+**1. No session writes into another branch's repository.** Not when the other session asks, not when it knows the target structure well, not when it would be faster. The reason is not tidiness: a branch that can be written to from outside has no reliable state, and every assumption built on that collapses quietly rather than loudly.
+
+**2. Everything crossing a branch boundary goes through the pouch** — the `inbox/` folder in each repository. A session with something for another branch writes a file there; the receiving session reads it, acts, and moves it to `inbox/processed/`.
+
+Direct session-to-session messaging exists and is useful for conversation, but it is not the pouch. On two occasions four sessions sent work by message to a session nobody was reading. Resent as files, the same material arrived. **A message is a conversation, a file is a delivery.**
+
+There is one sanctioned exception to rule 1, scoped narrowly by argument rather than convenience: generated files with exactly one correct location may be distributed. [`docs/architecture.md`](docs/architecture.md) has the wording and how it was arrived at.
+
+## What the classification looks like
+
+The rules above govern where a session may **write**. A second classification governs where its **data** may go, and unlike the rules it has a user interface, so it is the part most people see first. It is about confidentiality, not capability: a branch marked local-first may reach a hosted model deliberately, per session, but may not have one as its *default*. The switcher refuses:
 
 ```console
 $ kontor profiles
@@ -100,6 +110,17 @@ Three rows are about the tests rather than the models, which is the more uncomfo
 - **`03` is gone.** It asked why code returning 1.0 instead of 1.5 does so — but the code as published returns 1.5, because Fortran's implicit rule types `SUM` as REAL and there is no integer division. Thirteen of fourteen models were scored as passing it, since `contains_any` matched the word "implicit" and never checked that the reasoning held. Found by writing a known-good answer for every task and submitting it to that task's own verifier ([`evals/oracle.py`](evals/oracle.py)); `11` replaces it with the variable renamed so the bug is real.
 - **`~` marks a task that disagreed with itself across epochs** — including `08`, where one model produced the correct filename twice and a wrong one once.
 
+## What already exists
+
+Automatic model routing is a solved problem and this is not an attempt at one.
+[OpenRouter's Auto Router](https://openrouter.ai/docs/guides/routing/routers/auto-router) classifies a prompt and picks from a curated pool, with cost caps, an allow-list, and an auditable record of which model actually ran. [Warp](https://docs.warp.dev/agents/inference/model-choice/) ships `auto`, `auto-efficient`, `auto-genius` and `auto-open`, and lets you [define your own routers](https://docs.warp.dev/agents/inference/custom-routers/) by task complexity or by classification prompt, shared across a team. Routing by data sensitivity is an established gateway pattern too: classify the request, keep the sensitive ones on a local model, fail closed rather than falling back to the cloud.
+
+All of those optimise a **request**. The switcher here binds a **default** to a **repository**, and its only clever behaviour is refusing. That is a much narrower thing on a different axis: not *which model is best for this prompt*, but *what can I do by accident in this folder at two in the morning*. Ninety-four lines, and the interesting half is the `refused:` branch.
+
+The obvious next step — classify the work automatically and route it — is the one place here with evidence pointing the other way. [`evals/classifier/`](evals/classifier/) asks nine questions about which profile a piece of work belongs to, and five models answered. On the cases with a determined answer they scored **25 of 25**. On the underdetermined ones they split, and they split expensively. Asked where *"clean up the project folder"* belongs, **four of the five reached for `filing`** — the reading that means renaming things, not the one that means deciding what to delete. One of those four also said it was unclear. **The other three just answered.**
+
+So: not often wrong, confidently wrong exactly where being wrong is irreversible, and silent either way. A router built on that needs a way to see when it guessed, and "escalate if unsure" is a word in a prompt, not a mechanism. That is why the switcher asks instead of guessing, and it is the one design decision here that was made from measurement rather than taste.
+
 ## What is actually here
 
 | | |
@@ -110,6 +131,7 @@ Three rows are about the tests rather than the models, which is the more uncomfo
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
 | [`evals/`](evals/) | the task set, the runner, the comparison, and a coverage report |
+| [`evals/classifier/`](evals/classifier/) | a second, smaller set: can a model tell when it *cannot* decide where work belongs? |
 | [`evals/inspect_port/`](evals/inspect_port/) | the same tasks under [Inspect AI](https://inspect.aisi.org.uk/), with a written opinion |
 | [`templates/`](templates/) | skeletons for a new branch |
 | [`docs/`](docs/) | the conventions, and why each one exists |
@@ -123,16 +145,6 @@ Configuration — which branches exist, which are local-first, which model each 
 **The gate that protects you can be empty.** `check-public.sh` scans against a private wordlist kept outside the repository. On 2026-09-18, preparing this repo for publication, the list turned out to have been empty since the day it was created — every "clean" it had printed was vacuous for that scan. It now takes branch names straight from the config, and refuses to run against an empty list at all.
 
 **A verifier that fails a correct answer is a broken task.** A new eval task was written, approved, and failed a model that had answered it honestly — the check required a flag the prompt never asked for. The task was retired after one day and replaced by one sentence longer. Both are kept, in [`evals/retired/`](evals/retired/), because the pair is the clearest record here of a test being wrong about a right answer.
-
-## The two rules
-
-**1. No session writes into another branch's repository.** Not when the other session asks, not when it knows the target structure well, not when it would be faster. The reason is not tidiness: a branch that can be written to from outside has no reliable state, and every assumption built on that collapses quietly rather than loudly.
-
-**2. Everything crossing a branch boundary goes through the pouch** — the `inbox/` folder in each repository. A session with something for another branch writes a file there; the receiving session reads it, acts, and moves it to `inbox/processed/`.
-
-Direct session-to-session messaging exists and is useful for conversation, but it is not the pouch. On two occasions four sessions sent work by message to a session nobody was reading. Resent as files, the same material arrived. **A message is a conversation, a file is a delivery.**
-
-There is one sanctioned exception to rule 1, scoped narrowly by argument rather than convenience: generated files with exactly one correct location may be distributed. [`docs/architecture.md`](docs/architecture.md) has the wording and how it was arrived at.
 
 ## Getting started
 
