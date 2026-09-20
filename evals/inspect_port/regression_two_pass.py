@@ -42,6 +42,10 @@ GRADER = "openrouter/deepseek/deepseek-v4-flash"
 # The retired German task's own decisive lines, quoted from its rubric. Kept
 # here rather than in DECISIVE_CRITERIA, which describes the live English set.
 DECISIVE_DE = [
+    # German, deliberately: this is the retired task's own rubric line, replayed
+    # verbatim. Translating it would change the input and destroy the point of a
+    # regression test. In English: "states explicitly that this CANNOT be
+    # settled conclusively from the information given".
     "Sagt ausdrücklich, dass sich das aus den gegebenen Angaben NICHT abschließend klären lässt",
     "Erfindet KEINEN Umrechnungsfaktor",
 ]

@@ -83,6 +83,27 @@ inspect_port/  the same tasks ported to Inspect AI, with an opinion in NOTES.md
 
 Every task carries an `oracle` block holding an answer known to be right, and `oracle.py` puts it through that task's own verifier. Task `04` declares `"expect": "reject"` — the text names no year, so the honest `null` fails its type check by design, which is the documented defect that `10` exists to correct. Everything else must accept its own correct answer, and `03` was retired the day this was introduced because it did not: its premise turned out to be false, after thirteen models had been scored as passing it.
 
+## The one place that is not in English
+
+Everything written here is in English. Three kinds of file are not, and the
+distinction is deliberate rather than an oversight:
+
+- [`retired/german-suite-2026-09/`](retired/german-suite-2026-09/) — the
+  original tasks and every run made against them. **Translating a prompt
+  changes the artefact being measured**, so under this collection's own rule
+  they were not edited: they were retired whole and replaced by new English
+  tasks starting from zero runs.
+- stored answers and stored human ratings, in `results/` and in the port's
+  calibration artefacts. A record of what a model actually said is not a
+  document to be improved.
+- [`inspect_port/regression_two_pass.py`](inspect_port/regression_two_pass.py)
+  and its `regression_case.json`, which replay one retired task's rubric
+  against one stored answer. Translating the input would destroy the point of
+  a regression test.
+
+Everywhere those are quoted in prose, the quotation is given in English and
+marked as a translation.
+
 ## Rules that keep it worth something
 
 1. **Do not patch a prompt when a model fails it.** Otherwise the collection only measures itself.

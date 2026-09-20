@@ -123,10 +123,11 @@ def _build_criterion(task_id, rubric):
     starts one with "Bonus:"), and the first version of this split missed
     that distinction: it graded a bare, correct "1962" down to P for not
     also volunteering the bonus remark, when the human rating on record for
-    that exact answer shape was a full pass ("Kein Bonus-Hinweis..., aber
-    das ist optional" — HANDOVER_evals_2026-09-16.md, since removed once its
-    content was acted on). Secondary and Bonus are not the same thing:
-    Secondary still moves C vs P, Bonus never does.
+    that exact answer shape was a full pass ("no bonus remark..., but that
+    is optional", translated from the German it was written in — a handover
+    note of 2026-09-16, since removed once its content was acted on).
+    Secondary and Bonus are not the same thing: Secondary still moves C vs P,
+    Bonus never does.
 
     Falls back to a flat list for a task with no DECISIVE_CRITERIA entry
     (grade holistically; see kontor_manual's instructions)."""
