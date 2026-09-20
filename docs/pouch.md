@@ -17,11 +17,11 @@ The distinction is not about reliability of transport. A message addresses *a se
 ## Format
 
 ```markdown
-**Von:** <sending branch>
-**An:** <receiving branch>
-**Datum:** <YYYY-MM-DD>
-**Betreff:** <one line>
-**Erledigt:** [ ]
+**From:** <sending branch>
+**To:** <receiving branch>
+**Date:** <YYYY-MM-DD>
+**Subject:** <one line>
+**Done:** [ ]
 
 ---
 
@@ -31,7 +31,7 @@ The distinction is not about reliability of transport. A message addresses *a se
 Four conventions make it work:
 
 - **The subject line is a claim, not a topic.** "Config distributed, three branches missing" rather than "config".
-- **`Erledigt` is checked by the receiver**, never the sender.
+- **`Done` is checked by the receiver**, never the sender.
 - **Processed means processed.** A file moves to `processed/` when it has been acted on, not when it has been read.
 - **Filenames are dated and descriptive**, because a directory listing is the index.
 

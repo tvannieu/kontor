@@ -1,5 +1,18 @@
 # CLAUDE.md — Kontor
 
+The full working guidelines for this repository, and the single source of
+truth. [`AGENTS.md`](AGENTS.md) beside it is a short pointer here, never a
+second copy.
+
+**Why both.** The filename is an accident of tooling, not a claim about the
+content: the work was done with Claude Code, which loads a file of this name
+automatically, while `AGENTS.md` is the vendor-neutral name other harnesses
+look for. Nothing in the conventions below depends on which model reads them —
+that is the same principle as the profile switcher and the eval suite, which
+exist so that one model can be swapped for another without rewriting the
+documentation around it. Whichever harness a session arrives in, it should
+reach the same text, and that text names no model.
+
 This repository is the **system**: the conventions, scripts and documentation that the branches around it follow. It is **destined to be public** and currently private while it is written.
 
 `REPO_MANIFEST.md`, when it is beside this file, is the map of the whole arrangement — generated and distributed, never committed, so a fresh clone does not have it. [`docs/adopting.md`](docs/adopting.md) says where it comes from.

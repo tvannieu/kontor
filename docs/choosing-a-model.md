@@ -4,13 +4,13 @@ The question this is meant to answer: *which model should I open a branch of typ
 
 **It is not answered yet.** This file says what is measured, what is not, and what the method is, rather than presenting a recommendation the evidence does not support.
 
-That is not modesty. The evaluation suite's central test is whether a model admits there is no answer instead of producing a plausible one; writing a confident selection guide on eight runs would fail the suite's own criterion.
+That is not modesty. The evaluation suite's central test is whether a model admits there is no answer instead of producing a plausible one; writing a confident selection guide on twenty runs would fail the suite's own criterion.
 
 ## What exists
 
 [`../evals/`](../evals) holds a fixed set of tasks, re-run unchanged against each new model, at temperature zero, with results versioned — including the bad runs, because a discarded run is a dishonest record.
 
-How many tasks there are, and how many are machine-checkable, is `tasks/`'s own count — not a number to keep in sync here by hand. A fixed count in this sentence already drifted once: the collection grew from seven tasks to nine and this file, like `evals/README.md`, still said seven. **Three deliberately have no determinable answer** and measure whether the model says so or invents something plausible.
+How many tasks there are, and how many are machine-checkable, is `tasks/`'s own count — not a number to keep in sync here by hand. A fixed count in this sentence has already drifted twice: the collection grew from seven tasks to nine while this file still said seven, and the count of trap tasks stood at three here and in `evals/README.md` while five were listed beneath it. **Five have no determinable answer or contain a trap** — `ls ../evals/tasks/` is the authority, not this line — and they measure whether the model says so or invents something plausible.
 
 ## The bridge
 
@@ -41,7 +41,43 @@ The first version of this tool did not enforce that and cheerfully made a hosted
 
 - Enough runs to say anything about a tier. A handful of models is an impression, not a measurement.
 - Task sets for branch classes other than the scientific and code ones.
-- ~~A mapping from task class to confidentiality class~~ Now measurable rather than asserted: [`../evals/coverage.py`](../evals/coverage.py) checks each profile's assigned model against the tasks carrying that profile, using only committed runs in `results/`, and says per profile whether the assignment is *belegt* or a *Schätzung*. Its second section is the confidentiality axis proper — for every profile pointing at a hosted model, whether any **local** model is evidenced on that profile's tasks at all, i.e. whether a local-first branch could do that class of work with measured capability or would have to guess. As of 2026-09-18, after `run.py` learned to go through `crush run` for the one provider only it reaches: drafting's model is evidenced on all three of its tasks (one failure — it hedged the unanswerable question well, then named a number anyway); reading on one of three; filing on one of three, with a failure on record. Analysis's assigned model (`hyper/glm-5.3`) rejects every request through crush with `bad request: Invalid input` — a one-word probe included, while its `-flash` sibling answers — so four attempts produced no verdict at all. Chased as far as it can be from here: the model ID matches crush's cached catalog and `crush models` lists it for this account; lowering `max_tokens` and clearing the reasoning flag (in scratch copies of the config only) change nothing; crush's log shows a generic upstream `fantasy.ProviderError` with no request detail. Every config-side lever is ruled out — the rejection is on the provider's side, for this model. That is a finding about the instance, not about capability, and it is the kind the report exists to surface: the profile has been pointing at a model that does not currently answer, and nothing else would have said so. Its `-flash` sibling, run on the same four analysis tasks as a stand-in, passes both machine-checked ones (03, 07) and fails both epistemic ones — asserts a cause on 01 with "Fast sicher", names "≈ 8,8 s" on 02 with no caveat at all. Two of four, the same shape as every hosted model so far: competent on the checkable work, wrong in exactly the way this suite exists to catch. The profile was repointed to `glm-5.3-flash` on 2026-09-18, the reason recorded beside the line in `profiles.conf`, with a note to return to `glm-5.3` once it answers. Runs through crush are marked as such in the result (`geschirr`): the temperature is the provider's default, not 0, and crush's agent system prompt precedes the task — comparable among themselves, not with the direct API runs.
+
+### The mapping from task class to confidentiality class
+
+No longer missing, and no longer asserted. [`../evals/coverage.py`](../evals/coverage.py)
+checks each profile's assigned model against the tasks carrying that profile,
+using only committed runs in `results/`, and reports per profile whether the
+assignment is **evidenced** or an **estimate**. Its second section is the
+confidentiality axis proper: for every profile pointing at a hosted model,
+whether any *local* model is evidenced on those tasks at all — that is, whether
+a local-first branch could do that class of work with measured capability or
+would simply have to guess.
+
+**The instance finding that came out of it.** `analysis` pointed at
+`hyper/glm-5.3`, which rejected every request through crush with `bad request:
+Invalid input` — a one-word probe included, while its `-flash` sibling answered.
+Four attempts, no verdict. Chased as far as it can be from here: the model ID
+matches crush's cached catalog and `crush models` lists it for this account;
+lowering `max_tokens` and clearing the reasoning flag change nothing; crush's
+log shows a generic upstream provider error with no request detail. Every
+config-side lever is ruled out, so the rejection is on the provider's side.
+
+That is a finding about the instance rather than about capability, and it is
+exactly what the report exists to surface: **the profile had been pointing at a
+model that does not answer, and nothing else would have said so.** Repointed to
+`glm-5.3-flash` on 2026-09-18, the reason recorded beside the line in
+`profiles.conf`, with a note to return once it answers.
+
+Run on the same four tasks as a stand-in, `glm-5.3-flash` passes both
+machine-checked ones and fails both epistemic ones — it asserts a cause on `01`
+as good as certain, and names a figure on `02` with no caveat at all. Two of
+four: competent on the checkable work, wrong in precisely the way this suite
+exists to catch.
+
+Runs made through crush carry a `harness` field in the result, because the
+temperature is the provider's default rather than 0 and crush's agent system
+prompt precedes the task. They are comparable among themselves, not with the
+direct API runs.
 
 Until those runs exist, the model choice per branch in the distributed configuration is an **estimate**, and is marked as one — `coverage.py` says which ones.
 

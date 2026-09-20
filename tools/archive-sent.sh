@@ -4,7 +4,7 @@
 #
 # Once a drafted piece of correspondence has actually gone out, copies every
 # file out of its drafts folder into wherever the receiving repo keeps its
-# sent-correspondence record, prefixed with today's date and a GESENDET
+# sent-correspondence record, prefixed with today's date and a SENT
 # marker, then removes the now-empty drafts folder. Judgement about *which*
 # repo and *which* category a piece of correspondence belongs to stays with
 # the session — this script only does the part that's identical every time.
@@ -13,7 +13,7 @@
 #   archive-sent.sh <draft-dir> <archive-dir>
 #
 # Convention:
-#   <archive-dir>/YYYY-MM-DD_GESENDET_<original-stem>.<ext>
+#   <archive-dir>/YYYY-MM-DD_SENT_<original-stem>.<ext>
 #
 # A file already at the destination is left alone and reported, never
 # overwritten — a move into a collection folder is a replacement, not a
@@ -29,11 +29,15 @@ archive_dir="${2:?Usage: archive-sent.sh <draft-dir> <archive-dir>}"
 regular=()
 for f in "$draft_dir"/*; do
     [ -f "$f" ] || continue
-    [ "$(basename "$f")" = "00_LIESMICH.txt" ] && continue
+    # The register is not correspondence. Both names are skipped: the folders
+    # were called 00_LIESMICH.txt before the documentation was put into English
+    # on 2026-09-20, and a rename on disk is the operator's to do, not this
+    # script's to assume.
+    case "$(basename "$f")" in 00_README.txt|00_LIESMICH.txt) continue;; esac
     regular+=("$f")
 done
 if [ "${#regular[@]}" -eq 0 ]; then
-    echo "No files to archive in $draft_dir (looked past 00_LIESMICH.txt)" >&2
+    echo "No files to archive in $draft_dir (looked past the register, 00_README.txt)" >&2
     exit 1
 fi
 
@@ -46,9 +50,9 @@ for f in "${regular[@]}"; do
     if [[ "$base" == *.* && "$base" != .* ]]; then
         stem="${base%.*}"
         ext="${base##*.}"
-        dest="$archive_dir/${stamp}_GESENDET_${stem}.${ext}"
+        dest="$archive_dir/${stamp}_SENT_${stem}.${ext}"
     else
-        dest="$archive_dir/${stamp}_GESENDET_${base}"
+        dest="$archive_dir/${stamp}_SENT_${base}"
     fi
     if [ -e "$dest" ]; then
         echo "  SKIP (already exists): $(basename "$dest")" >&2
@@ -68,4 +72,4 @@ rm -rf "$draft_dir"
 echo "Removed $draft_dir"
 echo
 echo "Not done automatically — add to the recipient's register by hand:"
-echo "  ${stamp} GESENDET — archived to ${archive_dir}"
+echo "  ${stamp} SENT — archived to ${archive_dir}"

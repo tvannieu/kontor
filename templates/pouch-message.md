@@ -1,4 +1,4 @@
-**Von:** <sending branch> **An:** <receiving branch> **Datum:** <YYYY-MM-DD> **Betreff:** <a claim, not a topic — "config distributed, three branches missing", not "config"> **Erledigt:** [ ]
+**From:** <sending branch> **To:** <receiving branch> **Date:** <YYYY-MM-DD> **Subject:** <a claim, not a topic — "config distributed, three branches missing", not "config"> **Done:** [ ]
 
 ---
 

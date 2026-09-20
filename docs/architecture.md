@@ -1,6 +1,6 @@
 # Architecture
 
-A **branch** is one git repository with one agent session and one domain. Twenty of them on one laptop. They are not folders in a project; they are separate establishments that write to each other.
+A **branch** is one git repository with one agent session and one domain. Eighteen of them on one laptop, as of the last [`census.sh`](../tools/census.sh) — that script is the authority on the number, not this sentence. They are not folders in a project; they are separate establishments that write to each other.
 
 ## The two rules
 

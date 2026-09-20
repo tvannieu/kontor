@@ -138,6 +138,8 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 
 Configuration — which branches exist, which are local-first, which model each profile implies — lives in `~/.config/kontor/`, outside every repository. The scripts are generic; the lists they act on are yours.
 
+Each branch carries a `CLAUDE.md` and an `AGENTS.md`. The first holds the guidelines and the second is a short pointer to it — the filename is an accident of tooling rather than a dependency. This was built with Claude Code, which loads a file of that name automatically; `AGENTS.md` is the vendor-neutral name other harnesses look for. Both exist so a session finds the same text whichever harness it arrives in, and that text names no model. Swapping one model for another should not mean rewriting the documentation around it, which is the same reason the profile switcher and [`evals/`](evals/) exist at all.
+
 ## Three things that cost something to learn
 
 **A check reports success over a population it defined itself.** A distribution script had a `--check` mode that said *all copies match* for months. Its list of targets held three branches; sixteen repositories carried the file. The thirteen it had never heard of sat three versions behind. → [`docs/lessons.md`](docs/lessons.md)

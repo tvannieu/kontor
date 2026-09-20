@@ -4,7 +4,7 @@ Two channels are already documented: the pouch (`inbox/`, branch-to-branch, see 
 
 ## What it is
 
-`~/Desktop/_Offen_Entwuerfe/` — one subfolder per recipient. Each holds drafts of things addressed to people outside the system entirely: letters, emails, applications, forms. State: *finished enough to review, not yet sent.* Each recipient folder carries its own register, `00_LIESMICH.txt`, with sections for what was finished today, what's still open, what's parked, what's waiting on a reply, and any dates that matter.
+`~/Desktop/_Open_Drafts/` — one subfolder per recipient. Each holds drafts of things addressed to people outside the system entirely: letters, emails, applications, forms. State: *finished enough to review, not yet sent.* Each recipient folder carries its own register, `00_README.txt`, with sections for what was finished today, what's still open, what's parked, what's waiting on a reply, and any dates that matter.
 
 Nothing about *which* recipients exist belongs in this repository — same reasoning as the absence of a branch roster in [the README](../README.md#branch-names): a list of plausible recipients says almost exactly what the real ones would.
 
@@ -18,17 +18,27 @@ Nothing about *which* recipients exist belongs in this repository — same reaso
 
 ## Before adding anything
 
-Read `00_LIESMICH.txt` in the recipient's folder first. If the folder doesn't exist yet, that is itself informative — check with the operator before creating one, rather than guessing at a recipient name.
+Read `00_README.txt` in the recipient's folder first. If the folder doesn't exist yet, that is itself informative — check with the operator before creating one, rather than guessing at a recipient name.
 
 ## Once something is actually sent
 
-Two branches arrived at the same rule independently before either of them wrote it down: once a draft has gone out, its text is copied into whichever branch owns that relationship, named `YYYY-MM-DD_GESENDET_<what it was>.<ext>` (an optional matching `_QUELLE.txt` may hold the rationale), and the recipient's Desktop folder is **deleted**, not left marked done. A folder still sitting there is a claim that something is still open.
+Two branches arrived at the same rule independently before either of them wrote it down: once a draft has gone out, its text is copied into whichever branch owns that relationship, named `YYYY-MM-DD_SENT_<what it was>.<ext>` (an optional matching `_SOURCE.txt` may hold the rationale), and the recipient's Desktop folder is **deleted**, not left marked done. A folder still sitting there is a claim that something is still open.
 
 [`tools/archive-sent.sh`](../tools/archive-sent.sh) does the mechanical half of that — copy with the date prefix, skip rather than overwrite if a copy already exists there, delete the drafts folder. It does not decide which repository or which category a piece of correspondence belongs to, and it does not touch the register; both stay judgement calls for the session:
 
 ```
 tools/archive-sent.sh <draft-dir> <archive-dir>
 ```
+
+## A note on the names
+
+This channel grew before the documentation did, and it grew in German: the
+folder was `_Offen_Entwuerfe/`, the register `00_LIESMICH.txt`, the archive
+prefix `GESENDET`. The names above are the English ones, which is what
+[`tools/archive-sent.sh`](../tools/archive-sent.sh) now writes. It still
+recognises the old register name when reading, because renaming folders on a
+desktop is the operator's job and not a script's assumption — but nothing new
+is created with the German names.
 
 ---
 ← [README](../README.md) · [The pouch](pouch.md)
