@@ -15,7 +15,11 @@ Set TypingSpeed 55ms
 Set Shell bash
 
 Hide
-Type "export PS1='$ ' KONTOR_CONF=$(cd ../conf && pwd)/branches.conf; clear" Enter
+# Both variables, and both naming a FILE. KONTOR_CONF alone was not enough:
+# `kontor profiles` then fell back to ~/.config/kontor/profiles.conf and the
+# recording would have shown the real instance's model assignments -- which is
+# the one thing demo/ exists to prevent.
+Type "export PS1='$ ' KONTOR_CONF=$(cd ../conf && pwd)/branches.conf KONTOR_PROFILES=$(cd ../conf && pwd)/profiles.conf; clear" Enter
 Show
 
 Sleep 700ms
