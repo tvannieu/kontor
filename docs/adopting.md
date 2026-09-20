@@ -31,9 +31,14 @@ What's there and what it gives you:
 
 None of this lives in git, anywhere:
 
-- `~/.config/kontor/branches.conf` — which branches exist, which are local-first, which are read-only. `tools/kontor.conf.example` shows the shape.
-- `~/.config/kontor/deny.txt` — the private wordlist `check-public.sh` refuses to run without. Never in a repository, for the reason the README gives: a public file enumerating the names you're protecting publishes the names.
-- `~/.config/kontor/profiles.conf` — task-profile-to-model mapping, if you're using `tools/kontor` (see `choosing-a-model.md`).
+- `~/.config/kontor/branches.conf` — which branches exist, which are local-first, which are read-only. Shape: [`tools/kontor.conf.example`](../tools/kontor.conf.example).
+- `~/.config/kontor/deny.txt` — the private wordlist: people, organisations, matters. Shape: [`tools/deny.txt.example`](../tools/deny.txt.example).
+- `~/.config/kontor/vocab.txt` — the domain vocabulary: the *kinds* of matter you handle, which identify them even with every name removed. Shape: [`tools/vocab.txt.example`](../tools/vocab.txt.example).
+- `~/.config/kontor/profiles.conf` — task-profile-to-model mapping, if you're using `tools/kontor`. Shape: [`tools/profiles.conf.example`](../tools/profiles.conf.example), reasoning in [`choosing-a-model.md`](choosing-a-model.md).
+
+**`check-public.sh` refuses to run without both `deny.txt` and `vocab.txt`**, and a gate that cannot run blocks the push. That is the intended behaviour — a scan that cannot run is not a pass — but it means these two are not optional extras. This guide omitted `vocab.txt` until 2026-09-20, so anyone who had followed it would have reached step 5 with a gate that refused every push and no indication why.
+
+Neither file ever enters a repository. A public file enumerating the names you are protecting publishes the names; a public file enumerating the kinds of matter describes them nearly as well.
 
 ## 5. Distribute, then work independently
 

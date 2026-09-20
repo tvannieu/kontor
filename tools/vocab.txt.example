@@ -1,0 +1,26 @@
+# vocab.txt — domain vocabulary. check-public.sh refuses to run without it.
+#
+# COPY THIS TO ~/.config/kontor/vocab.txt AND FILL IT IN. Like deny.txt it
+# stays outside every repository: a published list of the KINDS of matter you
+# handle describes them nearly as well as the names would.
+#
+# This is the second line of defence. deny.txt catches the names; this
+# catches the subject matter that would identify them even with every name
+# removed — a sentence can leak a situation without leaking a person.
+#
+# One extended-regex alternative per line, matched case-insensitively
+# anywhere in the text (not whole-word, unlike deny.txt). Blank lines and
+# lines starting with # are ignored.
+#
+# The shape, with deliberately generic placeholders:
+#
+#   <matter A term>|<synonym>|<the word a stranger would use>
+#   <matter B term>|<synonym>
+#   <matter C term>|<abbreviation>
+#
+# Real entries look like the above with the placeholders replaced by the
+# handful of words that would identify each kind of matter on sight. Three to
+# six lines is usually enough; this is not a thesaurus.
+#
+# Write the vocabulary of the matters YOUR branches actually handle. The
+# examples above are illustrative and are not what this instance uses.

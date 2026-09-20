@@ -1,0 +1,27 @@
+# deny.txt — the private wordlist check-public.sh refuses to run without.
+#
+# COPY THIS TO ~/.config/kontor/deny.txt AND FILL IT IN. Never commit the
+# filled-in version, to this repository or any other: a public file listing
+# the names you are protecting publishes the names.
+#
+# One term per line. Blank lines and lines starting with # are ignored.
+# Matching is whole-word and case-insensitive, so ordinary words are safe to
+# list. A branch named after an ordinary noun will not match that noun with a
+# suffix attached, but it WILL match every innocent use of the bare word.
+# That false positive is the price of catching the real one, and it is worth
+# paying: this repository has twice reworded innocent prose rather than
+# weaken the list.
+#
+# Branch names do NOT belong here. check-public.sh reads those straight from
+# branches.conf, including hyphen/underscore variants, so that a branch can
+# never be missed because nobody remembered to type it. This file is for
+# everything the config does not already know:
+#
+#   - people: correspondents, colleagues, family, opposing parties
+#   - organisations: employers, clients, schools, authorities, insurers
+#   - matters: the short name you use for an ongoing case or process
+#   - places specific enough to identify a person
+#
+# If the gate blocks on a term here and the text is genuinely innocent,
+# reword the text. Do not remove the term. That trade has been made twice in
+# this repository's history and the reword was the right call both times.
