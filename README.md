@@ -4,7 +4,7 @@ Eighteen git repositories on one laptop, one agent session each, and one hard ru
 
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
-The tooling is also meant to be useful on its own. Each script in [`tools/`](tools/) is a single file that takes its configuration from outside the repository and can be lifted out without the rest. Most need nothing but git and a shell. Three need something specific: `kontor` and the crush distributor need [`crush`](https://github.com/charmbracelet/crush) and Ollama, and `mail-reader.py` needs macOS, since it drives Mail.app and the Keychain.
+The tooling is also meant to be useful on its own. Each script in [`tools/`](tools/) is a single file that takes its configuration from outside the repository and can be lifted out without the rest. Most need nothing but git and a shell. Some need something specific: `kontor` and the crush distributor need [`crush`](https://github.com/charmbracelet/crush) and Ollama; `mail-reader.py` and `ocr_vision.swift` need macOS, for Mail.app and the Keychain in the first case and Apple's Vision framework in the second.
 
 ---
 
@@ -150,6 +150,8 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
 | [`tools/mail-reader.py`](tools/mail-reader.py) | read and search Mail.app from the command line, find a message over IMAP by sender, subject or date, and archive it as a raw `.eml`. Mail.app and IMAP number their messages differently, so `find` returns the IMAP UID that `archive` needs; passing a `list` id to `archive` was reported as a bug twice. Tested against a fake server, never real mail |
 | [`tools/archive-sent.sh`](tools/archive-sent.sh) | files a sent draft into the record with a date prefix, skips rather than overwrites, and removes the drafts folder |
+| [`tools/letter_pdf.py`](tools/letter_pdf.py) | a DIN 5008 letter as a PDF, written by hand with no dependencies. The sender block lives in a config file outside the repository, and it refuses to run without one rather than fall back to a default sender |
+| [`tools/ocr_vision.swift`](tools/ocr_vision.swift) | OCR the pages of a PDF with Apple's Vision framework, locally, macOS only |
 | [`evals/`](evals/) | the task set, the runner, the comparison, and a coverage report |
 | [`evals/classifier/`](evals/classifier/) | a second, smaller set: can a model tell when it *cannot* decide where work belongs? |
 | [`evals/inspect_port/`](evals/inspect_port/) | the same tasks under [Inspect AI](https://inspect.aisi.org.uk/), with a written opinion |

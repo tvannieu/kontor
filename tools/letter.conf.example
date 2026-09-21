@@ -1,0 +1,18 @@
+# Example configuration for letter_pdf.py. All values are fictional.
+# Copy this file to a location OUTSIDE every repository, fill in your own
+# details, and point KONTOR_LETTER_CONFIG at it:
+#
+#   export KONTOR_LETTER_CONFIG="$HOME/.config/kontor/letter.conf"
+#
+# Lines starting with # are comments.
+
+# Sender block: name | street | postcode and town. The first field is printed
+# in bold and below the signature line.
+sender: Example Sender | Sample Street 1 | 12345 Sampletown
+
+# Place printed in front of the date.
+place: Sampletown
+
+# Optional lines below the sender block.
+phone: +00 000 0000000
+email: <your e-mail address>

@@ -1,0 +1,13 @@
+Recipient: Example Court | Sample Avenue 2 | 12345 Sampletown
+Date: 8. September 2026
+Subject: Rücknahme des Antrags
+Reference: Ihr Zeichen X 1/26
+Enclosure: Formblatt zur Rücknahme
+
+Sehr geehrte Damen und Herren,
+
+hiermit nehme ich den **Antrag vom 1. September 2026** zurück.
+
+Mit freundlichen Grüßen
+
+--

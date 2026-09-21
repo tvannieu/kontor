@@ -78,16 +78,5 @@ So the original argument holds, with numbers behind it now: a cheap classifier i
 
 `colima` and the docker CLI are installed; the VM has never been started, because the machine has not had the memory since they went in. One `hello-alpine` trial would turn that section of `NOTES.md` from a careful code reading into experience. Same blocker as (1), and it should wait for the same clearance.
 
-## 7. Tools that exist, but in the branch that owns them
-
-`tools/` is meant to be a collection of small standalone tools, and two obvious ones are missing: a
-generator for DIN 5008 letters as PDF, and a macOS OCR helper. Both exist and work, in a branch
-that uses them. They cannot be copied in — nothing from another branch enters this repository — so
-the owning branch has to prepare them (configuration out, fictional examples, English throughout)
-and send them through the pouch, after which they get the same gate as everything else.
-
-Requested 2026-09-21. Until they arrive the collection is what is in `tools/` today, and this item
-is the reminder that it is smaller than intended.
-
 ---
 ← [README](../README.md) · [Choosing a model](choosing-a-model.md)
