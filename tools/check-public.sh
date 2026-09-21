@@ -104,5 +104,33 @@ if [ -s "/tmp/.k_pub.$$" ] && [ -r "${KONTOR_CONF:-$HOME/.config/kontor/branches
 fi
 rm -f "/tmp/.k_pub.$$"
 
+# 6. commit messages. This gate read files and never read the history's own
+# prose, and that was a hole with two entries in it: one message quoted the
+# false positive it had just been blocked on, which was a real branch name, and
+# another quoted a word from the private vocabulary list. Both were found by
+# hand, after the fact, and both needed the history rewritten and the remote
+# recreated. A message is published text like any other.
+#
+# The Co-Authored-By trailer is excluded, not because it is trusted but because
+# its address would trip the mail-shaped pattern on every commit; it names a
+# model and nothing else. Session links are refused outright: they point from
+# a public repository into a private conversation, and the only thing standing
+# between a stranger and that conversation is a sharing setting this script
+# cannot see.
+msgfile="/tmp/.k_msg.$$"
+git log --all --format=%B 2>/dev/null | grep -vE '^Co-Authored-By: ' > "$msgfile"
+while IFS= read -r t; do
+  [ -z "$t" ] && continue
+  m=$(grep -niwF -- "$t" "$msgfile" | head -3)
+  [ -n "$m" ] && { hit "private term in a commit message:"; printf '%s\n' "$m" >&2; }
+done < <(terms)
+m=$(grep -nEi "$pat" "$msgfile" | head -3)
+[ -n "$m" ] && { hit "domain vocabulary in a commit message:"; printf '%s\n' "$m" >&2; }
+m=$(grep -nE 'claude\.ai/(code|chat|share)/|session_[A-Za-z0-9]{12,}' "$msgfile" | head -3)
+[ -n "$m" ] && { hit "session link in a commit message:"; printf '%s\n' "$m" >&2; }
+m=$(grep -nE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|(sk-or|tvly|ghp_|github_pat|xoxb)[-_A-Za-z0-9]{12,}|/Users/[a-z]' "$msgfile" | head -3)
+[ -n "$m" ] && { hit "address, key or home path in a commit message:"; printf '%s\n' "$m" >&2; }
+rm -f "$msgfile"
+
 if [ "$fail" = 0 ]; then echo "clean"; else echo "REFUSING TO PUBLISH" >&2; fi
 exit "$fail"

@@ -26,7 +26,7 @@ term=$(grep -vE '^[[:space:]]*(#|$)' "$DENY" | head -1)
 [ -n "$term" ] || { echo "deny-list is empty — nothing to plant" >&2; exit 2; }
 
 canaries=("./.kontor-canary.md" "./inbox/.kontor-canary.txt")
-cleanup() { rm -f "${canaries[@]}"; }
+cleanup() { rm -f "${canaries[@]}"; git update-ref -d refs/kontor-canary/msg 2>/dev/null; }
 trap cleanup EXIT INT TERM
 
 fail=0
@@ -52,6 +52,25 @@ for c in "${canaries[@]}"; do
   fi
 done
 
+# Commit messages: a throwaway commit on a temporary ref, never on a branch.
+# The gate did not read messages until 2026-09-21, and two leaked through it.
+tree=$(git rev-parse 'HEAD^{tree}')
+for what in "a deny-listed term" "a session link"; do
+  cleanup
+  case "$what" in
+    "a deny-listed term") body="$term" ;;
+    "a session link")     body="see https://claude.ai/code/session_canary0123456789" ;;
+  esac
+  c=$(printf 'canary\n\n%s\n' "$body" | git commit-tree "$tree" -p HEAD)
+  git update-ref refs/kontor-canary/msg "$c"
+  if bash "$GATE" >/dev/null 2>&1; then
+    note "commit message with $what — gate should BLOCK" "FAIL (it passed)"
+    fail=1
+  else
+    note "commit message with $what — gate blocks" "ok"
+  fi
+done
+
 cleanup
 if bash "$GATE" >/dev/null 2>&1; then
   note "canaries removed — gate clean again" "ok"
@@ -62,7 +81,7 @@ fi
 
 echo
 if [ "$fail" = 0 ]; then
-  echo "Self-test passed: the gate blocks what it claims to catch, in the repository root AND in inbox/."
+  echo "Self-test passed: the gate blocks what it claims to catch, in the root, in inbox/, and in commit messages."
 else
   echo "Self-test FAILED — the gate cannot be trusted until this is understood." >&2
 fi
