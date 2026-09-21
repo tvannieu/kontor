@@ -8,3 +8,14 @@ evals/.venv/
 evals/inspect_port/logs/
 __pycache__/
 *.pyc
+
+# The pouch is a delivery mechanism, and its contents come from other branches.
+# Messages are never committed here: a live one would otherwise block the
+# publication gate until handled, and a handled one would block it from
+# processed/. Only the two READMEs that explain the folders are tracked.
+# (A message that is force-added anyway is still scanned: the gate reads
+# tracked files whether or not they match an ignore pattern.)
+inbox/*.md
+inbox/processed/*.md
+!inbox/README.md
+!inbox/processed/README.md

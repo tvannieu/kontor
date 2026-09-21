@@ -25,7 +25,7 @@ DENY="${KONTOR_DENY:-$HOME/.config/kontor/deny.txt}"
 term=$(grep -vE '^[[:space:]]*(#|$)' "$DENY" | head -1)
 [ -n "$term" ] || { echo "deny-list is empty — nothing to plant" >&2; exit 2; }
 
-canaries=("./.kontor-canary.md" "./inbox/.kontor-canary.md")
+canaries=("./.kontor-canary.md" "./inbox/.kontor-canary.txt")
 cleanup() { rm -f "${canaries[@]}"; }
 trap cleanup EXIT INT TERM
 
