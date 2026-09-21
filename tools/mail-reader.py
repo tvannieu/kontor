@@ -25,13 +25,22 @@ Usage:
   mail-reader list [--limit N] [--json]
   mail-reader read <uid> [--json]
   mail-reader search <query> [--json]
-  mail-reader archive <uid> <output.eml> [--imap-service NAME] [--imap-host HOST]
-                       [--account EMAIL] [--mailbox NAME] [--attachments-dir DIR]
+  mail-reader archive <imap-uid> <output.eml> --account=EMAIL [--imap-service=NAME]
+                       [--imap-host=HOST] [--mailbox=NAME] [--attachments-dir=DIR]
+
+'archive' REQUIRES an account: pass --account=EMAIL or set KONTOR_MAIL_ACCOUNT.
+Options take the form --name=value; a space between name and value is not read.
 
 'list', 'read' and 'search' only ever see Mail.app's own IMAP mailbox
 (INBOX) as scripted by AppleScript. 'archive' talks IMAP directly and
 its UIDs live in a different number space from Mail.app's AppleScript
 message ids — an id from 'list' is not an IMAP UID for 'archive'.
+
+That is the most likely reason for `Error: no data for UID <n>` after a
+successful `read <n>`: the same number was passed to both, and it means two
+different things. This was reported as a bug in the fetch call on 2026-09-17
+and again on 2026-09-21; the first report was a real one (fixed in the git
+history of this file), the second was this.
 """
 
 import sys
@@ -42,6 +51,7 @@ import re
 import imaplib
 import email as eml_lib
 from email.header import decode_header, make_header
+from email import utils as email_utils
 
 IMAP_HOST = "imap.gmx.net"
 IMAP_PORT = 993
@@ -305,10 +315,20 @@ def archive_message(uid, output_path, account_email, imap_service="imap.gmx.net"
     try:
         M = imaplib.IMAP4_SSL(imap_host, IMAP_PORT)
         M.login(account_email, pw)
-        M.select(mailbox)
+        typ, sel = M.select(mailbox, readonly=True)
+        if typ != "OK":
+            print(f"Error: could not open mailbox {mailbox!r}: {sel}", file=sys.stderr)
+            M.logout()
+            return False
         typ, data = M.uid('fetch', uid, "(RFC822)")
         if not (data and data[0] and data[0][1]):
-            print(f"Error: no data for UID {uid}", file=sys.stderr)
+            count = sel[0].decode() if sel and isinstance(sel[0], bytes) else "?"
+            print(f"Error: no data for UID {uid} in mailbox {mailbox!r} ({count} messages).",
+                  file=sys.stderr)
+            print("  If this number came from 'list' or 'read', that is why: those print Mail.app's own\n"
+                  "  message ids, which are not IMAP UIDs. Other causes: the message is in a different\n"
+                  "  mailbox (--mailbox=NAME) or belongs to a different account (--account=EMAIL).",
+                  file=sys.stderr)
             M.close()
             M.logout()
             return False
@@ -320,7 +340,13 @@ def archive_message(uid, output_path, account_email, imap_service="imap.gmx.net"
         msg = eml_lib.message_from_bytes(raw)
         date_str = ""
         if msg.get("Date"):
-            date_str = re.sub(r'[^0-9]', '', msg.get("Date", ""))
+            # Stripping every non-digit from "Mon, 21 Sep 2026 10:00:00 +0000"
+            # loses the month name and yields 2120261000000000, which is not a
+            # date. Parse it, and fall back to nothing rather than to a wrong one.
+            try:
+                date_str = email_utils.parsedate_to_datetime(msg["Date"]).strftime("%Y-%m-%d")
+            except (TypeError, ValueError):
+                date_str = ""
         subj = decode_mime(msg.get("Subject", "unknown"))
         safe_name = re.sub(r'[^\w\-.]', '_', subj)[:80]
         base = os.path.basename(output_path)
@@ -435,7 +461,7 @@ def main():
 
     elif cmd == "archive":
         if len(sys.argv) < 4:
-            print("Usage: mail-reader archive <uid> <output.eml> [--imap-service NAME] [--imap-host HOST] [--account EMAIL] [--mailbox NAME] [--attachments-dir DIR]", file=sys.stderr)
+            print("Usage: mail-reader archive <imap-uid> <output.eml> --account=EMAIL [--imap-service=NAME] [--imap-host=HOST] [--mailbox=NAME] [--attachments-dir=DIR]\n  (--account, or KONTOR_MAIL_ACCOUNT, is required; <imap-uid> is NOT the id printed by list/read)", file=sys.stderr)
             sys.exit(1)
         uid = sys.argv[2]
         output_path = sys.argv[3]
