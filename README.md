@@ -148,7 +148,7 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 | [`tools/kontor`](tools/kontor) | the profile switcher above, and the local-first guard |
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
-| [`tools/mail-reader.py`](tools/mail-reader.py) | list, read and search Mail.app from the command line, and archive a message as a raw `.eml` over IMAP. `archive` takes an IMAP UID, which is **not** the id `list` and `read` print — a mix-up reported as a bug twice, so the error message now says so |
+| [`tools/mail-reader.py`](tools/mail-reader.py) | read and search Mail.app from the command line, find a message over IMAP by sender, subject or date, and archive it as a raw `.eml`. Mail.app and IMAP number their messages differently, so `find` returns the IMAP UID that `archive` needs; passing a `list` id to `archive` was reported as a bug twice. Tested against a fake server, never real mail |
 | [`tools/archive-sent.sh`](tools/archive-sent.sh) | files a sent draft into the record with a date prefix, skips rather than overwrites, and removes the drafts folder |
 | [`evals/`](evals/) | the task set, the runner, the comparison, and a coverage report |
 | [`evals/classifier/`](evals/classifier/) | a second, smaller set: can a model tell when it *cannot* decide where work belongs? |
