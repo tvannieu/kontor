@@ -3,7 +3,6 @@ crush.json
 .DS_Store
 *.local.*
 REPO_MANIFEST.md
-demo/*.gif
 evals/.venv/
 evals/inspect_port/logs/
 __pycache__/
