@@ -21,16 +21,3 @@ nothing else can appear.
 What to look for: `use filing` succeeds, and `use analysis` is **refused**, because a local-first
 branch may reach a hosted model per session but may not have one as its default. The
 [README](../README.md) shows the real output.
-
-## Why there is no recording
-
-There was a [VHS](https://github.com/charmbracelet/vhs) tape here, and it never produced a file. The
-cause turned out to be a version mismatch, not the tape and not the machine:
-
-- VHS 0.12.0 starts `ttyd` with `-t rendererType canvas`. ttyd 1.7.7 requires `-t key=value` and
-  exits at once with `invalid client option`. VHS records nothing and still reports success.
-- Rewriting those arguments gets ttyd running and the browser connected. VHS then still writes no
-  file and never calls ffmpeg. That second cause was not found.
-
-The tape was removed rather than kept as something that looks like it works. The printed output in
-the README is the same thing the recording would have shown.
