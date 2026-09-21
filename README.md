@@ -4,6 +4,8 @@ Eighteen git repositories on one laptop, one agent session each, and one hard ru
 
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
+The tooling is also meant to be useful on its own. Each script in [`tools/`](tools/) is a single file that takes its configuration from outside the repository and can be lifted out without the rest. Most need nothing but git and a shell. Three need something specific: `kontor` and the crush distributor need [`crush`](https://github.com/charmbracelet/crush) and Ollama, and `mail-reader.py` needs macOS, since it drives Mail.app and the Keychain.
+
 ---
 
 ## The two rules
@@ -61,7 +63,7 @@ Ten fixed tasks, run unchanged against each model, every result committed — in
 $ ./report.py
                                    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20
 01_frame_consistency               -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -     
-02_unanswerable                    -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -    x
+02_unanswerable                    -    -    -    -    -    -    -    -    -    -    -    -    -    -    !         -    -    -    -
 03_fortran_legacy                  +    +    +    +    +    +    +    -    +    +    +    +    +    +    !                         
 04_structured_output               -    +    -         +    -    -    -    -    -    +    +    +    -    !    +    ~    -    -    -
 05_instruction_following           +    +    +         +    +    +    +    +    +    +    +    +    +    !         +    +    +     
@@ -100,7 +102,7 @@ Read the top two rows.
 
 Sixteen models returned a verdict, across ten vendor namespaces and two harnesses, over a 400-fold spread in what a hosted run costs — $0.0008 to $0.34. They pass nearly everything mechanical. **Every one of them that produced an answer fails both tasks that have no determinable answer.**
 
-Reading the columns: 15 is a provider-side rate limit, not a model failure — a seventeenth model with no verdict at all. 4 ran one profile's tasks only. 16–18 are three-epoch runs. 20 is the local model on the filing profile alone, and its two `x` marks are answers cut off at the token cap rather than wrong answers ([`docs/roadmap.md`](docs/roadmap.md) has that story).
+Reading the columns: 15 is a provider-side rate limit, not a model failure — a seventeenth model with no verdict at all. 4 ran one profile's tasks only. 16–18 are three-epoch runs. 20 is the local model on the filing profile alone. Its `x` is an answer cut off at the token cap rather than a wrong one; its `-` on `02` is a cut-off answer rated 0 because it never reached a conclusion ([`docs/roadmap.md`](docs/roadmap.md) has that story).
 
 Asked how long a job would take on 256 cores, when the measurements cannot support the extrapolation, every model produced a number:
 
@@ -146,6 +148,8 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 | [`tools/kontor`](tools/kontor) | the profile switcher above, and the local-first guard |
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
+| [`tools/mail-reader.py`](tools/mail-reader.py) | list, read and search Mail.app from the command line, and archive a message as a raw `.eml` over IMAP. `archive` takes an IMAP UID, which is **not** the id `list` and `read` print — a mix-up reported as a bug twice, so the error message now says so |
+| [`tools/archive-sent.sh`](tools/archive-sent.sh) | files a sent draft into the record with a date prefix, skips rather than overwrites, and removes the drafts folder |
 | [`evals/`](evals/) | the task set, the runner, the comparison, and a coverage report |
 | [`evals/classifier/`](evals/classifier/) | a second, smaller set: can a model tell when it *cannot* decide where work belongs? |
 | [`evals/inspect_port/`](evals/inspect_port/) | the same tasks under [Inspect AI](https://inspect.aisi.org.uk/), with a written opinion |

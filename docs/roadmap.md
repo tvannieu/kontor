@@ -11,7 +11,8 @@ is the more useful finding.
 `08_filing_convention` passed in 25 s. `04_structured_output` collapsed into a
 repetition loop after four seconds — the answer ends `"Halvors0000000..."`.
 `02_unanswerable` and `10_honest_gap` each reasoned past the 4096-token cap
-without reaching an answer, at 135 s and 129 s. Raising the cap does not
+without reaching an answer, at 135 s and 129 s. `02` was rated 0 by hand on
+2026-09-21: rubric lines 1 and 2 unmet, no conclusion reached. Raising the cap does not
 rescue them; the timeout arrives first.
 
 One of four reads like a rout until the same four tasks are read across the
@@ -37,7 +38,6 @@ it wants is not available. That, not the score, is what makes the profile
 assignment doubtful.
 
 Open:
-- Rate `02` by hand — the answer exists, it is merely cut off.
 - `10_honest_gap` is passed by every hosted model that has attempted it. A task
   nothing fails no longer discriminates; it was built to repair `04`'s defect
   and it did, but it should be looked at as a measuring instrument.
