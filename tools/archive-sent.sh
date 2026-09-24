@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # archive-sent.sh — the mechanical half of "draft here, record of sending
-# there" (see ../docs/desktop-drafts.md).
+# there" (see ../docs/outbox.md).
 #
 # Once a drafted piece of correspondence has actually gone out, copies every
 # file out of its drafts folder into wherever the receiving repo keeps its

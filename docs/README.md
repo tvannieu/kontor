@@ -10,7 +10,7 @@ Why each convention exists, and what it cost to find out. Roughly in reading ord
 | [`adopting.md`](adopting.md) | the five steps from nothing to a working set of branches |
 | [`choosing-a-model.md`](choosing-a-model.md) | which model per kind of work, and why that is not answered yet |
 | [`fallback.md`](fallback.md) | the second agent runner, and the kernel seal that was removed on purpose |
-| [`desktop-drafts.md`](desktop-drafts.md) | a third channel outside every repository, for post addressed to people |
+| [`outbox.md`](outbox.md) | the third channel: where drafts of post addressed to people outside the system wait |
 | [`lessons.md`](lessons.md) | the failures. One shape recurs, and it is worth reading before the rest |
 | [`roadmap.md`](roadmap.md) | what is open |
 

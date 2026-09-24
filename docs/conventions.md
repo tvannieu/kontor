@@ -2,7 +2,7 @@
 
 Two layers: rules every branch follows, and rules each branch invented for itself.
 
-The second layer is the interesting one. Eleven branches were asked independently what conventions they had and which mistake produced each. They work on entirely unrelated things — a manuscript, a recipe collection, a benchmark suite, a set of running administrative matters — and they had **independently arrived at the same class of rule.**
+Eleven branches were asked independently what conventions they had and which mistake produced each. They work on entirely unrelated things — a manuscript, a recipe collection, a benchmark suite, a set of running administrative matters — and they had **independently arrived at the same class of rule.**
 
 > **Every one of them had built a mechanism to stop a record from quietly drifting away from
 > reality.**
@@ -79,7 +79,7 @@ Collected from eleven branches. Each is quoted close to how its branch stated it
 
 A duplicate check keyed on document references and invoice numbers found several duplicates. The rows with neither — typed in from a statement rather than from a document — were invisible to it, and there were more of them.
 
-This is the single most transportable sentence the system has produced, and it names the failure that recurs in [`lessons.md`](lessons.md) four separate times.
+It travels further than anything else here, and it names the shape that [`lessons.md`](lessons.md) records over and over: a check that reports success over a population it defined itself.
 
 ### Against automating the part that is the work
 

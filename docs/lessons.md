@@ -1,6 +1,6 @@
 # Lessons
 
-The failures. This is the most useful file here, and it is the one most systems omit.
+The failures, with what each one cost and what changed afterwards.
 
 One shape recurs. It is worth stating before the instances, because the instances are otherwise just a list of small mistakes:
 
@@ -112,8 +112,7 @@ The canary described in the previous lesson turned out never to have been
 written down as anything runnable — it was a procedure someone had carried out
 once. It is now [`tools/check-public-selftest.sh`](../tools/check-public-selftest.sh),
 and it plants its file twice: at the repository root, and inside `inbox/`. Run
-against the old exclusion it fails on the second one, which is the whole point
-of having it.
+against the old exclusion it fails on the second one, which is why it exists.
 
 ---
 
@@ -136,7 +135,7 @@ re-run since:
 | "four months" | matched none of the three dates in the repository |
 | three tasks have no determinable answer | five, listed directly beneath the sentence |
 
-The last one is the one to keep. That sentence carried a hedge, written
+The last one matters most. That sentence carried a hedge, written
 specifically to stop the number going stale:
 
 > *"how many there are in total is what `ls tasks/` says, not this line"*

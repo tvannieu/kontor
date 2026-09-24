@@ -4,8 +4,8 @@ What is open, in the order it should happen. What is finished lives in the git h
 
 ## 1. Local evidence for the two local-first profiles
 
-Half done. The first reading of the result was too harsh, and the correction
-is the more useful finding.
+Half done, and the first reading of the result was too harsh. The correction
+is below.
 
 **`filing` -> `kontor-4b`, measured 2026-09-19: one of four.**
 `08_filing_convention` passed in 25 s. `04_structured_output` collapsed into a
@@ -25,8 +25,8 @@ whole fleet, which is what a fixed task set is for:
 | `claude-3-haiku`, `gemini-2.5-flash`, `llama-4-scout`, **`kontor-4b`** | 1 of 4 |
 
 Nobody scores four. `02_unanswerable` is failed by all seventeen models that
-have a verdict, across a 400x price range — it is the collection's flagship
-result, not a defect. So `kontor-4b` sits at the bottom of the fleet, in the
+have a verdict, across a 400x price range. That is what the task
+was built to measure, not a fault in it. So `kontor-4b` sits at the bottom of the fleet, in the
 company of three hosted models, rather than off the scale.
 
 **Its distinctive problem is not accuracy, it is completion.** The hosted
@@ -49,6 +49,14 @@ after 4B alone lagged the machine, and that has not been revisited.
 
 The runner now refuses a local run the machine has no room for rather than
 discovering it the hard way — `preflight_local` in [`run.py`](../evals/run.py).
+
+One capability went with the cleanup: nothing can set Ollama's `num_ctx` any
+more. A second script could, and was deleted on 2026-09-24 for having none of
+the guards `run.py` grew after two hangs. Since [`fallback.md`](fallback.md)
+records that a context window pinned too large thrashes rather than failing,
+that control will be wanted again before 8B is attempted — through the native
+Ollama endpoint, which takes `options`, not the OpenAI-compatible one `run.py`
+uses now.
 
 ## 2. Weigh a rubric line without hand-maintaining a list
 

@@ -18,6 +18,8 @@ Direct session-to-session messaging exists and is useful for conversation, but i
 
 There is one sanctioned exception to rule 1, scoped narrowly by argument rather than convenience: generated files with exactly one correct location may be distributed. [`docs/architecture.md`](docs/architecture.md) has the wording and how it was arrived at.
 
+Both rules govern traffic *inside* the system. Post addressed to people outside it goes through a third channel, an outbox kept outside every repository — [`docs/outbox.md`](docs/outbox.md).
+
 ## What the classification looks like
 
 The rules above govern where a session may **write**. A second classification governs where its **data** may go, and unlike the rules it has a user interface, so it is the part most people see first. It is about confidentiality, not capability: a branch marked local-first may reach a hosted model deliberately, per session, but may not have one as its *default*. The switcher refuses:
@@ -177,7 +179,7 @@ Both exist so a session finds the same text whichever harness it arrives in — 
 
 ## Getting started
 
-[`docs/adopting.md`](docs/adopting.md) is the five-step path: clone this, create your branch repositories as siblings with no shared git history, seed them from `templates/`, write your own config in `~/.config/kontor/`, run the distributors. The rest of [`docs/`](docs/) is the reasoning: [`architecture`](docs/architecture.md), [`pouch`](docs/pouch.md), [`conventions`](docs/conventions.md), [`fallback`](docs/fallback.md), [`choosing-a-model`](docs/choosing-a-model.md), [`lessons`](docs/lessons.md), [`roadmap`](docs/roadmap.md).
+[`docs/adopting.md`](docs/adopting.md) is the five-step path: clone this, create your branch repositories as siblings with no shared git history, seed them from `templates/`, write your own config in `~/.config/kontor/`, run the distributors. The rest of [`docs/`](docs/) is the reasoning: [`architecture`](docs/architecture.md), [`pouch`](docs/pouch.md), [`outbox`](docs/outbox.md), [`conventions`](docs/conventions.md), [`fallback`](docs/fallback.md), [`choosing-a-model`](docs/choosing-a-model.md), [`lessons`](docs/lessons.md), [`roadmap`](docs/roadmap.md).
 
 ## What this is not
 

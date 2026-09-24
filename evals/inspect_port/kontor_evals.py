@@ -181,8 +181,8 @@ def _load(only_checks):
 # The deterministic checks are run.py's own, imported, not a copy: the first
 # version of this file transliterated them, and the moment run.py's
 # json_schema check grew two optional keys (2026-09-18, for task 10) the copy
-# would have silently scored that task differently from the runner. Same
-# reason re_run_ollama.py imports them. One source, or two that drift.
+# would have silently scored that task differently from the runner. One
+# source, or two that drift.
 import sys as _sys
 
 _sys.path.insert(0, str(TASKS_DIR.parent))

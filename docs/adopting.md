@@ -1,6 +1,6 @@
 # Adopting kontor
 
-The path from nothing to a working set of branches, assembled once instead of left as five separate things a reader has to reconstruct from `architecture.md`, `pouch.md`, `conventions.md` and `fallback.md`. Nothing below is a new rule — every piece is already documented elsewhere and linked from here rather than restated.
+The path from nothing to a working set of branches. Nothing here is a new rule; each step links to the document that explains it rather than restating it.
 
 ## 1. Clone the system repo
 

@@ -4,7 +4,7 @@ The question this is meant to answer: *which model should I open a branch of typ
 
 **It is not answered yet.** This file says what is measured, what is not, and what the method is, rather than presenting a recommendation the evidence does not support.
 
-That is not modesty. The evaluation suite's central test is whether a model admits there is no answer instead of producing a plausible one; writing a confident selection guide on twenty runs would fail the suite's own criterion.
+The evaluation suite's central test is whether a model admits there is no answer instead of producing a plausible one; writing a confident selection guide on twenty runs would fail the suite's own criterion.
 
 ## What exists
 

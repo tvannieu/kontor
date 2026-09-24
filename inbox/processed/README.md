@@ -1,11 +1,11 @@
 # processed
 
 Where a pouch message goes once this branch has **acted** on it — not once it
-has been read. That distinction is the whole point of the folder: a message
+has been read. The folder exists to hold that distinction: a message
 read and not acted on is still outstanding, and leaving it in `inbox/` is what
 keeps it visible.
 
-This folder is empty in the published repository, and that is deliberate.
+This folder is empty in the published repository.
 
 Real pouch messages arrive **from the other branches**. They are written by a
 session that knows its own repository, its own correspondents and its own
