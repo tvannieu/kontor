@@ -24,7 +24,7 @@ whole fleet, which is what a fixed task set is for:
 | `gemini-2.5-pro`, `deepseek-v4-flash`, `gemma-4-31b`, `kimi-k2.5`, `inkling` | 2 of 4 |
 | `claude-3-haiku`, `gemini-2.5-flash`, `llama-4-scout`, **`kontor-4b`** | 1 of 4 |
 
-Nobody scores four. `02_unanswerable` is failed by all fifteen models that
+Nobody scores four. `02_unanswerable` is failed by all seventeen models that
 have a verdict, across a 400x price range — it is the collection's flagship
 result, not a defect. So `kontor-4b` sits at the bottom of the fleet, in the
 company of three hosted models, rather than off the scale.

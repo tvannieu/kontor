@@ -126,8 +126,8 @@ re-run since:
 
 | claimed | actual |
 |---|---|
-| `check-public.sh` is 57 lines | 90, since the empty-wordlist fix |
-| about 1,200 lines of shell and Python | 2,600; 1,200 was one directory |
+| `check-public.sh` is 57 lines | 90 then, 136 now that it reads commit messages too |
+| about 1,200 lines of shell and Python | 2,600 then, 3,800 now; 1,200 was one directory |
 | two of four profiles report *estimate* | one, after a local run the day before |
 | fifteen models across nine vendors | sixteen with a verdict, across ten namespaces |
 | 3,868 commits, 713 pouch messages | 3,925 and 715 |

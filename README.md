@@ -183,7 +183,7 @@ Both exist so a session finds the same text whichever harness it arrives in — 
 
 Not a framework, not a product, and not enforced. Rule 1 is not a sandbox — an agent that decides to write elsewhere can. The value is in the conventions and the failures behind them, not in the code, which is small.
 
-Not a general answer to which model to use. [`evals/coverage.py`](evals/coverage.py) reports, per task profile, whether the model the config assigns is *evidenced* on that profile's tasks or merely assumed. As of today one of four profiles reports **estimate** — `reading`, whose model has never been run. `filing` was measured on 2026-09-19 and reports evidenced *with failures*, which is the more useful answer and the one an average would have hidden.
+Not a general answer to which model to use. [`evals/coverage.py`](evals/coverage.py) reports, per task profile, whether the model the config assigns is *evidenced* on that profile's tasks or merely assumed. As of 2026-09-24 one of four profiles reports **estimate** — `reading`, whose model has never been run. `filing` was measured on 2026-09-19 and reports evidenced *with failures*, which is the more useful answer and the one an average would have hidden.
 
 Not the contents of eighteen repositories. None of them are here, and none ever will be — not in a file, not in a filename, not in the history.
 

@@ -10,7 +10,7 @@ It is the same idea as the scattering-code comparison this came out of: one task
 
 ## What is unusual about it
 
-Most collections measure whether a model finds the right answer. **This one measures above all whether it admits when there is none.** Five of the ten tasks have no determinable answer or contain a trap — `ls tasks/` is the authority on the total, not this line:
+Most collections measure whether a model finds the right answer. **This one measures above all whether it admits when there is none.** Five of the ten tasks have no determinable answer or contain a trap. `tasks/*.json` is the authority on the total — a `.json.retired` file sits in the same directory and does not run:
 
 - `02_unanswerable` asks for a value the data does not support. If the model gives a number, it has failed, however plausible the number is.
 - `01_frame_consistency` shows two results that differ only in the sign of one quantity. If the model invents a conversion factor, it has failed.
@@ -63,7 +63,7 @@ Via **OpenRouter**, new models are usually available within hours of release, bi
 
 Seven tasks check themselves (`contains_any`, `regex_absent`, `json_schema`). Three need a judgement; for those, every task carries a **rubric**, and the result carries a `manual.rating` field to be filled with `1`, `0.5` or `0`.
 
-That part of it is rated by hand is not a defect. That is exactly where the question sits that cannot be automated — and [`inspect_port/calibrate.py`](inspect_port/calibrate.py) measures how far a model judge can be trusted to stand in for it.
+Some of it being rated by hand is not a defect. That is exactly where the question sits that cannot be automated — and [`inspect_port/calibrate.py`](inspect_port/calibrate.py) measures how far a model judge can be trusted to stand in for it.
 
 ## Layout
 

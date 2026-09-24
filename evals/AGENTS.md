@@ -16,7 +16,7 @@ That applies to you as an agent too: **never touch `tasks/*.json` quietly.**
 
 ## What is measured here
 
-Not in the first instance whether a model finds the right answer, but **whether it admits when there is none.** Five of the tasks (`01`, `02`, `06`, `09`, `10`) have no determinable answer or contain a trap. `ls tasks/` is the authority on both counts, not this line — it has been wrong about this one twice. A plausible invented number is a failure, not partial credit.
+Not in the first instance whether a model finds the right answer, but **whether it admits when there is none.** Five of the tasks (`01`, `02`, `06`, `09`, `10`) have no determinable answer or contain a trap. For the total, count the `*.json` files in `tasks/` — a `.json.retired` file sits there too and does not run. This line has been wrong about the five twice. A plausible invented number is a failure, not partial credit.
 
 That is the failure shape at issue: these systems do not fail with an error message, they fail with a fluent wrong answer.
 
@@ -49,8 +49,7 @@ The OpenRouter key is in the macOS keychain under **`kontor-openrouter`**, the s
 Two purposes, and the second is the more important one.
 
 1. **Selection:** which model is fit for which kind of work in the Kontor. The crush.json carries several providers and price tiers; which tier suffices where used to be a feeling. `coverage.py` is where it stops being one.
-2. **Evidence:** claiming experience with evaluation is easy. After a few runs this is no longer a claim.
+2. **Evidence:** "I test new models" is easy to say. The same tasks, rated the same way, with every result kept, is the difference between saying it and having done it.
 
 ---
-## Document Information
-*Last Updated: September 19, 2026* *Document Type: Guide* *Scope: Working instructions for agents in model-evals* *Status: Active Documentation*
+← [README](README.md) · [The rating contract](kontor-eval-contract.md)

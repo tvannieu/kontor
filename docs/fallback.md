@@ -21,7 +21,10 @@ The classification lives in the instance config, not here.
 
 What survived the argument is the distinction between **accident and intention**. With a hosted default, the first question is sent before the thought *which model am I on* arrives; noticing happens on the second prompt, not the first. Local-first removes exactly that and nothing else.
 
-The sandbox profile is kept, unused, in case the decision is revisited.
+The sandbox profile is kept, unused, in case the decision is revisited. It lives with the instance
+configuration, not in this repository. **The two sections below describe that sealed arrangement, and
+they are the part of this document that is not currently in force** — they are kept as the record of
+how it was built and what it would have to satisfy again.
 
 ## Configuration is generated, not hand-written
 
@@ -34,7 +37,7 @@ A script writes the runner's config into every branch from the classification li
 
 The manifest is documentation and is committed. The runner config is machinery: an output of a script that is itself versioned, whose history nobody will ever read, and which in a repository later shared with collaborators names a personal account.
 
-## The sandbox list is generated, not written twice
+## The sandbox list is generated, not written twice *(seal only)*
 
 The wrapper that decides whether a branch is local-first reads a file the distribution script writes. It previously carried its own hardcoded list — a second copy of a decision, which is the shape of every drift in [`lessons.md`](lessons.md).
 
@@ -49,9 +52,12 @@ The wrapper that decides whether a branch is local-first reads a file the distri
 - **The session database is plaintext inside the repository.** Every message of every session. The runner writes its own `.gitignore` for it; do not depend on a vendor's housekeeping for that.
 - **macOS has no `timeout`.** Two verification attempts failed for that reason and looked like findings.
 
-## Proving the boundary still holds
+## Proving the boundary still holds *(seal only)*
 
-Re-run after every upgrade of the runner.
+Written for the sealed arrangement, to be re-run after every upgrade of the runner. With the seal
+removed, steps 2 to 4 have nothing to test: a hosted call from a local-first branch is refused by
+`tools/kontor` as a *default*, not by the kernel, and a deliberate per-session call is meant to
+succeed. Steps 1 and 5 still apply and are worth running as they stand.
 
 1. **Only the expected models are listed.**
 2. **A poisoned environment changes nothing** — fake hosted API keys in the environment must not make hosted providers appear.

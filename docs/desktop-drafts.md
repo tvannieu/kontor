@@ -6,7 +6,7 @@ Two channels are already documented: the pouch (`inbox/`, branch-to-branch, see 
 
 `~/Desktop/_Open_Drafts/` — one subfolder per recipient. Each holds drafts of things addressed to people outside the system entirely: letters, emails, applications, forms. State: *finished enough to review, not yet sent.* Each recipient folder carries its own register, `00_README.txt`, with sections for what was finished today, what's still open, what's parked, what's waiting on a reply, and any dates that matter.
 
-Nothing about *which* recipients exist belongs in this repository — same reasoning as the absence of a branch roster in [the README](../README.md#branch-names): a list of plausible recipients says almost exactly what the real ones would.
+Nothing about *which* recipients exist belongs in this repository — same reasoning as the absence of a branch roster anywhere in this repository: a list of plausible recipients says almost exactly what the real ones would.
 
 ## Why this is Kontor's business even though it is not a repository
 

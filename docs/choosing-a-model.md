@@ -10,7 +10,7 @@ That is not modesty. The evaluation suite's central test is whether a model admi
 
 [`../evals/`](../evals) holds a fixed set of tasks, re-run unchanged against each new model, at temperature zero, with results versioned — including the bad runs, because a discarded run is a dishonest record.
 
-How many tasks there are, and how many are machine-checkable, is `tasks/`'s own count — not a number to keep in sync here by hand. A fixed count in this sentence has already drifted twice: the collection grew from seven tasks to nine while this file still said seven, and the count of trap tasks stood at three here and in `evals/README.md` while five were listed beneath it. **Five have no determinable answer or contain a trap** — `ls ../evals/tasks/` is the authority, not this line — and they measure whether the model says so or invents something plausible.
+How many tasks there are, and how many are machine-checkable, is `tasks/`'s own count — not a number to keep in sync here by hand. A fixed count in this sentence has already drifted twice: the collection grew from seven tasks to nine while this file still said seven, and the count of trap tasks stood at three here and in `evals/README.md` while five were listed beneath it. **Five have no determinable answer or contain a trap** — `../evals/tasks/*.json` is the authority on the total — and they measure whether the model says so or invents something plausible.
 
 ## The bridge
 

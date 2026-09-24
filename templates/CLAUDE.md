@@ -2,7 +2,7 @@
 
 The full working guidelines for this repository. Model-agnostic despite the filename — every agent harness in use here reads it the same way. `AGENTS.md` beside this file is a short pointer to it, not a second copy.
 
-This repository is one branch in the kontor system: <one sentence — what this branch is for>. The rules that hold across every branch are not restated here; restating them is exactly the kind of duplication that drifts. They live in kontor itself:
+This repository is one branch in the kontor system: <one sentence — what this branch is for>. The rules that hold across every branch are not restated here; restating them is exactly the kind of duplication that drifts. They live in kontor itself, in the sibling directory `kontor/` — `$KONTOR_ROOT` below is the directory holding every branch, defined in `~/.config/kontor/branches.conf`; if you cannot read that, the paths still resolve from one level above this repository:
 
 - `$KONTOR_ROOT/kontor/docs/architecture.md` — the two rules, and the one sanctioned exception to the first
 - `$KONTOR_ROOT/kontor/docs/pouch.md` — the cross-branch message protocol
