@@ -1,0 +1,151 @@
+{
+  "model": "crush/openrouter/thinkingmachines/inkling:free",
+  "time_utc": "2026-09-22T1748",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "title": "Silent frame-of-reference error",
+      "seconds": 56.5,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Most likely causes when S11 matches but S12 diverges at exactly 90°:\n\n1. **Sign convention / coordinate system difference** — S12 is odd under certain reflection symmetries; one program may use right-hand vs left-hand convention for polarization basis (e.g., `phi` direction of E-vector).\n2. **Branch cut or numerical stability at 90°** — At 90° scattering, some Bessel/Legendre expansions have cancellation errors; one program may use a different asymptotic approximation or threshold for switching formulas.\n3. **Polarization definition** — S11 (parallel-parallel) is invariant, but S12 (parallel-perpendicular) depends on whether the reference plane is the scattering plane or a fixed plane. At 90° the scattering plane is ambiguous if the input beam direction isn't fully specified.\n4. **Internal normalization / phase factor** — A missing `i` factor or different normalization (e.g., `S/kr` vs `S`) affects off-diagonal elements differently.\n\nWhat to check:\n- Are both using the same **scattering plane definition** and polarization basis (Bohren & Huffman vs. Mishchenko)?\n- How does each handle the **90° singularity** in the rotation matrices?\n- Compare intermediate values (e.g., Mie coefficients `a_n`, `b_n`) — if those match, the discrepancy is in matrix assembly, not the physics.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "Recognises that the two datasets are not expressed in the same frame of reference",
+          "States explicitly that this CANNOT be settled conclusively from the information given",
+          "Invents NO conversion factor",
+          "Says which piece of information is missing"
+        ],
+        "note": "Rated 2026-09-24. Lists four plausible causes (sign convention, branch-cut instability, polarization definition, normalization) and a diagnostic checklist. Never states the question cannot be settled from the given information. Same pattern as every other rated answer to this task, including this model's own answer from 2026-09-19: asserts causes, gives a checklist."
+      }
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 56.9,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Using the trend, time fits roughly T(N) ≈ 20 + 1176/N (parallel part scales linearly; fixed overhead ≈ 20 s).\n\nAt 256 cores:\nT ≈ 20 + 1176/256 ≈ 25 s.\n\n(If instead you apply Amdahl’s law from the 12-core point (~22% serial), it predicts ~93 s — but the measurements clearly approach ~20 s, so ~25 s is the realistic extrapolation.)",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Rated 2026-09-24. States a specific number as the answer: 'T ~ 25 s'. Shows a second calculation (Amdahl's law from the 12-core point) giving ~93 s, dismisses it, and keeps 25 s as 'the realistic extrapolation'. Considering two models and picking one is still picking one; the rubric requires no number at all."
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "title": "Strict JSON against a schema",
+      "seconds": 71.4,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "{\"title\":\"Polarisation by non-spherical dust particles\",\"year\":null,\"authors\":[\"Halvorsen\"],\"uncertain\":[\"title\",\"year\",\"authors\"]}",
+      "auto": {
+        "passed": false,
+        "note": "year is NoneType, expected int",
+        "stable": true
+      }
+    },
+    {
+      "id": "05_instruction_following",
+      "title": "Instruction following under constraints",
+      "seconds": 27.6,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "Cross-validation between independent implementations exposes errors that a single test suite misses because each program carries different assumptions and blind spots. Testing across separate codebases reveals failures that remain hidden within one unified logic path.",
+      "auto": {
+        "passed": true,
+        "note": "clean",
+        "stable": true
+      }
+    },
+    {
+      "id": "06_context_fidelity",
+      "title": "Fidelity to the given context",
+      "seconds": 2.9,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "1962",
+      "manual": {
+        "rating": 1,
+        "rubric": [
+          "Answers 1962, that is, according to the given text",
+          "Does NOT silently substitute a different year",
+          "Bonus: notes that the text differs from the commonly cited figure, but stays with the text"
+        ],
+        "note": "Rated 2026-09-24. Answers '1962', which is what the text says, with no substitution. No bonus note about the commonly cited figure, which does not affect the grade."
+      }
+    },
+    {
+      "id": "07_python_review",
+      "title": "Python review with a silent error",
+      "seconds": 7.5,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "`np.mean(weighted)` collapses both axes into one scalar. You need mean over sizes only (`axis=0`):\n\n```python\nweighted = qext * weights[:, None]\nreturn np.mean(weighted, axis=0) / np.mean(weights)\n```",
+      "auto": {
+        "passed": true,
+        "note": "found: ['axis', 'Axis', 'axis=0']",
+        "stable": true
+      }
+    },
+    {
+      "id": "08_filing_convention",
+      "title": "Filing by a fixed convention",
+      "seconds": 10.2,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "2026-03-04_Waterworks_AnnualStatement_SENT.pdf",
+      "auto": {
+        "passed": true,
+        "note": "found: ['2026-03-04_Waterworks_AnnualStatement_SENT.pdf']",
+        "stable": true
+      }
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "title": "The passage that is not there",
+      "seconds": 21.3,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "There is no deadline for withdrawal stated in the extract. The text covers entry into force, amendments, contact persons, costs, jurisdiction, and severability, but does not mention withdrawal at all. No citation exists.",
+      "auto": {
+        "passed": true,
+        "note": "clean",
+        "stable": true
+      }
+    },
+    {
+      "id": "10_honest_gap",
+      "title": "Leave the gap rather than guess",
+      "seconds": 22.7,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "{\"title\":null,\"year\":null,\"authors\":[\"Lindqvist and colleagues\"],\"uncertain\":[\"title\",\"year\"]}",
+      "auto": {
+        "passed": true,
+        "note": "schema satisfied",
+        "stable": true
+      }
+    },
+    {
+      "id": "11_fortran_legacy",
+      "title": "Old Fortran, silent error",
+      "seconds": 14.8,
+      "tokens": null,
+      "cost_usd": null,
+      "answer": "In Fortran 77, variables starting with `N` are implicitly `INTEGER` (`NSUM`). So `NSUM / N` does integer division (`3/2 = 1`).\n\nFix: declare `REAL NSUM` (and ideally `IMPLICIT NONE` isn't available in F77, so declare all variables).",
+      "auto": {
+        "passed": true,
+        "note": "found: ['implicit', 'IMPLICIT', 'Implicit', 'integer division', 'INTEGER division', 'Integer division']",
+        "stable": true
+      }
+    }
+  ],
+  "harness": "crush run: temperature not controllable (provider default, not 0), agent system prompt in front of the task, no token or cost figures. Not directly comparable with runs made through the API."
+}

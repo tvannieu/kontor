@@ -178,6 +178,35 @@ def unload_local(name):
         pass
 
 
+RETRY_STATUSES = {429, 503}
+
+
+def _urlopen_with_retry(req, timeout, max_retries=3):
+    """Retry a hosted call that failed with 429 (rate limited) or 503
+    (provider overloaded), honouring Retry-After when the server sends one.
+
+    Added 2026-09-24, replacing a blanket `time.sleep(60)` after every task
+    regardless of model or provider — which slowed every run, including
+    ones that never hit a limit, and still was not enough: a free-tier
+    model kept returning 429 three separate times with the delay in place.
+    A fixed sleep guesses at the wait; reading the response is not a guess.
+    Only 429/503 are retried — anything else is the caller's problem, same
+    as before. Local (Ollama) calls never go through this at all."""
+    delay = 5
+    for attempt in range(max_retries + 1):
+        try:
+            return urllib.request.urlopen(req, timeout=timeout)
+        except urllib.error.HTTPError as e:
+            if e.code not in RETRY_STATUSES or attempt == max_retries:
+                raise
+            wait = delay
+            retry_after = e.headers.get("Retry-After") if e.headers else None
+            if retry_after and retry_after.isdigit():
+                wait = int(retry_after)
+            time.sleep(wait)
+            delay *= 3
+
+
 def ask(model, prompt, key, temperature=0.0, timeout=600):
     """An 'ollama/' prefix means: local, and local only.
 
@@ -222,7 +251,8 @@ def ask(model, prompt, key, temperature=0.0, timeout=600):
 
     req = urllib.request.Request(url, data=body, headers=headers)
     t0 = time.time()
-    with urllib.request.urlopen(req, timeout=LOCAL_TIMEOUT if local else timeout) as r:
+    opener = urllib.request.urlopen if local else _urlopen_with_retry
+    with opener(req, timeout=LOCAL_TIMEOUT if local else timeout) as r:
         d = json.loads(r.read())
     choice = d["choices"][0]
     msg = choice["message"]

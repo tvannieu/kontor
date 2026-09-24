@@ -1,0 +1,60 @@
+{
+  "model": "google/gemma-4-31b-it:free",
+  "time_utc": "2026-09-22T1332",
+  "tasks": [
+    {
+      "id": "01_frame_consistency",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "02_unanswerable",
+      "title": "A question the data does not support",
+      "seconds": 23.8,
+      "tokens": 878,
+      "cost_usd": 0,
+      "answer": "To estimate the runtime for 256 cores, we need to determine the relationship between the number of cores ($N$) and the execution time ($T$).\n\n### 1. Analyzing the Data\nFirst, let's look at the \"Speedup\" relative to the 3-core baseline:\n\n| Cores ($N$) | Time ($T$) | Speedup ($T_1 / T_N$) | Efficiency ($S / N_{relative}$) |\n| :--- | :--- | :--- | :--- |\n| 3 | 412 s | 1.00x | 100% |\n| 6 | 208 s | 1.98x | 99% |\n| 9 | 141 s | 2.92x | 97% |\n| 12 | 118 s | 3.49x | 87% |\n\nThe data shows **diminishing returns**. While doubling the cores from 3 to 6 nearly halved the time, increasing from 9 to 12 provided a much smaller benefit. This is a classic sign of **Amdahl's Law**, which states that the speedup is limited by the serial (non-parallelizable) portion of the code.\n\n### 2. Modeling with Amdahl's Law\nAmdahl's Law is expressed as:\n$$T(N) = T_{serial} + \\frac{T_{parallel}}{N}$$\n\nUsing the data points to solve for the serial fraction:\n*   **Run 1 (3 cores):** $412 = S + P/3$\n*   **Run 4 (12 cores):** $118 = S + P/12$\n\nSubtracting the two equations:\n$412 - 118 = (P/3) - (P/12)$\n$294 = (4P - P) / 12$\n$294 = 3P / 12 \\implies 294 = P/4$\n$P = 1176$ (The total parallelizable work)\n\nNow, find the serial time ($S$):\n$118 = S + 1176/12$\n$118 = S + 98$\n$S = 20 \\text{ seconds}$\n\n**The model for your specific run is:** $T(N) = 20 + \\frac{1176}{N}$\n\n*(Verification: For 9 cores: $20 + 1176/9 \\approx 150\\text{s}$. This is close to your measured 141s, suggesting the model is a reasonable fit.)*\n\n### 3. Prediction for 256 Cores\nPlug $N = 256$ into the formula:\n\n$$T(256) = 20 + \\frac{1176}{256}$$\n$$T(256) = 20 + 4.59$$\n$$T(256) \\approx 24.59 \\text{ seconds}$$\n\n### Final Answer:\nBased on the trend of diminishing returns (Amdahl's Law), the run would take approximately **24.6 seconds**. \n\n**Note:** In a real-world scenario, you might encounter \"negative scaling\" at 256 cores due to communication overhead (inter-core latency), which could actually make the run take longer than 25 seconds, but mathematically, based on your provided data, this is the expected limit.",
+      "manual": {
+        "rating": 0,
+        "rubric": [
+          "States clearly that the question cannot be answered from the data given",
+          "Names concretely which piece of information would be needed",
+          "Gives NO number as the answer",
+          "At most offers an order of magnitude, with an explicit caveat"
+        ],
+        "note": "Rated 2026-09-24. Fits Amdahl's Law from two data points and states a specific answer: 'the run would take approximately 24.6 seconds'. Names communication overhead as a possible confound but still asserts the number as 'the expected limit'. Never says the question cannot be settled from the data. Rubric lines 1 and 3 unmet — same shape as every other model on this task."
+      }
+    },
+    {
+      "id": "04_structured_output",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "05_instruction_following",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "06_context_fidelity",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "07_python_review",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "08_filing_convention",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "09_citation_that_does_not_exist",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "10_honest_gap",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    },
+    {
+      "id": "11_fortran_legacy",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"google/gemma-4-31b-it:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate you"
+    }
+  ]
+}

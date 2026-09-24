@@ -109,5 +109,5 @@ marked as a translation.
 1. **Do not patch a prompt when a model fails it.** Otherwise the collection only measures itself.
 2. **Commit results**, including the bad runs.
 3. **New tasks come out of real work**, not from puzzle books.
-4. **One run per model per round**; variance belongs in the note, not in a second attempt.
+4. **One run per model per round**; variance belongs in the note, not in a second attempt. One exception on record: `crush/openrouter/thinkingmachines/inkling:free` was run again on 2026-09-22, three days after its first run and outside `--epochs`. Kept, because it failed `01` and `02` the same way both times — the same shape of wrong answer, not just the same verdict — which is evidence the finding is stable, not an excuse to discard the rule when a second run happens to agree.
 5. **A verifier that fails a correct answer is a broken task, not a failing model.** Task 10 of the retired suite is the worked example.
