@@ -195,4 +195,4 @@ A *Kontor* was a trading house's foreign branch — Bergen, Bruges, Novgorod, th
 
 ---
 
-*Eighteen repositories, 3,925 commits. Earliest repository 2025-05-21, newest 2026-09-09; conventions since 2025-07-14, the pouch since 2026-03-02. 715 pouch messages delivered, 520 of them acted on and filed. Numbers as of 20 September 2026 — reproduce them with [`tools/census.sh`](tools/census.sh), which prints the definition it used for each.*
+*Eighteen repositories, 4,073 commits. Earliest repository 2025-05-21, newest 2026-09-09; conventions since 2025-07-14, the pouch since 2026-03-02. 733 pouch messages delivered, 527 of them acted on and filed. Numbers as of 24 September 2026 — reproduce them with [`tools/census.sh`](tools/census.sh), which prints the definition it used for each.*
