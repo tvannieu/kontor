@@ -1,6 +1,6 @@
 # Kontor
 
-Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement: the conventions, about 2,600 lines of shell and Python (1,100 of it the tooling, the rest the eval suite), and the failures that produced both. It grew — one repository in May 2025, six by that September, eighteen by September 2026 — and the pouch, which is what makes it an arrangement rather than a pile of folders, has only been in use since March 2026.
+Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement: the conventions, about 3,800 lines of shell and Python (2,100 of it the tooling, 1,700 the eval suite, and 380 of that total is tests), and the failures that produced both. It grew — one repository in May 2025, six by that September, eighteen by September 2026 — and the pouch, which is what makes it an arrangement rather than a pile of folders, has only been in use since March 2026.
 
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
@@ -145,7 +145,7 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 
 | | |
 |---|---|
-| [`tools/check-public.sh`](tools/check-public.sh) | 90 lines. Refuses to push if anything private is present, and refuses to run at all against an empty wordlist. Wired as a `pre-push` hook |
+| [`tools/check-public.sh`](tools/check-public.sh) | 136 lines. Refuses to push if anything private is present — in a file, or in a commit message — and refuses to run at all against an empty wordlist. Wired as a `pre-push` hook |
 | [`tools/check-public-selftest.sh`](tools/check-public-selftest.sh) | plants a deny-listed term at the repository root and inside `inbox/`, and fails if the gate lets either through |
 | [`tools/kontor`](tools/kontor) | the profile switcher above, and the local-first guard |
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
@@ -159,6 +159,7 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 | [`evals/inspect_port/`](evals/inspect_port/) | the same tasks under [Inspect AI](https://inspect.aisi.org.uk/), with a written opinion |
 | [`templates/`](templates/) | skeletons for a new branch |
 | [`docs/`](docs/) | the conventions, and why each one exists |
+| `test_*.py` | beside the code they cover — the gate's retry path, the mail tool, the letter generator. No network and no real mail: fakes and mocks throughout. Each was mutation-tested once, by breaking the thing it guards and checking it failed |
 
 Configuration — which branches exist, which are local-first, which model each profile implies — lives in `~/.config/kontor/`, outside every repository. The scripts are generic; the lists they act on are yours.
 

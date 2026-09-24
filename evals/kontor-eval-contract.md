@@ -14,8 +14,8 @@
 ```
 
 Anything else — a word like `"passed"` or `"failed"`, or any
-non-numeric value — falls through to `"?"` (unbewertet) and does not appear as
-a pass/fail/partial in the table. The rubric fields in `tasks/*.json` are German
+non-numeric value — falls through to `"?"` (unrated) and does not appear as
+a pass/fail/partial in the table. The `rubric` fields in `tasks/*.json` are
 descriptions for the human rater; they are NOT the rating value.
 
 When rating an existing result:
@@ -27,7 +27,7 @@ When rating an existing result:
 
 ## Error codes mean different things — don't lump them as `!`
 
-The current report collapses every `fehler` into `!`. The actual codes carry
+The current report collapses every error into `!`. The actual codes carry
 information:
 
 | Code | Meaning | Action |
@@ -42,24 +42,48 @@ because lumping them all as `!` makes the table say "every model failed every
 task" when what actually happened is "two models had invalid IDs and one was
 rate-limited."
 
-## The gate must not scan inbox/
+## The gate must scan `inbox/` — this section used to say the opposite
 
-`tools/check-public.sh` scans tracked and untracked files for private content
-before every push. `inbox/` holds inter-branch mail (the pouch), not
-publishable repository content. If the gate scans inbox items, ordinary German
-prose in them can share word stems with the private domain-vocabulary list —
-confirmed in practice, not hypothetical — and the gate refuses to publish on
-noise that was never a leak.
+**Superseded 2026-09-20. The instruction that stood here was wrong, and acting
+on it caused a leak.** It is kept rather than deleted because the reasoning that
+produced it is worth seeing.
 
-The `files()` function in `check-public.sh` must exclude `inbox/`:
+It argued that `inbox/` holds inter-branch mail rather than publishable content,
+that ordinary prose in a message can share word stems with the private
+domain-vocabulary list, and that the gate therefore refuses to publish over
+noise that was never a leak. The last part is true and was observed. The
+conclusion drawn from it was not:
 
 ```
+# WRONG — do not restore this
 files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$' | grep -vE '^inbox/'; }
 ```
 
-After changing `files()`, run `bash tools/check-public.sh` and confirm it says
-`clean`. An inbox item landing in the working tree is normal and must not block
-publishing.
+`inbox/` is where the **other branches** write. Their messages name their own
+repository, their own correspondents and their own subject matter, because that
+is what makes them useful to the branch receiving them. Of everything in a
+kontor repository it is the likeliest place for another branch's private
+material to appear — and that exclusion made it the one place never scanned.
+Eight committed and pushed messages carried between one and seventeen
+deny-listed terms each before it was found. See [`../docs/lessons.md`](../docs/lessons.md).
+
+The real problem — that ordinary mail should not block an unrelated push — is
+solved where it belongs, in `.gitignore`:
+
+```
+inbox/*.md
+inbox/processed/*.md
+!inbox/README.md
+!inbox/processed/README.md
+```
+
+An ignored file is not listed by `git ls-files -co --exclude-standard`, so
+everyday pouch traffic never blocks a push. A message that is force-added
+becomes tracked, and a tracked file is scanned like any other. Both properties
+hold at once, which is what the exclusion was reaching for and missed.
+
+`tools/check-public-selftest.sh` plants a canary inside `inbox/` specifically so
+that restoring the exclusion fails the self-test instead of passing silently.
 
 ## Credentials: do not bake the account identifier into tool source
 

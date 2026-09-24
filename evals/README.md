@@ -79,7 +79,15 @@ coverage.py profile-to-model assignment against results/: evidenced or estimated
 oracle.py   submits each task's own known-good answer to its own check
 classifier/ a second task set: can a model tell when it cannot route a job?
 inspect_port/  the same tasks ported to Inspect AI, with an opinion in NOTES.md
+run.py, report.py, coverage.py and oracle.py each have tests beside them
+            where the behaviour is worth guaranteeing: test_run.py covers the
+            retry-and-backoff path
 ```
+
+[`kontor-eval-contract.md`](kontor-eval-contract.md) is the depth: how a manual
+rating has to be written so `report.py` can read it, what the HTTP error codes
+mean and why collapsing them all into `!` loses information, and one
+instruction that turned out to be wrong and is kept as a correction.
 
 Every task carries an `oracle` block holding an answer known to be right, and `oracle.py` puts it through that task's own verifier. Task `04` declares `"expect": "reject"` — the text names no year, so the honest `null` fails its type check by design, which is the documented defect that `10` exists to correct. Everything else must accept its own correct answer, and `03` was retired the day this was introduced because it did not: its premise turned out to be false, after thirteen models had been scored as passing it.
 
