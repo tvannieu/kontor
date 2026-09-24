@@ -2,6 +2,8 @@
 
 Eighteen git repositories on one laptop, one agent session each, and one hard rule: **no session may write into another repository.** This is the infrastructure that came out of running that arrangement: the conventions, about 3,800 lines of shell and Python (2,100 of it the tooling, 1,700 the eval suite, and 380 of that total is tests), and the failures that produced both. It grew — one repository in May 2025, six by that September, eighteen by September 2026 — and the pouch, which is what makes it an arrangement rather than a pile of folders, has only been in use since March 2026.
 
+A *branch* below is one of those repositories — the word comes from the trading-house metaphor at the end, not from git.
+
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
 The tooling is also meant to be useful on its own. Each script in [`tools/`](tools/) is a single file that takes its configuration from outside the repository and can be lifted out without the rest. Most need nothing but git and a shell. Some need something specific: `kontor` and the crush distributor need [`crush`](https://github.com/charmbracelet/crush) and Ollama; `mail-reader.py` and `ocr_vision.swift` need macOS, for Mail.app and the Keychain in the first case and Apple's Vision framework in the second.
@@ -102,9 +104,7 @@ Key:  + passed   o partial   - failed   ~ unstable across epochs   x cut off at 
   22: crush/openrouter/thinkingmachines/inkling:free  (2026-09-22)  unknown — the agent runner reports no usage
 ```
 
-Read the top two rows.
-
-Seventeen models returned a verdict, across ten vendor namespaces and two harnesses, over a 400-fold spread in what a hosted run costs — $0.0008 to $0.34. They pass nearly everything mechanical. **Every one of them that produced an answer fails both tasks that have no determinable answer.**
+The finding is in the top two rows. Seventeen models returned a verdict, across ten vendor namespaces and two harnesses, over a 400-fold spread in what a hosted run costs — $0.0008 to $0.34. They pass nearly everything mechanical. **Every one of them that produced an answer fails both tasks that have no determinable answer.**
 
 Reading the columns: 15 is a provider-side rate limit, not a model failure — the eighteenth model, with no verdict at all. 4 ran one profile's tasks only. 16–18 are three-epoch runs. 20 is the local model on the filing profile alone; its `x` is an answer cut off at the token cap rather than a wrong one, and its `-` on `02` is a cut-off answer rated 0 because it never reached a conclusion ([`docs/roadmap.md`](docs/roadmap.md) has that story). 21 is a free-tier model that was rate-limited on nine of ten tasks; the one that got through failed `02` exactly like every other model. 22 is a second run of column 19's model, three days later — a deliberate exception to [rule 4](evals/README.md#rules-that-keep-it-worth-something): kept because it failed `01` and `02` in the same shape both times, which is evidence the finding is stable rather than a reason to discard the rule.
 

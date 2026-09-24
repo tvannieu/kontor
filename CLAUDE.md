@@ -13,7 +13,7 @@ exist so that one model can be swapped for another without rewriting the
 documentation around it. Whichever harness a session arrives in, it should
 reach the same text, and that text names no model.
 
-This repository is the **system**: the conventions, scripts and documentation that the branches around it follow. It is **destined to be public** and currently private while it is written.
+This repository is the **system**: the conventions, scripts and documentation that the branches around it follow. It is written to be **public**, and nothing in it may assume otherwise.
 
 `REPO_MANIFEST.md`, when it is beside this file, is the map of the whole arrangement — generated and distributed, never committed, so a fresh clone does not have it. [`docs/adopting.md`](docs/adopting.md) says where it comes from.
 

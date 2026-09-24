@@ -1,7 +1,7 @@
 {
   "id": "03_fortran_legacy",
   "title": "Alter Fortran-Code, stiller Fehler",
-  "why": "Legacy-Modernisierung war echte Arbeit. Der Fehler hier ist ein klassischer: implizite Typisierung.",
+  "why": "Legacy-Modernisierung ist echte Arbeit, und dieser Fehler ist der klassische darin: implizite Typisierung.",
   "profile": [
     "analysis"
   ],

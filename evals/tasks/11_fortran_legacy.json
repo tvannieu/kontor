@@ -1,7 +1,7 @@
 {
   "id": "11_fortran_legacy",
   "title": "Old Fortran, silent error",
-  "why": "Legacy modernisation was real work. The bug is a classic one: implicit typing. Successor to 03_fortran_legacy, retired 2026-09-19 because its variable was named SUM, which Fortran types as REAL, so the symptom it described could not occur. Here the accumulator is NSUM, which the implicit rule types as INTEGER, and the code really does return 1.0. Verified with gfortran before the task was written, which is the point of evals/oracle.py.",
+  "why": "Legacy modernisation is real work, and this bug is the classic one in it: implicit typing. Successor to 03_fortran_legacy, retired 2026-09-19 because its variable was named SUM, which Fortran types as REAL, so the symptom it described could not occur. Here the accumulator is NSUM, which the implicit rule types as INTEGER, and the code really does return 1.0. Verified with gfortran before the task was written, which is the point of evals/oracle.py.",
   "profile": [
     "analysis"
   ],

@@ -30,6 +30,7 @@ RAW = (b"From: Sample Sender\r\nSubject: hello\r\n"
 # The fake never checks it. No address-shaped string appears in this file, on purpose:
 # the publication gate blocks those, and the tests do not need one.
 ACCOUNT = "account-under-test"
+HOST = "imap.example.test"
 
 
 class FakeIMAP:
@@ -86,6 +87,16 @@ class Arguments(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("unrecognized", err)
         lm.assert_not_called()
+
+    def test_archive_and_find_need_a_host_and_have_no_default(self):
+        """The provider is instance data; the tool must not name one."""
+        self.assertIsNone(mr.IMAP_HOST if "KONTOR_IMAP_HOST" not in os.environ else None)
+        with mock.patch.dict(os.environ, {"KONTOR_MAIL_ACCOUNT": ACCOUNT}), \
+                mock.patch.object(mr, "IMAP_HOST", None):
+            for argv in (["archive", "1", "x.eml"], ["find", "--from", "x"]):
+                code, _, err = run_main(argv)
+                self.assertEqual(code, 1, argv)
+                self.assertIn("IMAP host required", err)
 
     def test_archive_and_find_need_an_account(self):
         with mock.patch.dict(os.environ, {}, clear=False):
@@ -151,7 +162,7 @@ class Find(unittest.TestCase):
         with mock.patch.object(mr, "get_imap_password", return_value="pw"), \
                 mock.patch.object(mr.imaplib, "IMAP4_SSL", return_value=fake), \
                 redirect_stderr(io.StringIO()) as err:
-            out = mr.find_messages(ACCOUNT, **kw)
+            out = mr.find_messages(ACCOUNT, imap_host=kw.pop('imap_host', HOST), **kw)
         return out, fake, err.getvalue()
 
     def test_returns_real_uids_newest_first_with_their_id_space(self):
@@ -194,7 +205,7 @@ class Find(unittest.TestCase):
         with mock.patch.object(mr, "get_imap_password", return_value="pw"), \
                 mock.patch.object(mr.imaplib, "IMAP4_SSL", return_value=FakeIMAP()), \
                 redirect_stderr(io.StringIO()):
-            self.assertTrue(mr.archive_message(out[0]["uid"], dest, ACCOUNT))
+            self.assertTrue(mr.archive_message(out[0]["uid"], dest, ACCOUNT, imap_host=HOST))
         self.assertTrue(os.path.exists(dest))
 
 
@@ -213,7 +224,7 @@ class ArchiveKeepsWorking(unittest.TestCase):
         with mock.patch.object(mr, "get_imap_password", return_value="pw"), \
                 mock.patch.object(mr.imaplib, "IMAP4_SSL", return_value=fake), \
                 redirect_stderr(io.StringIO()) as err:
-            return mr.archive_message("1", dest, ACCOUNT), dest, err.getvalue()
+            return mr.archive_message("1", dest, ACCOUNT, imap_host=HOST), dest, err.getvalue()
 
     def test_absent_uid_explains_the_id_space(self):
         ok, dest, err = self.archive(FakeIMAP(have=False))

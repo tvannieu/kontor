@@ -7,10 +7,9 @@
 # the gate passes again.
 #
 # It plants the canary in TWO places, and inbox/ is the important one: the
-# gate excluded that directory from every scan until 2026-09-20, and reported
-# clean over eight messages full of other branches' names for as long as they
-# sat there. A self-test that only plants at the repository root would have
-# passed throughout. See docs/lessons.md.
+# gate excluded that directory until 2026-09-20 (docs/lessons.md), and a
+# self-test that only plants at the repository root would have passed
+# throughout.
 #
 # The term is read from the deny-list at run time and never printed, never
 # written anywhere but the canary file, and the canary file is removed on

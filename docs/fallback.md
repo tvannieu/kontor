@@ -30,10 +30,7 @@ how it was built and what it would have to satisfy again.
 
 A script writes the runner's config into every branch from the classification lists, and appends the config filename to each branch's `.gitignore` as it goes.
 
-**That last part came from a sibling branch noticing a question it should not have to answer.** The config arrived untracked in its repository, leaving it to decide whether to commit or ignore it — a decision eleven branches would answer eleven ways. Its reasoning generalises:
-
-> **A distributed file is cheapest when it is clearly documentation (commit it) or clearly
-> machinery (ignore it), and expensive when it sits between.**
+**That last part came from a sibling branch noticing a question it should not have to answer.** The config arrived untracked in its repository, leaving it to decide whether to commit or ignore it — a decision eleven branches would answer eleven ways. Its reasoning generalises: a distributed file is cheapest when it is clearly documentation (commit it) or clearly machinery (ignore it), and expensive when it sits between.
 
 The manifest is documentation and is committed. The runner config is machinery: an output of a script that is itself versioned, whose history nobody will ever read, and which in a repository later shared with collaborators names a personal account.
 

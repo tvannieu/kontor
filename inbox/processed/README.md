@@ -13,9 +13,7 @@ subject matter, and they name all three — which is what makes them useful to
 the branch receiving them, and unpublishable here.
 
 Eight of them were committed to this repository and removed again on
-2026-09-20, history included. They had been carrying organisation names, private
-surnames and paths naming private matters through every
-`clean` the publication gate printed, because `tools/check-public.sh` excluded
+2026-09-20, history included, because `tools/check-public.sh` excluded
 `inbox/` from its scan — the one directory whose contents come from somewhere
 else. The exclusion is gone. See [`docs/lessons.md`](../../docs/lessons.md).
 

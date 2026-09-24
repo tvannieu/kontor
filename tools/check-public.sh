@@ -30,37 +30,25 @@ VOCAB="${KONTOR_VOCAB:-$HOME/.config/kontor/vocab.txt}"
 BCONF="${KONTOR_CONF:-$HOME/.config/kontor/branches.conf}"
 self=$(basename "$(git rev-parse --show-toplevel)")
 
-# Two exclusions, and only one of them is defensible.
-#
-# check-public.sh excludes itself because it would otherwise match on the
-# patterns it is searching for.
-#
-# inbox/ used to be excluded too, on the reasoning that the pouch is a
-# delivery mechanism rather than content. That reasoning was wrong, and it
-# was wrong in the most expensive possible way: the messages that arrive in
-# inbox/ come FROM the other branches, so they are the likeliest place in
-# this repository for another branch's names and matters to appear -- and
-# they were the one place never scanned. Found 2026-09-20: eight committed
-# and pushed files, carrying between one and seventeen distinct deny-listed
-# terms each. Every "clean" this script had printed was silent about them.
-#
-# The rule this cost, twice now: an exclusion is a claim that a population
-# cannot contain what you are looking for. The deny-list was empty; the
-# inbox was unscanned. Both times the gate reported clean, and both times
-# the reason was the scope, not the content.
+# One exclusion: this script, which would otherwise match the patterns it
+# searches for. inbox/ was excluded too until 2026-09-20, and that let eight
+# pouch messages full of other branches' terms through a gate that printed
+# "clean" -- see docs/lessons.md. An exclusion is a claim that a population
+# cannot contain what you are looking for, and it needs evidence like any
+# other claim.
 files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$'; }
 
 # 1. the private wordlist — plus every branch name in the instance config.
-# Found 18.09.2026: the deny-list had been empty since it was created, and
-# every "clean" this script printed was vacuous for this scan. Names the
-# config already knows can never again be missing because nobody typed them;
-# the file itself is for people, employers and matters. Whole-word matching,
-# because branch names can be ordinary words.
+# Found 2026-09-18: the deny-list had been empty since it was created, so
+# every "clean" this scan had printed was vacuous. Names the config already
+# knows can never again be missing because nobody typed them; the file itself
+# is for people, organisations and matters. Whole-word matching, because
+# branch names can be ordinary words.
 terms() {
   grep -vE '^[[:space:]]*(#|$)' "$DENY"
   if [ -r "$BCONF" ]; then
     # A name written with a hyphen where the directory has an underscore (or
-    # the reverse) is the same name to a reader. Found 18.09.2026 in a
+    # the reverse) is the same name to a reader. Found 2026-09-18 in a
     # comment the whole-word scan had walked past.
     ( . "$BCONF"; for b in "${BRANCHES[@]:-}"; do
         [ "$b" = "$self" ] && continue

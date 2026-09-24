@@ -32,9 +32,7 @@ The test for whether something qualifies came from the branch with the strictest
 
 ## Hierarchy and chronology
 
-One branch had carried an absolute clause — *no exceptions* — since long before the general rule existed for an exception to attach to. It was read for months as evidence that this branch was stricter than the others. It was not: it was simply written first.
-
-> **An absolute clause must say whether it means *stricter* or merely *older*.**
+One branch had carried an absolute clause — *no exceptions* — since long before the general rule existed for an exception to attach to. It was read for months as evidence that this branch was stricter than the others. It was not: it was simply written first. An absolute clause has to say whether it means *stricter* or merely *older*.
 
 There is one rule, it applies to every branch equally, and the branch where it was first written down has no special status.
 

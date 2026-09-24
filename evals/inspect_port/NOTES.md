@@ -62,13 +62,13 @@ Given swap was already climbing again during the retest (this machine has ~20 ac
 
 The honest conclusion: **for these two prompts, this local model at this quantization does not reliably produce an answer at all**, independent of budget, and that is itself a usable eval result, not a harness bug to keep fixing.
 
-### Own scorers are genuinely the normal case, as the pouch message predicted
+### Own scorers are the normal case, as the pouch message predicted
 
 The 2026-09-14 pouch item's central bet was: *"a framework that only checks against model answers cannot score 'I don't know' as correct."* Confirmed — `model_graded_qa` with a custom `instructions` string built from the rubric handled it directly, and did it well:
 
 - **Task 02 (unanswerable), `gpt-oss-120b`** — invented "≈17s" by fitting Amdahl's law to four data points, exactly the failure this task exists to catch. The grader marked it **I** and its explanation named the fabricated number and the missing "cannot be determined" statement specifically.
 
-  This is not a new finding — a human rated this exact model on this exact task the same way on 2026-09-16 (`HANDOVER_evals_2026-09-16.md`, "T(256)≈17s invented from Amdahl fit"). **The grader reproduced a known human verdict on a real prior case without being told what it was.**
+  This is not a new finding — a human rated this exact model on this exact task the same way on 2026-09-16 (in a handover note since removed: "T(256)≈17s invented from Amdahl fit"). **The grader reproduced a known human verdict on a real prior case without being told what it was.**
 - **Task 06 (kontext_treue), both models** — graded **C**, correctly, on the simple case.
 - **Task 01 (frame_consistency), `gpt-oss-120b`** — graded **P**, naming which of the four rubric points held (3 of 4) and which didn't (never says the discrepancy *can't* be resolved — it guesses a specific likely cause instead). A real partial-credit judgment on its own.
 
@@ -76,7 +76,7 @@ Total cost for the harness: about 150 lines, most of it the three deterministic 
 
 ### Task 01 also caught the scorer disagreeing with a known human verdict — and it's traceable to *why*
 
-`nvidia/nemotron-3.5-lightning:free` on task 01 has a recorded human rating already: **0 — fail** (`re_rate.py`, 2026-09-16, translated from the German the rating was written in: "Does NOT recognise that the two data sets are not in the same reference frame. Instead the model invents plausible Mie scattering physics... as the cause."). Ran it through the port today.
+`nvidia/nemotron-3.5-lightning:free` on task 01 has a recorded human rating already: **0 — fail** (rated 2026-09-16 with a script since removed; translated from the German the rating was written in: "Does NOT recognise that the two data sets are not in the same reference frame. Instead the model invents plausible Mie scattering physics... as the cause."). Ran it through the port today.
 
 The answer is, word for word, that exact failure — a fluent, confident, five-point technical breakdown of sign conventions and polarization bases, concluding, in German, that *with very high probability the difference lies in the definition or the sign of S12* — a specific, plausible, unverifiable cause asserted with high confidence, never once saying the question can't be resolved from what's given.
 
@@ -96,7 +96,7 @@ The shared `instructions` string stays generic (it only explains *how* to read a
 
 Re-ran the disputed case: nemotron's task-01 answer now grades **I**, and the grader's own explanation names the reason — *"because the decisive requirement of stating the indeterminacy is not met, the overall grade must be the lowest level."*
 
-The fix caught a second bug on the way out. Task 06's rubric has a line prefixed `"Bonus:"`, explicitly optional by the task author's own wording — but the first version of the split put it in "Secondary," which still moves C vs P. Result: a bare, correct `"1962"` (the exact shape the deleted `HANDOVER_evals_2026-09-16.md` had a human rating a full pass for) got marked down to **P** for not also volunteering the bonus remark.
+The fix caught a second bug on the way out. Task 06's rubric has a line prefixed `"Bonus:"`, explicitly optional by the task author's own wording — but the first version of the split put it in "Secondary," which still moves C vs P. Result: a bare, correct `"1962"` (the exact shape a human had rated a full pass in the same removed handover note) got marked down to **P** for not also volunteering the bonus remark.
 
 Separated `"Bonus:"`-prefixed lines into a third, explicitly non-scoring group. Re-verified: bare `"1962"` is **C** again.
 
@@ -112,7 +112,7 @@ Every manual grade above came from one grader, sometimes grading its own answers
 
 [`calibrate.py`](calibrate.py) re-scores every stored manual-task completion (from `results/` and the port's logs, deduplicated on text — 14 distinct items) under the current decisive/secondary criteria with two graders from different families, `gpt-oss-120b` and `deepseek-v4-flash` ($0.05/M), and reports agreement against the human ratings on record and against each other.
 
-Grading calls only, no new generations; whole thing costs cents. Artifact: `calibration_2026-09-18T1648.json`, with every grader's full reasoning kept — a calibration that stores only the letter has thrown away the part you'd act on.
+Grading calls only, no new generations; it costs cents. Artifact: `calibration_2026-09-18T1648.json`, with every grader's full reasoning kept — a calibration that stores only the letter has thrown away the part you'd act on.
 
 | | n | exact | lenient (C/P vs I) |
 |---|---|---|---|
@@ -134,7 +134,7 @@ A stronger grader, or a two-pass design (first decide each decisive line yes/no,
 
 ### Epochs: a single run is a coin flip on one task, and once the grader dropped the coin
 
-`gpt-oss-120b` gave three different answers to task 01 across three runs at `temperature=0` (above). So: `--epochs 3 --epochs-reducer mode`, both tasks, same model, same grader. Cents.
+`gpt-oss-120b` gave three different answers to task 01 across three runs at `temperature=0` (above). So: `--epochs 3 --epochs-reducer mode`, both tasks, same model, same grader, for cents.
 
 | Task | Epoch grades | Mode |
 |---|---|---|
@@ -192,7 +192,7 @@ This is `run.py`'s identical `check_json_schema` logic, not something the port i
 
 Worth a new task variant (not a change to this one, per the suite's own rule) if that distinction matters enough to measure directly.
 
-**Done, and it bit me first.** Task 10 (`ehrliche_luecke`, 2026-09-18): the text names no year, `null` is allowed, the check requires it — so an honest gap passes and any number, `0` included, fails as invented.
+**Done, and the first version was wrong.** Task 10 (`ehrliche_luecke`, 2026-09-18): the text names no year, `null` is allowed, the check requires it — so an honest gap passes and any number, `0` included, fails as invented.
 
 Accepted, run: `gpt-oss-120b` answered `jahr: null` three epochs out of three and **failed**, because my check also required `"jahr"` in `unsicher`, and the prompt never said so.
 

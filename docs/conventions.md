@@ -4,10 +4,7 @@ Two layers: rules every branch follows, and rules each branch invented for itsel
 
 Eleven branches were asked independently what conventions they had and which mistake produced each. They work on entirely unrelated things — a manuscript, a recipe collection, a benchmark suite, a set of running administrative matters — and they had **independently arrived at the same class of rule.**
 
-> **Every one of them had built a mechanism to stop a record from quietly drifting away from
-> reality.**
-
-Nobody coordinated that. It emerged because the same failure kept happening in eleven different shapes.
+Every one of them had built a mechanism to stop a record from quietly drifting away from reality. Nobody coordinated that; the same failure had happened in eleven different shapes.
 
 ---
 
@@ -30,48 +27,37 @@ Collected from eleven branches. Each is quoted close to how its branch stated it
 
 ### Against silence
 
-> **An open-items register in which an item leaves the list by being decided, not by going quiet.**
-
-> **Incoming notes are closed with their resolution, not just archived.**
-
-> **A warning that is legitimate is triaged once and recorded as known-good, with the date and the
-> reason. A warning list everyone has learned to ignore is worse than no warning list.**
+- An open-items register in which an item leaves the list by being decided, not by going quiet.
+- Incoming notes are closed with their resolution, not just archived.
+- A warning that is legitimate is triaged once and recorded as known-good, with the date and the
+  reason. A warning list everyone has learned to ignore is worse than no warning list.
 
 ### Against the record and the world parting company
 
-> **Every inventory line carries the date it was last confirmed.** An inventory describes the past,
-> not the present.
-
-> **A full re-survey from direct observation supersedes accumulated incremental edits.**
-
-> **Status lives in the filename, not inside the document.** A directory listing is an index; line
-> 40 is not.
-
-> **Sent means: has a receipt.**
-
-> **A signed file is copied back into its folder immediately**, and whether the signature is
-> actually there is checked mechanically, not by eye.
+- Every inventory line carries the date it was last confirmed. An inventory describes the past,
+  not the present.
+- A full re-survey from direct observation supersedes accumulated incremental edits.
+- Status lives in the filename, not inside the document. A directory listing is an index; line
+  40 is not.
+- Sent means: has a receipt.
+- A signed file is copied back into its folder immediately, and whether the signature is
+  actually there is checked mechanically, not by eye.
 
 ### Against corrections that hide
 
-> **Corrections are appended, never applied silently.** A superseded passage is struck through and
-> a guard comment says why.
-
-> **Expected value and text change in the same commit, never one without the other.**
-
-> **Results are committed, including the bad ones.** A discarded run is a dishonest record.
+- Corrections are appended, never applied silently. A superseded passage is struck through and
+  a guard comment says why.
+- Expected value and text change in the same commit, never one without the other.
+- Results are committed, including the bad ones. A discarded run is a dishonest record.
 
 ### Against inferring what could be looked up
 
-> **Nothing is computed here, only cited.** Every number belongs to a branch that produced it.
-
-> **Identifiers come from a source or not at all.** If the search finds nothing, the answer is
-> "not found", not "does not exist".
-
-> **Verify at source before adopting.** Nothing relayed by another session is acted on from the
-> relay alone.
-
-> **A distinction is enforced between what the branch decided and what it merely relayed.**
+- Nothing is computed here, only cited. Every number belongs to a branch that produced it.
+- Identifiers come from a source or not at all. If the search finds nothing, the answer is
+  "not found", not "does not exist".
+- Verify at source before adopting. Nothing relayed by another session is acted on from the
+  relay alone.
+- A distinction is enforced between what the branch decided and what it merely relayed.
 
 ### Against checks that flatter themselves
 
@@ -79,7 +65,7 @@ Collected from eleven branches. Each is quoted close to how its branch stated it
 
 A duplicate check keyed on document references and invoice numbers found several duplicates. The rows with neither — typed in from a statement rather than from a document — were invisible to it, and there were more of them.
 
-It travels further than anything else here, and it names the shape that [`lessons.md`](lessons.md) records over and over: a check that reports success over a population it defined itself.
+It names the shape that [`lessons.md`](lessons.md) records over and over: a check that reports success over a population it defined itself.
 
 ### Against automating the part that is the work
 

@@ -2,7 +2,7 @@
   "id": "03_fortran_legacy",
   "retired": "2026-09-19. The premise is false. The code as published returns 1.5, not 1.0: Fortran's implicit rule types SUM as REAL (S is not in I-N), so RES = SUM / N is real division and the stated symptom never occurs. Verified with gfortran -std=legacy; renaming SUM to NSUM (implicit INTEGER) does reproduce 1.0. The rubric carried the contradiction openly - 'SUM is implicitly REAL' next to 'recognises the integer division' - and nobody read the two lines together. Thirteen of fourteen models were marked as passing, because contains_any matched the word 'implicit' and never checked whether the reasoning held. Found by writing a known-good answer for it, which is the whole point of evals/oracle.py. Replaced by 11_fortran_legacy, which names the variable so the bug is real.",
   "title": "Old Fortran, silent error",
-  "why": "Legacy modernisation was real work. The bug here is a classic one: implicit typing.",
+  "why": "Legacy modernisation is real work, and this bug is the classic one in it: implicit typing.",
   "profile": [
     "analysis"
   ],

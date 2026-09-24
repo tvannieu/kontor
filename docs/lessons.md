@@ -17,7 +17,7 @@ A script copied a generated file from its canonical location into every other br
 
 Its list of target branches held **three names. Sixteen repositories carried the file.** Thirteen were never written to and sat three versions behind while the canonical one moved on. No copy anywhere carried the generated-file header the script emits, which means it had in fact never written a single one.
 
-**The drift it existed to prevent was accumulating underneath it, invisibly, because the check only ever looked at the three it knew about.**
+The drift it existed to prevent was accumulating underneath it, because the check only ever looked at the three it knew about.
 
 ---
 
@@ -29,8 +29,7 @@ It read them from the **current working directory**, not the repository root —
 
 The conclusion drawn from the claim was correct. The reason was not.
 
-> **The conclusion was right and the reason was wrong, which is the more dangerous combination —
-> the claim carried a file-and-line reference, and the reference is what made it look checked.**
+The conclusion was right and the reason was wrong, which is the more dangerous combination: the claim carried a file-and-line reference, and the reference is what made it look checked.
 
 ---
 
@@ -59,9 +58,7 @@ The operator then opened the tool and typed `test`. It returned **`404 page not 
 
 Four faults were stacked behind that, each hidden by the one in front: a missing path segment in the endpoint URL; a context window pinned so large the model could not load at all on the available memory and thrashed instead; instruction files large enough to consume a fifth of the window before a question was asked; and a token budget so small that the model's reasoning consumed it entirely and returned empty content — a successful call that looks like a broken one.
 
-Three green lights had been read as four.
-
-> **A capability is not verified until it has produced its output once.**
+Three green lights had been read as four. A capability is not verified until it has produced its output once.
 
 ---
 
@@ -69,11 +66,9 @@ Three green lights had been read as four.
 
 A script was written to refuse publication if anything private was present. Its first run printed `clean`, and above it, a `grep` error: a pattern had been assembled by stripping whitespace, which also stripped the spaces *inside* a character class and left it malformed. That check never ran. The script reported success anyway.
 
-This happened **one hour** after the rule about checks and their populations was written down, in the code written to enforce it.
+This happened one hour after the rule about checks and their populations was written down, in the code written to enforce it. A scan that cannot run must fail, not pass.
 
-> A scan that cannot run must fail, not pass.
-
-It is now verified by [`tools/check-public-selftest.sh`](../tools/check-public-selftest.sh), which plants a file containing a real deny-listed term, asserts the gate blocks, removes it, and asserts the gate passes again. **A boundary you have never seen open is an outage, not a boundary.**
+It is now verified by [`tools/check-public-selftest.sh`](../tools/check-public-selftest.sh), which plants a file containing a real deny-listed term, asserts the gate blocks, removes it, and asserts the gate passes again. A boundary you have never seen open is an outage, not a boundary.
 
 ---
 
@@ -92,19 +87,19 @@ were the one place never scanned.
 
 Found 2026-09-20, by opening the files for an unrelated reason: eight committed
 and pushed messages, carrying between one and seventeen distinct deny-listed
-terms each. organisation names, two private surnames, and
-paths naming private matters. Every `clean` the gate had
-printed was silent about all of it. The repository was still private, which is
-the only reason this is a lesson and not an incident.
+terms each: organisation names, two private surnames, and paths that named
+private matters. Every `clean` the gate had printed was silent about all of
+it. The repository was still private, which is the only reason this is a
+lesson and not an incident.
 
 This is the second time the same shape has produced a false `clean`. The first
 was an empty deny-list: the gate scanned the right files against nothing. This
 time it scanned the wrong files against the right list. Both printed `clean`;
 in neither case was the content the problem.
 
-> **An exclusion is a claim that a population cannot contain what you are
-> looking for.** It needs the same evidence as any other claim, and it is
-> invisible in the output — the gate does not print what it declined to read.
+An exclusion is a claim that a population cannot contain what you are
+looking for. It needs the same evidence as any other claim, and it is
+invisible in the output: the gate does not print what it declined to read.
 
 The exclusion is gone, the eight messages are gone from the working tree and
 from history, and `inbox/processed/` now ships empty with a README saying why.
@@ -147,9 +142,9 @@ The same wrong number then turned up in **three** files — `evals/README.md`,
 that same hedge**. Each was fixed separately, on the same day, because each fix
 corrected the figure without removing the reason a figure was sitting there.
 
-> **A warning about drift is not a defence against it.** Either the document
-> derives the figure, or the figure will be wrong. A sentence that apologises
-> in advance for being unreliable is still unreliable.
+A warning about drift is not a defence against it. Either the document
+derives the figure, or the figure will be wrong. A sentence that apologises
+in advance for being unreliable is still unreliable.
 
 Two further things this pass established, both of them about method:
 
@@ -175,9 +170,7 @@ An early tool was deleted rather than fixed. Its documentation was kept as a tom
 
 The reasoning for not fixing it generalises: *the bugs were never the problem. Fix all six and it is still a single-turn chat that cannot open a file.*
 
-> **Deleting the record is how the reasoning gets lost and the thing gets rebuilt.**
-
-A retirement note is a convention worth having. See [`../templates/TOMBSTONE.md`](../templates/TOMBSTONE.md).
+Deleting the record is how the reasoning gets lost and the thing gets rebuilt. A retirement note is a convention worth having. See [`../templates/TOMBSTONE.md`](../templates/TOMBSTONE.md).
 
 ---
 ← [README](../README.md) · [Conventions](conventions.md)

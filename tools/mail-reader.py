@@ -10,24 +10,25 @@ Subcommands:
 
 All subcommands except 'archive' use AppleScript over Mail.app —
 no password required. 'archive' reads the IMAP password from macOS
-Keychain (account=<email>, service=imap.gmx.net) and fetches the
+Keychain (account=<email>, service=<imap host>) and fetches the
 raw RFC822 source via Python imaplib.
 
 Requirements:
   - macOS
   - Mail.app with at least one configured IMAP account
-  - For 'archive': the IMAP password stored in macOS Keychain under
-    account=<email>, service=imap.gmx.net (or pass --imap-service)
+  - For 'find' and 'archive': the IMAP host, via --imap-host or
+    KONTOR_IMAP_HOST, and the IMAP password in the macOS Keychain under
+    account=<email>, service=<that host> (or pass --imap-service)
 
-Tested with: GMX.net IMAP over Mail.app on macOS 26.6.
+Tested with one IMAP provider over Mail.app on macOS 26.6.
 
 Usage:
   mail-reader list   [--limit N] [--mail-account N|NAME] [--mailbox NAME] [--json]
   mail-reader read   <mail-app-id> [--mail-account N|NAME] [--mailbox NAME] [--json]
   mail-reader search <query> [--in subject|sender|either] [--mail-account ...] [--mailbox ...] [--json]
   mail-reader find   [--from TEXT] [--subject TEXT] [--since YYYY-MM-DD] [--limit N]
-                     --account EMAIL [--mailbox NAME] [--json]
-  mail-reader archive <imap-uid> <output.eml> --account EMAIL [--mailbox NAME] [--attachments-dir DIR]
+                     --account EMAIL --imap-host HOST [--mailbox NAME] [--json]
+  mail-reader archive <imap-uid> <output.eml> --account EMAIL --imap-host HOST [--mailbox NAME] [--attachments-dir DIR]
 
 `--name value` and `--name=value` both work. An option that is not recognised is an
 error; it used to be ignored silently, so `--limit 30` quietly meant 10.
@@ -35,7 +36,8 @@ error; it used to be ignored silently, so `--limit 30` quietly meant 10.
 Two kinds of account, two kinds of id. list/read/search go through Mail.app and take
 --mail-account (its own number or name; default 1) and print Mail.app ids. find and archive
 speak IMAP and take --account (the e-mail address you log in with, or set
-KONTOR_MAIL_ACCOUNT). To archive a message you already know how to describe, use `find` to get
+KONTOR_MAIL_ACCOUNT) and --imap-host (or KONTOR_IMAP_HOST). Neither has a default: the
+provider is instance data, not something a published tool should name. To archive a message you already know how to describe, use `find` to get
 its IMAP UID first:  mail-reader find --from someone --account EMAIL
 
 'list', 'read' and 'search' see one Mail.app mailbox at a time (INBOX of account 1 unless told
@@ -60,13 +62,13 @@ import email as eml_lib
 from email.header import decode_header, make_header
 from email import utils as email_utils
 
-IMAP_HOST = "imap.gmx.net"
+IMAP_HOST = os.environ.get("KONTOR_IMAP_HOST")  # no default on purpose
 IMAP_PORT = 993
 SEP = "|||"
 BODY_START = "\n|||\n"
 
 
-def get_imap_password(account_email, service="imap.gmx.net"):
+def get_imap_password(account_email, service):
     try:
         pw = subprocess.check_output(
             ["security", "find-generic-password",
@@ -318,9 +320,12 @@ def extract_attachments(msg, out_dir):
     return written
 
 
-def archive_message(uid, output_path, account_email, imap_service="imap.gmx.net", imap_host=None, mailbox="INBOX", attachments_dir=None):
-    if imap_host is None:
-        imap_host = IMAP_HOST
+def archive_message(uid, output_path, account_email, imap_service=None, imap_host=None, mailbox="INBOX", attachments_dir=None):
+    imap_host = imap_host or IMAP_HOST
+    if not imap_host:
+        print("Error: IMAP host required. Pass --imap-host=HOST or set KONTOR_IMAP_HOST.", file=sys.stderr)
+        return False
+    imap_service = imap_service or imap_host
     pw = get_imap_password(account_email, imap_service)
     if pw is None:
         print(f"Error: IMAP password not in keychain for {account_email} / {imap_service}", file=sys.stderr)
@@ -413,7 +418,7 @@ def print_message(msg, json_out=False):
         print("[No body]")
 
 
-def find_messages(account_email, imap_service="imap.gmx.net", imap_host=None,
+def find_messages(account_email, imap_service=None, imap_host=None,
                   mailbox="INBOX", sender=None, subject=None, since=None, limit=10):
     """Search over IMAP and return messages carrying their real IMAP UID.
 
@@ -445,12 +450,17 @@ def find_messages(account_email, imap_service="imap.gmx.net", imap_host=None,
         criteria += ["SINCE", f"{int(d)}-{months[int(m) - 1]}-{y}"]
     if not criteria:
         criteria = ["ALL"]
+    imap_host = imap_host or IMAP_HOST
+    if not imap_host:
+        print("Error: IMAP host required. Pass --imap-host=HOST or set KONTOR_IMAP_HOST.", file=sys.stderr)
+        return None
+    imap_service = imap_service or imap_host
     pw = get_imap_password(account_email, imap_service)
     if pw is None:
         print(f"Error: IMAP password not in keychain for {account_email} / {imap_service}", file=sys.stderr)
         return None
     try:
-        M = imaplib.IMAP4_SSL(imap_host or IMAP_HOST, IMAP_PORT)
+        M = imaplib.IMAP4_SSL(imap_host, IMAP_PORT)
         M.login(account_email, pw)
         typ, sel = M.select(mailbox, readonly=True)
         if typ != "OK":
@@ -506,8 +516,7 @@ def build_parser():
     import argparse
     ap = argparse.ArgumentParser(
         prog="mail-reader", description=__doc__.split("Usage:")[0].strip().splitlines()[0],
-        epilog="`--name value` and `--name=value` are both accepted. Anything not recognised is "
-               "an error, not ignored: `--limit 30` used to be dropped silently and the default of 10 used.")
+        epilog="`--name value` and `--name=value` are both accepted; anything not recognised is an error.")
     sub = ap.add_subparsers(dest="cmd", required=True, metavar="{list,read,search,find,archive}")
 
     def mail_app_opts(p):
@@ -519,8 +528,10 @@ def build_parser():
     def imap_opts(p):
         p.add_argument("--account", default=os.environ.get("KONTOR_MAIL_ACCOUNT"), metavar="EMAIL",
                        help="IMAP login; or set KONTOR_MAIL_ACCOUNT")
-        p.add_argument("--imap-service", default="imap.gmx.net", metavar="NAME", help="Keychain service name")
-        p.add_argument("--imap-host", default=None, metavar="HOST")
+        p.add_argument("--imap-host", default=None, metavar="HOST",
+                       help="IMAP server; or set KONTOR_IMAP_HOST. No default.")
+        p.add_argument("--imap-service", default=None, metavar="NAME",
+                       help="Keychain service name (default: the IMAP host)")
         p.add_argument("--mailbox", default="INBOX", metavar="NAME")
 
     p = sub.add_parser("list", help="recent messages, as Mail.app ids")

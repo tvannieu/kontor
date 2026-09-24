@@ -1,4 +1,4 @@
-# model-evals
+# evals
 
 A fixed set of tasks, run unchanged against every new model.
 

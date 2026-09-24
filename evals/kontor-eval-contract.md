@@ -59,13 +59,10 @@ conclusion drawn from it was not:
 files() { git ls-files -co --exclude-standard | grep -vE 'check-public\.sh$' | grep -vE '^inbox/'; }
 ```
 
-`inbox/` is where the **other branches** write. Their messages name their own
-repository, their own correspondents and their own subject matter, because that
-is what makes them useful to the branch receiving them. Of everything in a
-kontor repository it is the likeliest place for another branch's private
-material to appear — and that exclusion made it the one place never scanned.
-Eight committed and pushed messages carried between one and seventeen
-deny-listed terms each before it was found. See [`../docs/lessons.md`](../docs/lessons.md).
+`inbox/` is where the **other branches** write, so it is the likeliest place
+in a kontor repository for another branch's private material to appear, and the
+exclusion made it the one place never scanned. What that cost is in
+[`../docs/lessons.md`](../docs/lessons.md).
 
 The real problem — that ordinary mail should not block an unrelated push — is
 solved where it belongs, in `.gitignore`:

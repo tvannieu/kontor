@@ -12,7 +12,7 @@ Translating a prompt changes the artefact being measured, so under this collecti
 
 `tasks/` — eleven task files, `01` through `11`. Task `10` was itself already retired on 2026-09-18, one day into its life: its check required a key to be listed as uncertain on top of being null, and its prompt never said so, so a model that answered honestly failed. Task `11` is that task with the missing clause added. Both are kept, because the pair is the clearest record in this repository of a verifier being wrong about a correct answer.
 
-`results/` — fifteen result files, 2026-09-12 to 2026-09-18, across seven models: two local (Ollama), three through OpenRouter, two through the agent runner. Manual ratings and their German rationales are intact.
+`results/` — fifteen result files, 2026-09-12 to 2026-09-18, across nine models: two local (Ollama), four through OpenRouter, three through the agent runner. Manual ratings and their German rationales are intact.
 
 ## Reading them against the English suite
 
