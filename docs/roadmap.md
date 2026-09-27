@@ -58,6 +58,21 @@ that control will be wanted again before 8B is attempted — through the native
 Ollama endpoint, which takes `options`, not the OpenAI-compatible one `run.py`
 uses now.
 
+**A third-party alternative, tested 2026-09-27 and not pursued: AirLLM.** It
+streams one transformer layer onto the GPU at a time instead of holding the
+whole model resident, which is how it claims to run a 70B model on a 4GB
+card. On this machine it does what it claims — a correct answer, generated
+without error — but at 0.330 tokens/sec on a 1.1B model with weights already
+cached, because every generated token re-streams all layers from disk rather
+than reusing them; `use_cache=True` caches attention state, not weights. That
+scales the wrong way for "a bigger local model": throughput is roughly
+O(tokens × model size in bytes), so a 70B run would extrapolate to minutes
+per token, not seconds. Undocumented anywhere: on macOS the library always
+runs the Llama-architecture MLX backend regardless of which model is named,
+so neither `kontor-4b` nor `kontor-8b` (not Llama-architecture) could be
+tested through it at all — filed upstream as
+[lyogavin/airllm#371](https://github.com/lyogavin/airllm/issues/371).
+
 ## 2. Weigh a rubric line without hand-maintaining a list
 
 `DECISIVE_CRITERIA` in [`kontor_evals.py`](../evals/inspect_port/kontor_evals.py) names, per task, which rubric lines are decisive — and it is a hand-kept mapping of quoted strings, guarded only by an assertion that fires when a line stops matching. That is the shape of every drift this repository has recorded: the manifest's inbox table, the README's task count, the empty deny-list.
