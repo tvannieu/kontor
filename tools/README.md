@@ -11,9 +11,10 @@ need nothing but git and a shell; the exceptions are noted.
 | [`kontor`](kontor) | the profile switcher and the local-first guard. Needs `crush` and Ollama |
 | [`distribute_manifest.sh`](distribute_manifest.sh), [`distribute_crush_config.sh`](distribute_crush_config.sh) | push generated files into every branch. The second needs `crush` |
 | [`mail-reader.py`](mail-reader.py) | read, search and archive mail. macOS: Mail.app and the Keychain |
-| [`archive-sent.sh`](archive-sent.sh) | file a sent draft into the record, dated, without overwriting |
+| [`archive-sent.sh`](archive-sent.sh) | file a sent draft into the record, dated, without overwriting; refuses a folder with subfolders rather than delete them unarchived |
 | [`letter_pdf.py`](letter_pdf.py) | a DIN 5008 letter as a PDF. Standard library only |
 | [`ocr_vision.swift`](ocr_vision.swift) | OCR a PDF locally. macOS: Apple's Vision framework |
+| [`cal.swift`](cal.swift) | list calendar events in a date range. macOS: EventKit. Use this to read a calendar, not AppleScript, whose date queries time out on large calendars |
 | `*.example` | the shape of each file in `~/.config/kontor/`; copy and fill in |
 | `test_*.py` | run them directly, no framework and no network |
 

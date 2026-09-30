@@ -9,7 +9,10 @@
 # It plants the canary in TWO places, and inbox/ is the important one: the
 # gate excluded that directory until 2026-09-20 (docs/lessons.md), and a
 # self-test that only plants at the repository root would have passed
-# throughout.
+# throughout. Pouch mail is gitignored, so it is never published and the gate
+# rightly skips it; what must hold is that an inbox file that becomes TRACKED
+# is scanned. The inbox canary is therefore force-added to the index, the way
+# a real leak would arrive, and unstaged again on every exit path.
 #
 # The term is read from the deny-list at run time and never printed, never
 # written anywhere but the canary file, and the canary file is removed on
@@ -25,7 +28,11 @@ term=$(grep -vE '^[[:space:]]*(#|$)' "$DENY" | head -1)
 [ -n "$term" ] || { echo "deny-list is empty — nothing to plant" >&2; exit 2; }
 
 canaries=("./.kontor-canary.md" "./inbox/.kontor-canary.txt")
-cleanup() { rm -f "${canaries[@]}"; git update-ref -d refs/kontor-canary/msg 2>/dev/null; }
+cleanup() {
+  git rm -q --cached --ignore-unmatch -- "${canaries[@]}" >/dev/null 2>&1
+  rm -f "${canaries[@]}"
+  git update-ref -d refs/kontor-canary/msg 2>/dev/null
+}
 trap cleanup EXIT INT TERM
 
 fail=0
@@ -43,6 +50,7 @@ for c in "${canaries[@]}"; do
   cleanup
   mkdir -p "$(dirname "$c")"
   printf 'canary — this file must make the gate block.\n%s\n' "$term" > "$c"
+  git add -f -- "$c"
   if bash "$GATE" >/dev/null 2>&1; then
     note "planted in ${c#./} — gate should BLOCK" "FAIL (it passed)"
     fail=1

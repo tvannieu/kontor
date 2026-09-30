@@ -26,6 +26,18 @@ archive_dir="${2:?Usage: archive-sent.sh <draft-dir> <archive-dir>}"
 
 [ -d "$draft_dir" ] || { echo "Not a directory: $draft_dir" >&2; exit 1; }
 
+# Only top-level files are archived, and the folder is removed afterwards, so a
+# subfolder would be deleted without ever being copied. Refuse before touching
+# anything. Found 2026-09-30, when copying attachments into the draft folder
+# became the rule and one folder on the desk already held a subfolder.
+subdirs=$(find "$draft_dir" -mindepth 1 -maxdepth 1 -type d)
+if [ -n "$subdirs" ]; then
+    echo "Refusing: $draft_dir contains a subfolder, which this script would delete unarchived:" >&2
+    printf '  %s\n' "$subdirs" >&2
+    echo "Move its files up into $draft_dir, or archive them by hand, then run this again." >&2
+    exit 1
+fi
+
 regular=()
 for f in "$draft_dir"/*; do
     [ -f "$f" ] || continue
@@ -44,7 +56,8 @@ fi
 mkdir -p "$archive_dir"
 stamp="$(date +%Y-%m-%d)"
 echo "Archiving ${#regular[@]} file(s) from $draft_dir to $archive_dir:"
-skipped=0
+identical=0
+differs=0
 for f in "${regular[@]}"; do
     base="$(basename "$f")"
     if [[ "$base" == *.* && "$base" != .* ]]; then
@@ -55,21 +68,31 @@ for f in "${regular[@]}"; do
         dest="$archive_dir/${stamp}_SENT_${base}"
     fi
     if [ -e "$dest" ]; then
-        echo "  SKIP (already exists): $(basename "$dest")" >&2
-        skipped=$((skipped + 1))
+        # Never overwrite. An identical copy means this file is already safe;
+        # a different one means the draft may hold the newer text, so the
+        # folder must survive this run.
+        if cmp -s "$f" "$dest"; then
+            echo "  SKIP (identical copy already archived): $(basename "$dest")" >&2
+            identical=$((identical + 1))
+        else
+            echo "  KEEP (an archived file of this name differs): $(basename "$dest")" >&2
+            differs=$((differs + 1))
+        fi
         continue
     fi
     cp "$f" "$dest"
     echo "  $base -> $(basename "$dest")"
 done
 
-if [ "$skipped" -gt 0 ] && [ "$skipped" -eq "${#regular[@]}" ]; then
-    echo "Every file already had an archived copy — leaving $draft_dir in place." >&2
+if [ "$differs" -gt 0 ]; then
+    echo "$differs file(s) differ from an archived copy of the same name — leaving $draft_dir in place." >&2
+    echo "Compare them and resolve by hand; deleting now could lose the newer text." >&2
     exit 1
 fi
 
 rm -rf "$draft_dir"
 echo "Removed $draft_dir"
 echo
-echo "Not done automatically — add to the recipient's register by hand:"
-echo "  ${stamp} SENT — archived to ${archive_dir}"
+echo "Not done automatically: remove this folder's entry from the register"
+echo "(00_README.txt at the root of the desk). The register shows what is open;"
+echo "a sent item leaves it rather than being marked done."

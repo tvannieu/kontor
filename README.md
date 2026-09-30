@@ -6,7 +6,7 @@ A *branch* below is one of those repositories — the word comes from the tradin
 
 It is a field report with the tooling attached, not a framework. Nothing here is packaged for general use, and there is no enforcement layer: the rules are instructions in a file, kept by a well-behaved agent and a person paying attention.
 
-The tooling is also meant to be useful on its own. Each script in [`tools/`](tools/) is a single file that takes its configuration from outside the repository and can be lifted out without the rest. Most need nothing but git and a shell. Some need something specific: `kontor` and the crush distributor need [`crush`](https://github.com/charmbracelet/crush) and Ollama; `mail-reader.py` and `ocr_vision.swift` need macOS, for Mail.app and the Keychain in the first case and Apple's Vision framework in the second.
+The tooling is also meant to be useful on its own. Each script in [`tools/`](tools/) is a single file that takes its configuration from outside the repository and can be lifted out without the rest. Most need nothing but git and a shell. Some need something specific: `kontor` and the crush distributor need [`crush`](https://github.com/charmbracelet/crush) and Ollama; `mail-reader.py`, `ocr_vision.swift` and `cal.swift` need macOS, for Mail.app and the Keychain, Apple's Vision framework, and EventKit respectively.
 
 ---
 
@@ -20,7 +20,7 @@ Direct session-to-session messaging exists and is useful for conversation, but i
 
 There is one sanctioned exception to rule 1, scoped narrowly by argument rather than convenience: generated files with exactly one correct location may be distributed. [`docs/architecture.md`](docs/architecture.md) has the wording and how it was arrived at.
 
-Both rules govern traffic *inside* the system. Post addressed to people outside it goes through a third channel, an outbox kept outside every repository — [`docs/outbox.md`](docs/outbox.md).
+Both rules govern traffic *inside* the system. What the operator has to act on next — post addressed to people outside it, and preparation for appointments — goes on a third channel, a desk kept outside every repository — [`docs/outbox.md`](docs/outbox.md).
 
 ## What the classification looks like
 
@@ -153,15 +153,16 @@ So: not often wrong, confidently wrong exactly where being wrong is irreversible
 | [`tools/distribute_*.sh`](tools/) | push generated config and the shared manifest into every branch |
 | [`tools/census.sh`](tools/census.sh) | the numbers in this README, with the definition it used for each |
 | [`tools/mail-reader.py`](tools/mail-reader.py) | read and search Mail.app from the command line, find a message over IMAP by sender, subject or date, and archive it as a raw `.eml`. Mail.app and IMAP number their messages differently, so `find` returns the IMAP UID that `archive` needs; passing a `list` id to `archive` was reported as a bug twice. Tested against a fake server, never real mail |
-| [`tools/archive-sent.sh`](tools/archive-sent.sh) | files a sent draft into the record with a date prefix, skips rather than overwrites, and removes the drafts folder |
+| [`tools/archive-sent.sh`](tools/archive-sent.sh) | files a sent draft into the record with a date prefix and removes the drafts folder. Never overwrites, keeps the folder if an archived copy differs, and refuses a folder with subfolders rather than delete them unarchived |
 | [`tools/letter_pdf.py`](tools/letter_pdf.py) | a DIN 5008 letter as a PDF, written by hand with no dependencies. The sender block lives in a config file outside the repository, and it refuses to run without one rather than fall back to a default sender |
 | [`tools/ocr_vision.swift`](tools/ocr_vision.swift) | OCR the pages of a PDF with Apple's Vision framework, locally, macOS only |
+| [`tools/cal.swift`](tools/cal.swift) | list calendar events in a date range through EventKit, macOS only. AppleScript's date queries time out on large synced calendars; this returns in seconds and expands recurring events |
 | [`evals/`](evals/) | the task set, the runner, the comparison, and a coverage report |
 | [`evals/classifier/`](evals/classifier/) | a second, smaller set: can a model tell when it *cannot* decide where work belongs? |
 | [`evals/inspect_port/`](evals/inspect_port/) | the same tasks under [Inspect AI](https://inspect.aisi.org.uk/), with a written opinion |
 | [`templates/`](templates/) | skeletons for a new branch |
 | [`docs/`](docs/) | the conventions, and why each one exists |
-| `test_*.py` | beside the code they cover — the gate's retry path, the mail tool, the letter generator. No network and no real mail: fakes and mocks throughout. Each was mutation-tested once, by breaking the thing it guards and checking it failed |
+| `test_*.py` | beside the code they cover — the gate's retry path, the mail tool, the letter generator, the archive script. No network and no real mail: fakes and mocks throughout. Each was mutation-tested once, by breaking the thing it guards and checking it failed |
 
 Configuration — which branches exist, which are local-first, which model each profile implies — lives in `~/.config/kontor/`, outside every repository. The scripts are generic; the lists they act on are yours.
 
