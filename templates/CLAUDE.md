@@ -7,12 +7,14 @@ This repository is one branch in the kontor system: <one sentence — what this 
 - `$KONTOR_ROOT/kontor/docs/architecture.md` — the two rules, and the one sanctioned exception to the first
 - `$KONTOR_ROOT/kontor/docs/pouch.md` — the cross-branch message protocol
 - `$KONTOR_ROOT/kontor/docs/conventions.md` — shared style, and what other branches independently arrived at
+- `$KONTOR_ROOT/kontor/docs/outbox.md` — the desk: where drafts to people outside the system, and preparation for appointments, go
 
 This file only adds what is specific to *this* branch.
 
 ## If you read nothing else
 
 - **No session writes into another branch's repository.** To reach one, put a file in its `inbox/`.
+- **Drafts and appointment prep go on the desk**, not into this repository. Read `$KONTOR_ROOT/kontor/docs/outbox.md` before placing anything there.
 - **This branch is <local-first / not local-first>.** <One line on what that means for the default model — see `$KONTOR_ROOT/kontor/docs/fallback.md` if unsure what the distinction does.>
 - <Three to five rules specific to this branch — the ones that would cause irreversible damage if skipped. This is the part a generic template cannot write for you.>
 
